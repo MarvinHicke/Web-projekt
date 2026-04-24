@@ -1,7 +1,7 @@
 <?php
 $pageTitle = 'Home · Art Gallery';
 
-require_once __DIR__ . '/includes/mock-data.php';
+require_once __DIR__ . '/includes/mock-data.php'; /* later should be edited by A with the real data*/
 require_once __DIR__ . '/includes/boxes/top-works-box.php';
 require_once __DIR__ . '/includes/boxes/most-reviewed-artists-box.php';
 require_once __DIR__ . '/includes/boxes/most-recent-reviews-box.php';
