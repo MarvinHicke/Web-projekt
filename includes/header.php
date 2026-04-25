@@ -16,10 +16,10 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
     <!-- Bootstrap -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
 
-    <!-- Theme / 기존 스타일 -->
+    <!-- Theme -->
     <link rel="stylesheet" href="assets/css/theme.css">
 
-    <!-- 너가 추가할 components -->
+    <!-- Components -->
     <link rel="stylesheet" href="assets/css/components.css">
 </head>
 
