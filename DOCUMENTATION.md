@@ -23,3 +23,29 @@
 - maximal 5 kommentierte Screenshots (visueller Überblick)
 - Beschreibung der Arbeitsaufteilung unter den Teammitgliedern
 - Reflexion (Erfahrungen, aufgetretene Probleme etc.)
+
+
+UI Components
+
+page-header.php
+- $title (required)
+- $subtitle (optional)
+
+artist-card.php
+- $artist (artist object)
+
+artwork-card.php
+- $artwork (artwork object)
+
+button.php
+- $buttonText
+- $buttonHref
+- $buttonVariant (optional)
+
+alert-box.php
+- $alertMessage
+- $alertType (optional)
+
+sort-bar.php
+- $sortOptions
+- $currentSort (optional)
