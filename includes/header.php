@@ -11,6 +11,8 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle); ?></title>
     <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css"> /* Verlinkt bootstrap */
+    <link rel="stylesheet" href="assets/css/theme.css"> /* Verlinkt bootswatch (Design) */
 </head>
 <body>
 <header class="site-header">
