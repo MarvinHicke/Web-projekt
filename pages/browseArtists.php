@@ -14,10 +14,28 @@
     Diese lassen sich nach Name und Vorname sortieren (aufsteigend oder absteigend).
 </p>
 
-<table class="table">
+<!-- List Container -->
+<?php include 'C:\xampp\htdocs\Web-projekt\components\list-container-start.php';?>
+
+<!-- Artist card -->
+<?php include 'C:\xampp\htdocs\Web-projekt\components\artist-card.php';?>
+
+<!-- wie einbauen??? -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="col">
+        <div class="card">
+            <div class="card-body"></div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Components in Models einpflegen und nutzbar machen -->
+
+
     <thead>
     <tr>
-        <th>Name</th>
         <th>Vorname</th>
         <th>Bild</th>
         <th>Link</th>
