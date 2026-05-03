@@ -5,21 +5,23 @@ require_once "./../model/artist.php";
 
 
 class artistRepository {
-    private $pdo;
+    private $db;
 
-    public function __construct($pdo)
+    public function __construct($db)
     {
-        $this->pdo = $pdo;
+        $this->db = $db;
     }
 
-    public function findAll()
+    public function findAll($sortOrder = 'ASC')
     {
-        $sql = "SELECT * FROM artists";
+        $sortOrder = (strtoupper($sortOrder) === 'DESC') ? 'DESC' : 'ASC';
 
-        $stmt = $this->pdo->prepare($sql);
+        $sql = "SELECT * FROM artists ORDER BY FirstName " . $sortOrder;
+
+        $stmt = $this->db->preparedStatement($sql);
         $stmt->execute();
 
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $artists = [];
 
         foreach ($rows as $row)
@@ -29,6 +31,17 @@ class artistRepository {
 
         return $artists;
     }
+
+    public function getById($id)
+    {
+        $sql = "SELECT * FROM artists WHERE ArtistID = :id";
+
+        $stmt = $this->db->preparedStatement($sql);
+
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? new Artist($row) : null;
+    }
 }
 
-?>
