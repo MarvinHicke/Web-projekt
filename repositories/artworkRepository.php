@@ -2,23 +2,25 @@
 
 require_once "./../model/artwork.php";
 
+class artworkRepository{
 
-class artworkRepository {
-    private $pdo;
+    private $db;
 
-    public function __construct($pdo)
+    public function __construct($db)
     {
-        $this->pdo = $pdo;
+        $this->db = $db;
     }
 
-    public function findAll()
+    public function findAll($sortOrder = 'ASC')
     {
-        $sql = "SELECT * FROM artworks";
+        $sortOrder = (strtoupper($sortOrder) === 'DESC') ? 'DESC' : 'ASC';
 
-        $stmt = $this->pdo->prepare($sql);
+        $sql = "SELECT * FROM artworks ORDER BY Title " . $sortOrder;
+
+        $stmt = $this->db->preparedStatement($sql);
         $stmt->execute();
 
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $artworks = [];
 
         foreach ($rows as $row)
@@ -28,6 +30,15 @@ class artworkRepository {
 
         return $artworks;
     }
-}
 
-?>
+    public function getById($id)
+    {
+        $sql = "SELECT * FROM artworks WHERE ArtWorkID = :id";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? new artwork($row) : null;
+    }
+}
