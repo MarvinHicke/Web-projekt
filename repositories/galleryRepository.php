@@ -4,18 +4,18 @@ require_once "./../model/gallery.php";
 
 class galleryRepository
 {
-    private $pdo;
+    private $db;
 
-    public function __construct($pdo)
+    public function __construct($db)
     {
-        $this->pdo = $pdo;
+        $this->db = $db;
     }
 
     public function findAll()
     {
         $sql = "SELECT * FROM galleries";
 
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->db->preparedstatement($sql);
         $stmt->execute();
 
         $rows = $stmt->fetchAll();
