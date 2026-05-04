@@ -4,18 +4,18 @@ require_once "./../model/genre.php";
 
 
 class genreRepository {
-    private $pdo;
+    private $db;
 
-    public function __construct($pdo)
+    public function __construct($db)
     {
-        $this->pdo = $pdo;
+        $this->db = $db;
     }
 
     public function findAll()
     {
         $sql = "SELECT * FROM genres";
 
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = $this->db->preparedstatement($sql);
         $stmt->execute();
 
         $rows = $stmt->fetchAll();
