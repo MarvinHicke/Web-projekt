@@ -11,28 +11,28 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle); ?></title>
 
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <!-- Verlinkt Bootstrap -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <!-- Verlinkt Bootswatch / Design -->
     <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
 
 <header class="site-header">
 
-    <a class="logo" href="index.php">Art Gallery</a>
+    <div class="header-top">
+        <a class="logo" href="index.php">Art Gallery</a>
 
-    <!-- Utility-Menü -->
-    <nav class="utility-nav" aria-label="Hilfsnavigation">
-        <ul>
-            <li><a href="favorites.php">Favoriten anzeigen</a></li>
-            <li><a href="account.php">Mein Konto</a></li>
-            <li><a href="manage-users.php">Benutzer verwalten</a></li>
-            <li><a href="register.php">Registrieren</a></li>
-            <li><a href="login.php">Anmelden</a></li>
-        </ul>
-    </nav>
+        <!-- Utility-Menü -->
+        <nav class="utility-nav" aria-label="Hilfsnavigation">
+            <ul>
+                <li><a href="favorites.php">Favoriten anzeigen</a></li>
+                <li><a href="account.php">Mein Konto</a></li>
+                <li><a href="manage-users.php">Benutzer verwalten</a></li>
+                <li><a href="register.php">Registrieren</a></li>
+                <li><a href="login.php">Anmelden</a></li>
+            </ul>
+        </nav>
+    </div>
 
     <!-- Primäre Navigation -->
     <nav class="main-nav" aria-label="Hauptnavigation">

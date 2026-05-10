@@ -293,3 +293,88 @@ small {
         height: 220px;
     }
 }
+/* Navigation: Primäre Navigation, Utility-Menü und Dropdown */
+
+.site-header {
+    flex-wrap: wrap;
+}
+
+.header-top {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.utility-nav ul,
+.main-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+}
+
+.utility-nav {
+    font-size: 0.9rem;
+}
+
+.main-nav {
+    display: flex;
+    gap: 16px;
+}
+
+.main-nav a,
+.utility-nav a {
+    color: #6f3d20;
+    text-decoration: none;
+}
+
+.main-nav a:hover,
+.utility-nav a:hover {
+    text-decoration: underline;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    flex-direction: column;
+    gap: 0;
+    min-width: 170px;
+    padding: 8px 0;
+    background: #fffaf2;
+    border: 1px solid #e3d8c8;
+    border-radius: 10px;
+    z-index: 1000;
+}
+
+.dropdown-menu li a {
+    display: block;
+    padding: 8px 14px;
+    white-space: nowrap;
+}
+
+.dropdown:hover .dropdown-menu, .dropdown:focus-within .dropdown-menu {
+    display: flex;
+}
+
+@media (max-width: 800px) {
+    .header-top,
+    .utility-nav ul,
+    .main-nav ul {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .dropdown-menu {
+        position: static;
+        margin-top: 8px;
+    }
+}
