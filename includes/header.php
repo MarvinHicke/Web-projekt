@@ -12,7 +12,8 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
     <title><?= e($pageTitle); ?></title>
 
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/theme_bootswatch.css">
+    <link rel="stylesheet" href="assets/css/components.css">
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
