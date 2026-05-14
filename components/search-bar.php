@@ -4,12 +4,12 @@
         type="search"
         name="q"
         class="form-control"
-        placeholder="Search artworks or artists"
+        placeholder="Kunstwerke oder Künstler suchen"
         value="<?= htmlspecialchars($currentSearch ?? '') ?>"
     >
 
     <button type="submit" class="btn btn-primary">
-        Suchen
+        Anwenden
     </button>
 
 </form>
