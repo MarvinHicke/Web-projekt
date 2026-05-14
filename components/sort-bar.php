@@ -1,6 +1,6 @@
 <form method="get" class="sort-bar d-flex gap-2 align-items-center mb-4">
 
-    <label for="sort" class="form-label mb-0">Sort by</label>
+    <label for="sort" class="form-label mb-0">Sortieren nach</label>
 
     <select id="sort" name="sort" class="form-select w-auto">
         <?php foreach (($sortOptions ?? []) as $value => $label): ?>
@@ -14,7 +14,7 @@
     </select>
 
     <button type="submit" class="btn btn-outline-primary">
-        Apply
+        Anwenden
     </button>
 
 </form>
