@@ -15,6 +15,7 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
     <link rel="stylesheet" href="assets/css/theme_bootswatch.css">
     <link rel="stylesheet" href="assets/css/components.css">
     <link rel="stylesheet" href="assets/css/styles.css">
+    
 </head>
 <body>
 
@@ -42,14 +43,15 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
             <li><a href="about.php">Über uns</a></li>
             <li><a href="advanced-search.php">Erweiterte Suche</a></li>
 
-            <li class="dropdown">
-                <a href="browse-artworks.php">Durchsuchen</a>
-                <ul class="dropdown-menu">
-                    <li><a href="browse-artworks.php">Kunstwerke</a></li>
-                    <li><a href="browse-artists.php">Künstler</a></li>
-                    <li><a href="browse-genre.php">Genre</a></li>
-                </ul>
-            </li>
+            <li class="nav-dropdown">
+                <a class="dropdown-toggle" href="browse-artworks.php">
+                    Durchsuchen</a>
+            <ul class="nav-dropdown-menu">
+                <li><a href="browse-artworks.php">Kunstwerke</a></li>
+                <li><a href="browse-artists.php">Künstler</a></li>
+                <li><a href="browse-genre.php">Genres</a></li>
+            </ul>
+        </li>
         </ul>
     </nav>
 

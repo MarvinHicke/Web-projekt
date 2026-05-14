@@ -358,11 +358,11 @@ small {
     text-decoration: underline;
 }
 
-.dropdown {
+.nav-dropdown {
     position: relative;
 }
 
-.dropdown-menu {
+.nav-dropdown-menu {
     display: none;
     position: absolute;
     top: 100%;
@@ -377,25 +377,25 @@ small {
     z-index: 1000;
 }
 
-.dropdown-menu li a {
+.nav-dropdown-menu li a {
     display: block;
     padding: 8px 14px;
     white-space: nowrap;
 }
 
-.dropdown:hover .dropdown-menu, .dropdown:focus-within .dropdown-menu {
+.nav-dropdown:hover .nav-dropdown-menu, .nav-dropdown:focus-within .nav-dropdown-menu {
     display: flex;
 }
 
 @media (max-width: 800px) {
     .header-top,
     .utility-nav ul,
-    .main-nav ul {
+    .main-nav > ul {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .dropdown-menu {
+    .nav-dropdown-menu {
         position: static;
         margin-top: 8px;
     }
