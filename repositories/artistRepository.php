@@ -1,8 +1,6 @@
 <?php
 
-
-require_once "./../model/artist.php";
-
+require_once __DIR__ . "/../model/artist.php";
 
 class artistRepository {
     private $db;

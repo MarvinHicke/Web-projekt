@@ -1,6 +1,6 @@
 <?php
 
-require_once "./../model/artwork.php";
+require_once __DIR__ . "/../model/artwork.php";
 
 class artworkRepository{
 

@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../includes/dbaccess.php';
-require_once __DIR__ . '/../repositories/artistRepository.php';
+require_once __DIR__ . '/../../includes/dbaccess.php';
+require_once __DIR__ . '/../../repositories/artistRepository.php';
 
 $db = new dbaccess();
 $db->connect();
