@@ -14,4 +14,4 @@ foreach ($latest as $review)
     echo "Rating: " . $review->rating . " - Kommentar: " . $review->comment;
 }
 
-
+$db->close();
