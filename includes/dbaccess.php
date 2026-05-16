@@ -1,6 +1,7 @@
 <?php
 
-require_once "./../config/dbconfig.php";
+require_once __DIR__ . '/../config/dbconfig.php';
+
 class dbaccess
 {
     private $dsn = 'mysql:host=' . DBHOST . ';dbname=' . DBNAME;
@@ -50,6 +51,4 @@ class dbaccess
         return $this->pdo != null;
     }
 }
-
-?>
 

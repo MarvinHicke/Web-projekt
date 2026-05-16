@@ -1,7 +1,6 @@
 <?php
 
-require_once "./../model/genre.php";
-
+require_once __DIR__ . '/../model/genre.php';
 
 class genreRepository {
     private $db;

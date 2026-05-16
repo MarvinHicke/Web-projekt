@@ -1,6 +1,6 @@
 <?php
 
-require_once "./../model/gallery.php";
+require_once __DIR__ . "/../model/gallery.php";
 
 class galleryRepository
 {

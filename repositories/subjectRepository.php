@@ -1,6 +1,6 @@
 <?php
 
-require_once "./../model/subject.php";
+require_once __DIR__ . "/../model/subject.php";
 
 
 class subjectRepository {
