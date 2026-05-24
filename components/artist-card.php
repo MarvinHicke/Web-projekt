@@ -9,12 +9,12 @@
             </h2>
 
             <p class="card-text text-muted">
-                Artist ID: <?= htmlspecialchars($artist->getArtistid()) ?>
+                Artist ID: <?= htmlspecialchars($artist->getId()) ?>
             </p>
 
             <?php
             $buttonText = 'View Artist';
-            $buttonHref = 'single-artist.php?id=' . urlencode($artist->getArtistid());
+            $buttonHref = base_url('pages/single-artist.php') . '?id=' . urlencode((string) $artist->getId());
             $buttonVariant = 'primary';
             include __DIR__ . '/button.php';
             ?>

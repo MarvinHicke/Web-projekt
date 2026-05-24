@@ -1,7 +1,7 @@
 <?php
 
 
-require_once "./../model/artist.php";
+require_once __DIR__ . "/../model/artist.php";
 
 
 class artistRepository {
@@ -19,7 +19,7 @@ class artistRepository {
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
 
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $artists = [];
 
         foreach ($rows as $row)
@@ -30,5 +30,3 @@ class artistRepository {
         return $artists;
     }
 }
-
-?>
