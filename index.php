@@ -5,6 +5,7 @@ error_reporting(E_ALL);
 
 $pageTitle = 'Startseite · Art Gallery';
 
+require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/mock-data.php'; /* später durch echte Daten von A ersetzen */
 require_once __DIR__ . '/includes/boxes/top-works-box.php';
 require_once __DIR__ . '/includes/boxes/most-reviewed-artists-box.php';
@@ -17,7 +18,7 @@ require_once __DIR__ . '/includes/header.php';
         <p class="eyebrow">Willkommen bei</p>
         <h1>Art Gallery</h1>
         <p>Entdecken Sie Kunstwerke, Künstler, Rezensionen und Galerien.</p>
-        <a class="button-link" href="browse-artworks.php">Kunstwerke durchsuchen</a>
+        <a class="button-link" href="<? base_url('pages/browse-artworks.php') ?>">Kunstwerke durchsuchen</a>
     </div>
 </section>
 

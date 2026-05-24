@@ -2,7 +2,7 @@
     <div class="card h-100 shadow-sm ui-card">
 
         <img
-            src="../images/works/square-small/<?= htmlspecialchars($artwork->getImagefilename()) ?>.jpg"
+            src="/../images/works/square-small/<?= htmlspecialchars($artwork->getImagefilename()) ?>.jpg"
             class="card-img-top artwork-card-img"
             alt="<?= htmlspecialchars($artwork->getTitle()) ?>"
         >
