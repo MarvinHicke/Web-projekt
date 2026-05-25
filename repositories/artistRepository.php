@@ -2,7 +2,8 @@
 
 require_once __DIR__ . "/../model/artist.php";
 
-class artistRepository {
+class artistRepository
+{
     private $db;
 
     public function __construct($db)
@@ -14,7 +15,7 @@ class artistRepository {
     {
         $sortOrder = (strtoupper($sortOrder) === 'DESC') ? 'DESC' : 'ASC';
 
-        $sql = "SELECT * FROM artists ORDER BY FirstName " . $sortOrder;
+        $sql = "SELECT * FROM artists ORDER BY LastName " . $sortOrder . ", FirstName " . $sortOrder;
 
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute();
@@ -64,5 +65,28 @@ class artistRepository {
         }
         return $artists;
     }
+
+    public function getAllSorted($direction = 'ASC')
+    {
+        $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
+
+        $sql = "SELECT * FROM artists ORDER BY LastName " . $dir . ", FirstName " . $dir;
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function searchByLastName($keyword)
+    {
+        $searchString = $keyword . '%';
+
+        $sql = "SELECT * FROM artists WHERE LastName LIKE :keyword ORDER BY LastName ASC";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute(['keyword' => $searchString]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }
 

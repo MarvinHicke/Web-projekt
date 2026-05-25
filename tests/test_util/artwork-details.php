@@ -9,7 +9,8 @@ require_once __DIR__ . '/../../repositories/artworkRepository.php';
 $db = new dbaccess();
 $db->connect();
 
-if (!isset($db)) {
+if (!isset($db))
+{
     die("Fehler: Datenbankverbindung konnte nicht geladen werden.");
 }
 
@@ -20,7 +21,8 @@ $id = isset($_GET['id']) ? $_GET['id'] : 1;
 
 $artwork = $artworkRepo->getById($id);
 
-if ($artwork === null) {
+if ($artwork === null)
+{
     die("<h1>Fehler</h1><p>Artwork mit ID $id nicht gefunden.</p>");
 }
 

@@ -33,12 +33,38 @@ echo "<h2>Methode: getMostReviewedArtists(3)</h2>";
 
 $topArtists = $artistRepo->getMostReviewedArtists(3);
 
-if (!empty($topArtists)) {
-    foreach ($topArtists as $artist) {
+if (!empty($topArtists))
+{
+    foreach ($topArtists as $artist)
+    {
         echo "Künstler: " . $artist['FirstName'] . " " . $artist['LastName'] . " ". "-  Reviews: " . $artist['ReviewCount'] . "<br>";
     }
-} else {
+} else
+{
     echo "Ergebnis: Keine Künstler oder Reviews gefunden.";
+}
+
+echo "<h2>Methode: getAllSorted - Mit Limiter</h2>";
+
+$sortArtist = $artistRepo->getAllSorted('ASC');
+
+if (!empty($sortArtist))
+{
+    $i = 0;
+    foreach ($sortArtist as $sort)
+    {
+        if ($i >= 5)
+        {
+            break;
+        }
+
+        echo $sort['FirstName'] . " " . $sort['LastName'] . "<br>";
+        $i++;
+    }
+}
+else
+{
+    echo "Ergebnis: Keine Kunstwerke gefunden.<br>";
 }
 
 $db->close();

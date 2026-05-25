@@ -12,7 +12,7 @@ class reviewRepository
 
     public function getForArtwork($artworkId)
     {
-        $sql = "SELECT * FROM ArtworkReviews WHERE ArtWorkId = :id ORDER BY ReviewDate DESC";
+        $sql = "SELECT * FROM reviews WHERE ArtWorkId = :id ORDER BY ReviewDate DESC";
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute(['id' => $artworkId]);
 

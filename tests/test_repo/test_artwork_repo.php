@@ -47,4 +47,28 @@ else
     echo "Ergebnis: Keine Kunstwerke oder Reviews gefunden.";
 }
 
+echo "<h2>Methode: getAllSorted - Mit Limiter</h2>";
+
+$sortArtwork = $artworkRepo->getAllSorted('title', 'ASC');
+
+if (!empty($sortArtwork))
+{
+    $i = 0;
+    foreach ($sortArtwork as $sort)
+    {
+        if ($i >= 5)
+        {
+            break;
+        }
+
+        echo $sort['FirstName'] . " " . $sort['LastName'] . " - " . $sort['Title'] . "<br>";
+        $i++;
+    }
+}
+else
+{
+    echo "Ergebnis: Keine Kunstwerke gefunden.<br>";
+}
+
+
 $db->close();

@@ -21,11 +21,24 @@ class galleryRepository
         $rows = $stmt->fetchAll();
         $galleries= [];
 
-        foreach ($rows as $row) {
+        foreach ($rows as $row)
+        {
             $galleries[] = new gallery($row);
         }
 
         return $galleries;
     }
+
+    public function getById($id)
+    {
+        $sql = "SELECT * FROM galleries WHERE GalleryID = :id";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? new gallery($row) : null;
+    }
+
 }
 
