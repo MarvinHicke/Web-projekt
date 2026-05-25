@@ -41,4 +41,27 @@ class artworkRepository{
 
         return $row ? new artwork($row) : null;
     }
+
+    public function getTopArtworks($limit = 3)
+    {
+        $sql = "SELECT a.*, 
+                   (SELECT IF(COUNT(r.ReviewId) >= 3, AVG(r.Rating), NULL) 
+                    FROM reviews r 
+                    WHERE r.ArtWorkId = a.ArtWorkID) as AvgRating
+            FROM artworks a
+            ORDER BY AvgRating DESC
+            LIMIT :limit";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $artworks = [];
+        while ($row = $stmt->fetch())
+        {
+            $artworks[] = $row;
+        }
+        return $artworks;
+    }
 }
+

@@ -12,7 +12,7 @@ class reviewRepository
 
     public function getForArtwork($artworkId)
     {
-        $sql = "SELECT * FROM ArtworkReviews WHERE ArtworkId = :id ORDER BY ReviewDate DESC";
+        $sql = "SELECT * FROM ArtworkReviews WHERE ArtWorkId = :id ORDER BY ReviewDate DESC";
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute(['id' => $artworkId]);
 
@@ -38,5 +38,22 @@ class reviewRepository
         }
         return $reviews;
     }
+
+    public function getAverageRatingArtwork($artworkId)
+    {
+        $sql = "SELECT AVG(Rating) as AvgRating, COUNT(ReviewId) as TotalReviews 
+                FROM reviews 
+                WHERE ArtWorkId = :id";
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute(['id' => $artworkId]);
+
+        return $stmt->fetch();
+    }
+
+
 }
+
+
+
+
 

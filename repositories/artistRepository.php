@@ -41,5 +41,28 @@ class artistRepository {
 
         return $row ? new Artist($row) : null;
     }
+
+    public function getMostReviewedArtists($limit = 3)
+    {
+        $sql =
+            "SELECT a.*, 
+               (SELECT COUNT(r.ReviewId) 
+                FROM reviews r, artworks aw 
+                WHERE r.ArtWorkId = aw.ArtWorkID AND aw.ArtistID = a.ArtistID) as ReviewCount
+            FROM artists a
+            ORDER BY ReviewCount DESC
+            LIMIT :limit";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $artists = [];
+        while ($row = $stmt->fetch())
+        {
+            $artists[] = $row;
+        }
+        return $artists;
+    }
 }
 

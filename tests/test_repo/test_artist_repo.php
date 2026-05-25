@@ -29,4 +29,18 @@ else
     echo "Ergebnis: Nicht gefunden";
 }
 
+echo "<h2>Methode: getMostReviewedArtists(3)</h2>";
+
+$topArtists = $artistRepo->getMostReviewedArtists(3);
+
+if (!empty($topArtists)) {
+    foreach ($topArtists as $artist) {
+        echo "Künstler: " . $artist['FirstName'] . " " . $artist['LastName'] . " ". "-  Reviews: " . $artist['ReviewCount'] . "<br>";
+    }
+} else {
+    echo "Ergebnis: Keine Künstler oder Reviews gefunden.";
+}
+
 $db->close();
+
+

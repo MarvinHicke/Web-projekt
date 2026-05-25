@@ -3,8 +3,8 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once __DIR__ . '/../includes/dbaccess.php';
-require_once __DIR__ . '/../repositories/artistRepository.php';
+require_once __DIR__ . '/../../includes/dbaccess.php';
+require_once __DIR__ . '/../../repositories/artistRepository.php';
 
 $db = new dbaccess();
 $db->connect();
@@ -41,7 +41,7 @@ $db->close();
     <li><strong>ID:</strong> <?php echo $id; ?></li>
 </ul>
 
-<p><a href="index.php">Zurück zur Liste</a></p>
+<p><a href="/web-projekt/index.php">Zurück zur Startseite</a></p>
 </body>
 </html>
 

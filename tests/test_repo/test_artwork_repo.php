@@ -31,4 +31,20 @@ else
     echo "Ergebnis: Nicht gefunden";
 }
 
+echo "<h2>Methode: getTopArtworks(3)</h2>";
+
+$topWorks = $artworkRepo->getTopArtworks(3);
+
+if (!empty($topWorks))
+{
+    foreach ($topWorks as $work)
+    {
+        echo "Kunstwerk: " . $work['Title'] . " - Reviews: " . $work['AvgRating'] . "<br>";
+    }
+}
+else
+{
+    echo "Ergebnis: Keine Kunstwerke oder Reviews gefunden.";
+}
+
 $db->close();
