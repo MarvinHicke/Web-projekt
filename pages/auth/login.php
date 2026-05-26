@@ -23,6 +23,12 @@ if($_SERVER["REQUEST_METHOD"] === "POST")
     }
     if(empty($errors))
     {
+        /* Später:
+        * 1. User anhand der E-Mail aus der Datenbank laden.
+        * 2. Gespeicherten Passwort-Hash des Users holen.
+        * 3. Eingegebenes Passwort mit password_verify() prüfen.
+        * 4. Bei Erfolg User-ID und Rolle in der Session speichern.
+        */
         $successMessage="Die Eingaben sind gültig. Die echte Anmeldung folgt später.";
     }
 }

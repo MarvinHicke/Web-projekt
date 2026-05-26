@@ -5,6 +5,9 @@ $successMessage="";
 $firstName="";
 $lastName="";
 $email="";
+$nameMaxLength=50;
+$emailMaxLength=100;
+$passwordMinLength=8;
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $firstName=trim((string) ($_POST["firstName"] ?? ""));
     $lastName=trim((string) ($_POST["lastName"] ?? ""));
@@ -16,9 +19,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     {
         $errors[]="Bitte geben sie Ihren Vornamen ein";
     }
+    if(strlen($firstName)>$nameMaxLength)
+    {
+        $errors[]="Der Vornamen darf maximal " . $nameMaxLength . " Zeichen lang sein";
+    }
     if($lastName==="")
     {
         $errors[]="Bitte geben sie Ihren Nachnamen ein";
+    }
+    if(strlen($lastName)>$nameMaxLength)
+    {
+        $errors[]="Der Nachname darf maximal " . $nameMaxLength . " Zeichen lang sein";
     }
     if($email==="")
     {
@@ -28,13 +39,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     {
         $errors[]="Bitte geben sie eine gültige E-Mail ein";
     }
+    if(strlen($email)>$emailMaxLength)
+    {
+        $errors[]="Die E-Mail darf maximal " . $emailMaxLength . " Zeichen lang sein";
+    }
     if($password==="")
     {
         $errors[]="Bitte geben sie ein Passwort ein";
     }
-    elseif(strlen($password)<8)
+    elseif(strlen($password)<$passwordMinLength)
     {
-        $errors[]="Das Passwort muss mindestens 8 Zeichen lang sein";
+        $errors[]="Das Passwort muss mindestens " . $passwordMinLength . " Zeichen lang sein";
     }
     if($confirmPassword==="")
     {
@@ -46,7 +61,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
     if(empty($errors))
     {
-        $successMessage="Die Eingaben sind gültig. Speicherung in der DB erfolgt später.";
+        $passwordHash=password_hash($password,PASSWORD_DEFAULT);
+
+        $successMessage="Die Eingaben sind gültig. Das Paswort kann sicher gespeichert werden.";
     }
 }
 require_once __DIR__ . "/../../includes/header.php";
@@ -79,7 +96,7 @@ require_once __DIR__ . "/../../includes/header.php";
                 id="firstName"
                 name="firstName"
                 required
-                maxlength="50"
+                maxlength="<?= $nameMaxLength ?>"
                 value="<?= e($firstName) ?>"
         >
     </div>
@@ -91,7 +108,7 @@ require_once __DIR__ . "/../../includes/header.php";
                 id="lastName"
                 name="lastName"
                 required
-                maxlength="50"
+                maxlength="<?= $nameMaxLength ?>"
                 value="<?= e($lastName) ?>"
         >
     </div>
@@ -103,19 +120,31 @@ require_once __DIR__ . "/../../includes/header.php";
                id="email"
                name="email"
                required
-               maxlength="100"
+               maxlength="<?= $emailMaxLength ?>"
                value="<?= e($email) ?>"
         >
     </div>
 
     <div>
         <label for="password">Passwort</label>
-        <input type="password" id="password" name="password" required minlength="8">
+        <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                minlength="<?= $passwordMinLength ?>"
+        >
     </div>
 
     <div>
         <label for="confirmPassword">Passwort bestätigen</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8">
+        <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                required
+                minlength="<?= $passwordMinLength ?>"
+        >
     </div>
 
     <button type="submit">Registrieren</button>
