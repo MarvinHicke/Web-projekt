@@ -1,59 +1,81 @@
-<!DOCTYPE html>
-<html lang="de-de">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<?php
+require_once __DIR__ . '/../includes/bootstrap.php';
+$pageTitle = "Anmelden";
+$errors=[];
+$successMessage="";
+$email="";
 
+if($_SERVER["REQUEST_METHOD"] === "POST")
+{
+    $email=trim((string) ($_POST["email"] ?? ""));
+    $password= (string) ($_POST["password"] ?? "");
 
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    if($email==="")
+    {
+        $errors[]="Bitte geben sie Ihre E-Mail ein";
+    }
+    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL))
+    {
+        $errors[]="Bitte geben sie eine gültige E-Mail ein";
+    }
+    if($password==="")
+    {
+        $errors[]="Bitte geben sie ein Passwort ein";
+    }
+    if(empty($errors))
+    {
+        /* Später:
+        * 1. User anhand der E-Mail aus der Datenbank laden.
+        * 2. Gespeicherten Passwort-Hash des Users holen.
+        * 3. Eingegebenes Passwort mit password_verify() prüfen.
+        * 4. Bei Erfolg User-ID und Rolle in der Session speichern.
+        */
+        $successMessage="Die Eingaben sind gültig. Die echte Anmeldung folgt später.";
+    }
+}
+require_once __DIR__ . '/../includes/header.php';
+?>
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-    <!--Muss unbedingt noch gelöscht werden!-->
- 
-    
-    
+<h1>Anmelden</h1>
+<p>Melden Sie sich mit Ihrer E-Mail und Ihrem Passwort an</p>
 
+<?php foreach ($errors as $error): ?>
+    <?php
+    $alertType = "danger";
+    $alertMessage = $error;
+    include __DIR__ . "/../components/alert-box.php";
+    ?>
+<?php endforeach; ?>
 
-    <title>Anmeldung</title>
-</head>
-<body>
+<?php if ($successMessage !== ""): ?>
+    <?php
+    $alertType = "success";
+    $alertMessage = $successMessage;
+    include __DIR__ . "/../components/alert-box.php";
+    ?>
+<?php endif; ?>
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-4">
-
-                <h1>Anmeldung</h1>
-                <p>
-                    <form method="GET">
-                        <p>
-                            <div class="form-group">
-                                <label>Username:</label>
-                                <input type="text" name="username" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Passwort:</label>
-                                <input type="password" name="password" class="form-control" required>
-                            </div>
-                        </p>
-                        <button type="submit" class="btn btn-primary">Anmelden</button>
-                    </form>
-                </p>
-
-                <h4>Hinweis:</h4>
-                <p>
-                    Das dient lediglich als Test. 
-                </p>
-
-            </div>
-        </div>
+<form method="POST" novalidate>
+    <div>
+        <label for="email">E-Mail</label>
+        <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                maxlength="100"
+                value="<?= e($email) ?>"
+        >
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
-    <!--Muss unbedingt noch gelöscht werden!-->
+    <div>
+        <label for="password">Passwort</label>
+        <input type="password" id="password" name="password" required minlength="8">
+    </div>
 
-</body>
-</html>
+    <button type="submit">Login</button>
+</form>
+
+<?php
+require_once __DIR__ . '/../includes/footer.php';
+?>
