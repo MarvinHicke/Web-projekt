@@ -1,7 +1,7 @@
 </main>
 
 <footer class="site-footer">
-    <p>Web Technologie Projekt</p>
+    <p>Art Gallery. Alle Rechte verbehalten.</p>
 </footer>
 
 </body>

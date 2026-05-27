@@ -1,0 +1,47 @@
+/* ===== Fonts ===== */
+
+@font-face
+{
+    font-family: 'Italic';
+    src: url('../fonts/GoogleSans-Italic-VariableFont_GRAD,opsz,wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* ===== Components ===== */
+
+body
+{
+    font-family: 'Italic', sans-serif;
+}
+.page-header {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.page-title {
+    margin-bottom: 0.25rem;
+}
+
+.page-subtitle {
+    color: #6c757d;
+}
+
+.ui-card {
+    transition: transform 0.15s ease-in-out;
+}
+
+.ui-card:hover {
+    transform: translateY(-3px);
+}
+
+.artwork-card-img {
+    height: 240px;
+    object-fit: cover;
+}
+
+.sort-bar {
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+}
