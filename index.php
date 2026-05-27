@@ -18,7 +18,7 @@ require_once __DIR__ . '/includes/header.php';
         <p class="eyebrow">Willkommen bei</p>
         <h1>Art Gallery</h1>
         <p>Entdecken Sie Kunstwerke, Künstler, Rezensionen und Galerien.</p>
-        <a class="button-link" href="<? base_url('pages/browse-artworks.php') ?>">Kunstwerke durchsuchen</a>
+        <a class="button-link" href="<?= base_url('pages/browse-artworks.php') ?>">Kunstwerke durchsuchen</a>
     </div>
 </section>
 
