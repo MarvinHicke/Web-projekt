@@ -363,7 +363,7 @@ small {
 }
 
 .dropdown-menu {
-    display: none;
+    display: none !important;
     position: absolute;
     top: 100%;
     left: 0;
@@ -384,7 +384,7 @@ small {
 }
 
 .dropdown:hover .dropdown-menu {
-    display: flex;
+    display: flex !important;
 }
 
 @media (max-width: 800px) {
