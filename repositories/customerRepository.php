@@ -125,6 +125,18 @@ class customerRepository
 
     public function updateState($id, $state)
     {
+        if ($state == 0)
+        {
+            $user = $this->GetById($id);
+            if ($user && $user['Type'] == 2)
+            {
+                if ($this->getActiveAdminCount() <= 1)
+                {
+                    return false;
+                }
+            }
+        }
+
         $sql = "UPDATE customerlogon SET State = :state WHERE CustomerID = :id";
         $stmt = $this->db->preparedStatement($sql);
         return $stmt->execute
@@ -137,6 +149,31 @@ class customerRepository
     public function elevateToAdmin($id)
     {
         $sql = "UPDATE customerlogon SET Type = 2 WHERE CustomerID = :id";
+        $stmt = $this->db->preparedStatement($sql);
+        return $stmt->execute(['id' => $id]);
+    }
+
+    public function getActiveAdminCount()
+    {
+        $sql = "SELECT COUNT(*) AS Count FROM customerlogon WHERE Type = 2 AND State = 1";
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute();
+        return $stmt->fetch()['Count'];
+    }
+
+    public function demoteAdmin($id)
+    {
+        if($this->getActiveAdminCount() <= 1)
+        {
+            $user = $this->GetById($id);
+            if($user && $user['Type'] == 2)
+            {
+                return false;
+            }
+        }
+
+
+        $sql = "UPDATE customerlogon SET Type = 1 WHERE CustomerID = :id";
         $stmt = $this->db->preparedStatement($sql);
         return $stmt->execute(['id' => $id]);
     }
