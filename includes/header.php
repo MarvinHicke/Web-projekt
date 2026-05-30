@@ -1,25 +1,8 @@
 <?php
 require_once __DIR__ . '/helpers.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 $pageTitle = $pageTitle ?? 'Art Gallery';
 $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
-
-$currentUserName = $_SESSION['username']
-    ?? $_SESSION['user']['username']
-    ?? $_SESSION['userName']
-    ?? null;
-
-$currentUserType = $_SESSION['user_type']
-    ?? $_SESSION['user']['type']
-    ?? $_SESSION['type']
-    ?? null;
-
-$isLoggedIn = !empty($currentUserName);
-$isAdmin = strtolower((string) $currentUserType) === 'admin';
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -45,31 +28,15 @@ $isAdmin = strtolower((string) $currentUserType) === 'admin';
         <a class="logo" href="<?= base_url('index.php') ?>">Art Gallery</a>
 
         <!-- Utility-Menü -->
-       <nav class="utility-nav" aria-label="Hilfsnavigation">
-    <ul>
-        <li><a href="favorites.php">Favoriten anzeigen</a></li>
-
-        <?php if ($isLoggedIn): ?>
-            <li class="user-status">
-                Angemeldet als:
-                <strong><?= e((string) $currentUserName); ?></strong>
-            </li>
-
-            <li><a href="account.php">Mein Konto</a></li>
-
-            <?php if ($isAdmin): ?>
-                <li><a href="manage-users.php">Benutzer verwalten</a></li>
-            <?php endif; ?>
-
-            <li><a href="logout.php">Abmelden</a></li>
-        <?php else: ?>
-            <li class="user-status">Nicht angemeldet</li>
-            <li><a href="register.php">Registrieren</a></li>
-            <li><a href="login.php">Anmelden</a></li>
-        <?php endif; ?>
-    </ul>
-</nav>
-</nav>
+        <nav class="utility-nav" aria-label="Hilfsnavigation">
+            <ul>
+                <li><a href="<?= base_url('pages/favorites.php') ?>">Favoriten anzeigen</a></li>
+                <li><a href="<?= base_url('pages/account.php') ?>">Mein Konto</a></li>
+                <li><a href="<?= base_url('pages/manage-users.php') ?>">Benutzer verwalten</a></li>
+                <li><a href="<?= base_url('pages/register.php') ?>">Registrieren</a></li>
+                <li><a href="<?= base_url('pages/login.php') ?>">Anmelden</a></li>
+            </ul>
+        </nav>
     </div>
 
     <!-- Primäre Navigation -->
