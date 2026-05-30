@@ -1,5 +1,5 @@
 <?php
-require_once 'includes/init.php';
+require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../model/Helper.php';
 $msg = $_GET['msg'] ?? "Ein unbekannter Fehler ist aufgetreten.";
 ?>
@@ -42,4 +42,3 @@ $msg = $_GET['msg'] ?? "Ein unbekannter Fehler ist aufgetreten.";
 
 </body>
 </html>
-

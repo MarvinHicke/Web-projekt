@@ -1,12 +1,12 @@
 <?php
 require_once __DIR__ . '/../includes/bootstrap.php';
-require_once 'includes/init.php';
+require_once __DIR__ . '/../includes/init.php';
 $pageTitle = "Anmelden";
 $errors=[];
 $successMessage="";
 $email="";
 
-if($_SERVER["REQUEST_METHOD"] === "POST")
+if(($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST")
 {
     $email=trim((string) ($_POST["email"] ?? ""));
     $password= (string) ($_POST["password"] ?? "");

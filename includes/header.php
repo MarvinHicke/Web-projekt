@@ -56,8 +56,7 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
             </li>
         </ul>
     </nav>
-
-    <form class="global-search" action="<?= base_url('pages/search-results.php')?>" method="get" role="search">
+   <form class="global-search" action="<?= base_url('pages/search-results.php')?>" method="get" role="search">
         <label class="sr-only" for="global-search-input">Kunstwerke oder Künstler suchen</label>
         <input
             id="global-search-input"
