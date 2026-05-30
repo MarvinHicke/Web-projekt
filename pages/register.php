@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../repositories/customerRepository.php';
 $pageTitle = "Registrieren";
 $errors=[];
 $successMessage="";
@@ -64,8 +65,39 @@ if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
     if(empty($errors))
     {
         $passwordHash=password_hash($password,PASSWORD_DEFAULT);
+        $customerRepository = new customerRepository(db());
 
-        $successMessage="Die Eingaben sind gültig. Das Paswort kann sicher gespeichert werden.";
+        if ($customerRepository->GetByUsername($email)) {
+            $errors[] = "Diese E-Mail ist bereits registriert.";
+        } else {
+            $created = $customerRepository->create(
+                [
+                    'FirstName' => $firstName,
+                    'LastName' => $lastName,
+                    'Email' => $email,
+                ],
+                [
+                    'UserName' => $email,
+                    'Pass' => $passwordHash,
+                ]
+            );
+
+            if ($created) {
+                $user = $customerRepository->GetByUsername($email);
+                $_SESSION['user'] = [
+                    'CustomerID' => (int)$user['CustomerID'],
+                    'UserName' => (string)$user['UserName'],
+                    'Type' => (int)$user['Type'],
+                    'FirstName' => (string)($user['FirstName'] ?? ''),
+                    'LastName' => (string)($user['LastName'] ?? ''),
+                ];
+
+                header('Location: ' . base_url('index.php'));
+                exit;
+            }
+
+            $errors[] = "Die Registrierung konnte nicht gespeichert werden.";
+        }
     }
 }
 require_once __DIR__ . "/../includes/header.php";

@@ -17,7 +17,7 @@ function isLoggedIn(): bool
  */
 function isAdmin(): bool
 {
-    return isset($_SESSION['user']) && ($_SESSION['user']['Type'] ?? '') === 'admin';
+    return isset($_SESSION['user']) && (int)($_SESSION['user']['Type'] ?? 0) === 2;
 }
 
 /**

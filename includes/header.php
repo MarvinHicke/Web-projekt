@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/bootstrap.php';
+require_once __DIR__ . '/init.php';
 
 $pageTitle = $pageTitle ?? 'Art Gallery';
 $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
@@ -31,10 +31,16 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
         <nav class="utility-nav" aria-label="Hilfsnavigation">
             <ul>
                 <li><a href="<?= base_url('pages/favorites.php') ?>">Favoriten anzeigen</a></li>
-                <li><a href="<?= base_url('pages/account.php') ?>">Mein Konto</a></li>
-                <li><a href="<?= base_url('pages/manage-users.php') ?>">Benutzer verwalten</a></li>
-                <li><a href="<?= base_url('pages/register.php') ?>">Registrieren</a></li>
-                <li><a href="<?= base_url('pages/login.php') ?>">Anmelden</a></li>
+                <?php if (isLoggedIn()): ?>
+                    <li><a href="<?= base_url('pages/account.php') ?>"><?= e(getCurrentUsername()) ?></a></li>
+                    <?php if (isAdmin()): ?>
+                        <li><a href="<?= base_url('pages/manage-users.php') ?>">Benutzer verwalten</a></li>
+                    <?php endif; ?>
+                    <li><a href="<?= base_url('pages/logout.php') ?>">Abmelden</a></li>
+                <?php else: ?>
+                    <li><a href="<?= base_url('pages/register.php') ?>">Registrieren</a></li>
+                    <li><a href="<?= base_url('pages/login.php') ?>">Anmelden</a></li>
+                <?php endif; ?>
             </ul>
         </nav>
     </div>

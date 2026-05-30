@@ -1,7 +1,13 @@
 <?php
 require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/init.php';
 
 $pageTitle = 'Benutzer verwalten';
+
+if (!isAdmin()) {
+    header('Location: ' . base_url('index.php'));
+    exit;
+}
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
