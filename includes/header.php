@@ -1,8 +1,25 @@
 <?php
 require_once __DIR__ . '/helpers.php';
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 $pageTitle = $pageTitle ?? 'Art Gallery';
 $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
+
+$currentUserName = $_SESSION['username']
+    ?? $_SESSION['user']['username']
+    ?? $_SESSION['userName']
+    ?? null;
+
+$currentUserType = $_SESSION['user_type']
+    ?? $_SESSION['user']['type']
+    ?? $_SESSION['type']
+    ?? null;
+
+$isLoggedIn = !empty($currentUserName);
+$isAdmin = strtolower((string) $currentUserType) === 'admin';
 ?>
 <!DOCTYPE html>
 <html lang="de">
