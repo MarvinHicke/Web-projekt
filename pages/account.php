@@ -1,5 +1,5 @@
 <?php
-require_once 'includes/init.php';
+require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . "/../includes/bootstrap.php";
 $pageTitle = "Mein Konto";
 require_once __DIR__ . "/../includes/header.php";
@@ -20,4 +20,3 @@ require_once __DIR__ . "/../includes/header.php";
 <?php
 require_once __DIR__ . "/../includes/footer.php";
 ?>
-

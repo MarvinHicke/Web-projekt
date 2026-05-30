@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/bootstrap.php';
-require_once 'includes/init.php';
+require_once __DIR__ . '/../includes/init.php';
 $pageTitle = "Registrieren";
 $errors=[];
 $successMessage="";
@@ -10,7 +10,7 @@ $email="";
 $nameMaxLength=50;
 $emailMaxLength=100;
 $passwordMinLength=8;
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
     $firstName=trim((string) ($_POST["firstName"] ?? ""));
     $lastName=trim((string) ($_POST["lastName"] ?? ""));
     $email=trim((string) ($_POST["email"] ?? ""));

@@ -1,5 +1,5 @@
 <?php
-require_once 'includes/init.php';
+require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_once __DIR__ . "/../repositories/artworkRepository.php";
 require_once __DIR__ . "/../repositories/artistRepository.php";
@@ -24,26 +24,28 @@ $favoriteArtworkIds = $_SESSION["favorites"]["artworks"];
 $favoriteArtistIds = $_SESSION["favorites"]["artists"];
 $favoriteArtworks = [];
 $favoriteArtists = [];
-$db = new dbaccess();
-$db->connect();
-$artworkRepository = new artworkRepository($db);
-$artistRepository = new artistRepository($db);
-foreach ($favoriteArtworkIds as $artworkId)
-{
-    $artwork= $artworkRepository->getById((int) $artworkId);
-
-    if($artwork!==null)
+if (!empty($favoriteArtworkIds) || !empty($favoriteArtistIds)) {
+    $db = new dbaccess();
+    $db->connect();
+    $artworkRepository = new artworkRepository($db);
+    $artistRepository = new artistRepository($db);
+    foreach ($favoriteArtworkIds as $artworkId)
     {
-        $favoriteArtworks[] = $artwork;
+        $artwork= $artworkRepository->getById((int) $artworkId);
+
+        if($artwork!==null)
+        {
+            $favoriteArtworks[] = $artwork;
+        }
     }
-}
-foreach ($favoriteArtistIds as $artistId)
-{
-    $artist= $artistRepository->getById((int) $artistId);
-
-    if($artist!==null)
+    foreach ($favoriteArtistIds as $artistId)
     {
-        $favoriteArtists[] = $artist;
+        $artist= $artistRepository->getById((int) $artistId);
+
+        if($artist!==null)
+        {
+            $favoriteArtists[] = $artist;
+        }
     }
 }
 $pageTitle = "Favoriten";
