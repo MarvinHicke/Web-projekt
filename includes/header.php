@@ -51,7 +51,7 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
                 <ul class="dropdown-menu">
                     <li><a href="<?= base_url('pages/browse-artworks.php')?>">Kunstwerke</a></li>
                     <li><a href="<?= base_url('pages/browse-artists.php')?>">Künstler</a></li>
-                    <li><a href="<?= base_url('pages/browse-museums.php')?>">Museen</a></li>
+                    <li><a href="<?= base_url('pages/browse-genre.php')?>">Genre</a></li>
                 </ul>
             </li>
         </ul>
