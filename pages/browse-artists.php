@@ -5,6 +5,7 @@ error_reporting(E_ALL);
 
 $pageTitle = 'Browse Artists';
 
+require_once 'includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/artistRepository.php';
 

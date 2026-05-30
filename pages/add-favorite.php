@@ -1,4 +1,7 @@
 <?php
+
+require_once 'includes/init.php';
+
 if(session_status() === PHP_SESSION_NONE)
 {
     session_start();
@@ -37,3 +40,4 @@ if (!in_array($id, $_SESSION["favorites"][$favoriteKey], true))
 
 header("Location: favorites.php");
 exit;
+?>

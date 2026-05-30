@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/bootstrap.php';
+require_once 'includes/init.php';
 $pageTitle = "Registrieren";
 $errors=[];
 $successMessage="";

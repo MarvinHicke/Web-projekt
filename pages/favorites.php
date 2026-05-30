@@ -1,4 +1,5 @@
 <?php
+require_once 'includes/init.php';
 require_once __DIR__ . "/../includes/bootstrap.php";
 require_once __DIR__ . "/../repositories/artworkRepository.php";
 require_once __DIR__ . "/../repositories/artistRepository.php";
