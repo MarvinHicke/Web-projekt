@@ -1,8 +1,7 @@
 <?php
-require_once 'includes/init.php';
+require_once __DIR__ . 'includes/init.php';
 
-session_start();
-$SESSION=[];
+$_SESSION=[];
 session_destroy();
 header("Location: login.php");
 exit;
