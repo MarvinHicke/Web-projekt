@@ -9,5 +9,5 @@ $variant = in_array($buttonVariant ?? 'primary', $allowedVariants, true)
     href="<?= htmlspecialchars($buttonHref ?? '#') ?>"
     class="btn btn-<?= htmlspecialchars($variant) ?>"
 >
-    <?= htmlspecialchars($buttonText ?? 'Open') ?>
+    <?= htmlspecialchars($buttonText ?? 'öffnen') ?>
 </a>

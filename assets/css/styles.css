@@ -358,7 +358,7 @@ small {
     text-decoration: underline;
 }
 
-.dropdown {
+.nav-dropdown {
     position: relative;
 }
 
@@ -377,7 +377,7 @@ small {
     z-index: 1000;
 }
 
-.dropdown-menu li a {
+.nav-dropdown-menu li a {
     display: block;
     padding: 8px 14px;
     white-space: nowrap;
@@ -390,12 +390,12 @@ small {
 @media (max-width: 800px) {
     .header-top,
     .utility-nav ul,
-    .main-nav ul {
+    .main-nav > ul {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .dropdown-menu {
+    .nav-dropdown-menu {
         position: static;
         margin-top: 8px;
     }

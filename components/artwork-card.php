@@ -18,7 +18,7 @@
             </p>
 
             <?php
-            $buttonText = 'View Artwork';
+            $buttonText = 'Ansehen';
             $buttonHref = 'single-artwork.php?id=' . urlencode($artwork->getArtworkid());
             $buttonVariant = 'primary';
             include __DIR__ . '/button.php';
