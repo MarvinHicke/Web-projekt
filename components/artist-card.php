@@ -13,8 +13,8 @@
             </p>
 
             <?php
-            $buttonText = 'View Artist';
-            $buttonHref = base_url('pages/single-artist.php') . '?id=' . urlencode((string) $artist->getId());
+            $buttonText = 'Ansehen';
+            $buttonHref = 'single-artist.php?id=' . urlencode($artist->getArtistid());
             $buttonVariant = 'primary';
             include __DIR__ . '/button.php';
             ?>

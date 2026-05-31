@@ -5,6 +5,7 @@ error_reporting(E_ALL);
 
 $pageTitle = 'Browse Artists';
 
+require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/artistRepository.php';
 
@@ -29,5 +30,4 @@ require_once __DIR__.'/../includes/header.php';
 </section>
 
 
-<?php require_once '../includes/footer.php'; ?>
-
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

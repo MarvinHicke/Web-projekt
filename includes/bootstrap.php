@@ -11,12 +11,12 @@ function base_url(string $path = ''): string
 
 function db()
 {
-    static $pdo = null;
+    static $db = null;
 
-    if ($pdo === null) {
+    if ($db === null) {
         $db = new dbaccess();
-        $pdo = $db->getPdo();
+        $db->connect();
     }
 
-    return $pdo;
+    return $db;
 }
