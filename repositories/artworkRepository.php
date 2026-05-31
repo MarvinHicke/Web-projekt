@@ -2,16 +2,30 @@
 
 require_once __DIR__ . "/../model/artwork.php";
 
+/**
+ * Repository für Datenbankabfragen rund um die Kunstwerke
+ */
 class artworkRepository
 {
 
     private $db;
 
+    /**
+     * Erstellt eine neue Instanz des artworkRepository
+     *
+     * @param object $db Das Datenbank-Zugriffsobjekt (dbaccess)
+     */
     public function __construct($db)
     {
         $this->db = $db;
     }
 
+    /**
+     * Holt alle Kunstwerke aus der Datenbank, inklusive der verknüpften Künstlerdaten
+     *
+     * @param string $sortOrder Die Sortierreihenfolge ('ASC' oder 'DESC'). Standard ist 'ASC'
+     * @return array Ein Array aus fertigen artwork-Objekten
+     */
     public function findAll($sortOrder = 'ASC')
     {
         $sortOrder = (strtoupper($sortOrder) === 'DESC') ? 'DESC' : 'ASC';
@@ -35,6 +49,12 @@ class artworkRepository
         return $artworks;
     }
 
+    /**
+     * Sucht ein bestimmtes Kunstwerk anhand seiner ID
+     *
+     * @param int $id Die eindeutige Datenbank-ID des Kunstwerks
+     * @return artwork Das gefundene artwork-Objekt oder null, falls die ID nicht existiert
+     */
     public function getById($id)
     {
         $sql = "SELECT * FROM artworks WHERE ArtWorkID = :id";
@@ -46,6 +66,12 @@ class artworkRepository
         return $row ? new artwork($row) : null;
     }
 
+    /**
+     * Holt die am besten bewerteten Kunstwerke
+     *
+     * @param int $limit Die maximale Anzahl der zurückgegebenen Kunstwerke (Standard ist 3)
+     * @return array Ein Array aus Arrays mit den Kunstwerkdaten und der Durchschnittsbewertung (AvgRating).
+     */
     public function getTopArtworks($limit = 3)
     {
         $sql = "SELECT a.*, 
@@ -65,9 +91,17 @@ class artworkRepository
         {
             $artworks[] = $row;
         }
+
         return $artworks;
     }
 
+    /**
+     * Holt alle Kunstwerke und sortiert sie nach einem bestimmten Kriterium
+     *
+     * @param string $sortBy Das Sortierkriterium ('title', 'year' oder 'artist'). Standard ist 'title'
+     * @param string $direction Die Sortierrichtung ('ASC' oder 'DESC'). Standard ist 'ASC'
+     * @return array Ein Array aus fertigen artwork-Objekten.
+     */
     public function getAllSorted($sortBy = 'title', $direction = 'ASC')
     {
         $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
@@ -92,9 +126,24 @@ class artworkRepository
 
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $artworks = [];
+
+        foreach ($rows as $row)
+        {
+            $artworks[] = new artwork($row);
+        }
+
+        return $artworks;
     }
 
+    /**
+     * Holt alle Kunstwerke eines bestimmten Künstlers
+     *
+     * @param int $artistId Die eindeutige ID des Künstlers
+     * @return array Ein Array aus fertigen artwork-Objekten
+     */
     public function getForArtist($artistId)
     {
         $sql = "SELECT a.*, art.FirstName, art.LastName 
@@ -117,6 +166,12 @@ class artworkRepository
         return $artworks;
     }
 
+    /**
+     * Holt alle Kunstwerke, die einem bestimmten Genre zugeordnet sind
+     *
+     * @param int $genreId Die eindeutige ID des Genres
+     * @return array Ein Array aus fertigen artwork-Objekten
+     */
     public function getForGenre($genreId)
     {
         $sql = "SELECT a.*, art.FirstName, art.LastName 
@@ -137,9 +192,16 @@ class artworkRepository
         {
             $artworks[] = new artwork($row);
         }
+
         return $artworks;
     }
 
+    /**
+     * Holt alle Kunstwerke, die einem bestimmten Thema zugeordnet sind
+     *
+     * @param int $subjectId Die eindeutige ID des Themas
+     * @return array Ein Array aus fertigen artwork-Objekten
+     */
     public function getForSubject($subjectId)
     {
         $sql = "SELECT a.*, art.FirstName, art.LastName 
@@ -160,9 +222,16 @@ class artworkRepository
         {
             $artworks[] = new artwork($row);
         }
+
         return $artworks;
     }
 
+    /**
+     * Sucht Kunstwerke, deren Titel mit einem bestimmten Suchwort beginnt
+     *
+     * @param string $keyword Das Suchwort
+     * @return array Ein Array aus fertigen artwork-Objekten
+     */
     public function searchByTitle($keyword)
     {
         $searchString = $keyword . '%';
@@ -174,7 +243,16 @@ class artworkRepository
 
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute(['keyword' => $searchString]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $artworks = [];
+
+        foreach ($rows as $row)
+        {
+            $artworks[] = new artwork($row);
+        }
+
+        return $artworks;
     }
 }
 
