@@ -12,10 +12,10 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle); ?></title>
 
-    <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap.min.css')?>">
-    <link rel="stylesheet" href="<?= base_url('assets/css/theme_bootswatch.css')?>">
-    <link rel="stylesheet" href="<?= base_url('assets/css/components.css')?>">
-    <link rel="stylesheet" href="<?= base_url('assets/css/styles.css')?>">
+    <link rel="stylesheet" href="<?= e(base_url('assets/css/bootstrap.min.css')); ?>">
+    <link rel="stylesheet" href="<?= e(base_url('assets/css/theme_bootswatch.css')); ?>">
+    <link rel="stylesheet" href="<?= e(base_url('assets/css/components.css')); ?>">
+    <link rel="stylesheet" href="<?= e(base_url('assets/css/styles.css')); ?>?v=3">
 
 
 
