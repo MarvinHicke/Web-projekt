@@ -1,7 +1,10 @@
 <?php
 require_once __DIR__ . '/../includes/bootstrap.php';
+/*
 require_once __DIR__ . '/../repositories/artworkRepository.php';
 require_once __DIR__ . '/../repositories/artistRepository.php';
+*/
+require_once __DIR__ . '/../includes/mock-data.php';
 
 $pageTitle = 'Suchergebnisse';
 
@@ -12,24 +15,34 @@ $artistResults = [];
 $artworkResults = [];
 
 if (mb_strlen($query) >= 3) {
-    $db = new dbaccess();
-    $db->connect();
+    $queryLower = mb_strtolower($query);
 
-    $artistRepository = new artistRepository($db);
-    $artworkRepository = new artworkRepository($db);
+    foreach ($artists as $artist) {
+        $lastName = mb_strtolower((string) ($artist['last_name'] ?? $artist['LastName'] ?? ''));
 
-    $artistResults = $artistRepository->searchByLastName($query);
-    $artworkResults = $artworkRepository->searchByTitle($query);
+        if (str_contains($lastName, $queryLower)) {
+            $artistResults[] = $artist;
+        }
+    }
+
+    foreach ($artworks as $artwork) {
+        $title = mb_strtolower((string) ($artwork['title'] ?? $artwork['Title'] ?? ''));
+        $artistLastName = mb_strtolower((string) ($artwork['artist_last_name'] ?? $artwork['LastName'] ?? ''));
+
+        if (str_contains($title, $queryLower) || str_contains($artistLastName, $queryLower)) {
+            $artworkResults[] = $artwork;
+        }
+    }
 
     if ($sort === 'title') {
         usort($artworkResults, static function (array $a, array $b): int {
-            return strcmp((string) ($a['Title'] ?? ''), (string) ($b['Title'] ?? ''));
+            return strcmp((string) ($a['title'] ?? $a['Title'] ?? ''), (string) ($b['title'] ?? $b['Title'] ?? ''));
         });
     }
 
     if ($sort === 'artist') {
         usort($artworkResults, static function (array $a, array $b): int {
-            return strcmp((string) ($a['LastName'] ?? ''), (string) ($b['LastName'] ?? ''));
+            return strcmp((string) ($a['artist_last_name'] ?? $a['LastName'] ?? ''), (string) ($b['artist_last_name'] ?? $b['LastName'] ?? ''));
         });
     }
 }
@@ -45,6 +58,7 @@ require_once __DIR__ . '/../includes/header.php';
 <section class="sort-panel" aria-label="Suchformular">
     <form method="get" action="<?= e(base_url('pages/search-results.php')); ?>">
         <label for="search-page-input">Suchbegriff</label>
+
         <input
             id="search-page-input"
             type="search"
@@ -84,15 +98,17 @@ require_once __DIR__ . '/../includes/header.php';
 
             <?php foreach ($artistResults as $artist): ?>
                 <?php
-                $artistId = (int) ($artist['ArtistID'] ?? 0);
-                $artistName = trim((string) ($artist['FirstName'] ?? '') . ' ' . (string) ($artist['LastName'] ?? ''));
+                $artistId = (int) ($artist['id'] ?? $artist['ArtistID'] ?? 0);
+                $artistName = trim((string) ($artist['first_name'] ?? $artist['FirstName'] ?? '') . ' ' . (string) ($artist['last_name'] ?? $artist['LastName'] ?? ''));
+                $image = (string) ($artist['image'] ?? '');
                 ?>
 
                 <article class="mini-card">
-                    <img src="<?= e(artistImageUrl($artistId, 'medium')); ?>" alt="<?= e($artistName); ?>">
+                    <img src="<?= e($image !== '' ? base_url($image) : artistImageUrl($artistId, 'medium')); ?>" alt="<?= e($artistName); ?>">
+
                     <div>
                         <h3><?= e($artistName !== '' ? $artistName : 'Unbekannter Künstler'); ?></h3>
-                        <p><?= e((string) ($artist['Nationality'] ?? '')); ?></p>
+                        <p>Platzhalter für Zusatzinformationen.</p>
                         <a href="<?= e(artistDetailUrl($artistId)); ?>">Künstler öffnen</a>
                     </div>
                 </article>
@@ -108,20 +124,20 @@ require_once __DIR__ . '/../includes/header.php';
 
             <?php foreach ($artworkResults as $artwork): ?>
                 <?php
-                $artworkId = (int) ($artwork['ArtWorkID'] ?? 0);
-                $title = (string) ($artwork['Title'] ?? 'Unbekanntes Kunstwerk');
-                $artistName = trim((string) ($artwork['FirstName'] ?? '') . ' ' . (string) ($artwork['LastName'] ?? ''));
+                $artworkId = (int) ($artwork['id'] ?? $artwork['ArtWorkID'] ?? 0);
+                $title = (string) ($artwork['title'] ?? $artwork['Title'] ?? 'Unbekanntes Kunstwerk');
+                $artistName = trim((string) ($artwork['artist_first_name'] ?? $artwork['FirstName'] ?? '') . ' ' . (string) ($artwork['artist_last_name'] ?? $artwork['LastName'] ?? ''));
+                $year = (string) ($artwork['year'] ?? $artwork['YearOfWork'] ?? '');
+                $image = (string) ($artwork['image'] ?? $artwork['ImageFileName'] ?? '');
                 ?>
 
                 <article class="mini-card">
-                    <img
-                        src="<?= e(artworkImageUrl((string) ($artwork['ImageFileName'] ?? ''), 'square-small')); ?>"
-                        alt="<?= e($title); ?>"
-                    >
+                    <img src="<?= e($image !== '' ? base_url($image) : artworkImageUrl('', 'square-small')); ?>" alt="<?= e($title); ?>">
+
                     <div>
                         <h3><?= e($title); ?></h3>
                         <p><?= e($artistName !== '' ? $artistName : 'Unbekannter Künstler'); ?></p>
-                        <p><?= e((string) ($artwork['YearOfWork'] ?? '')); ?></p>
+                        <p><?= e($year !== '' ? $year : 'Jahr unbekannt'); ?></p>
                         <a href="<?= e(artworkDetailUrl($artworkId)); ?>">Kunstwerk öffnen</a>
                     </div>
                 </article>
