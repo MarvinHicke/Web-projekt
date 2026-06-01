@@ -171,7 +171,7 @@ class artwork
     /**
      * Gibt die ID der Galerie zurück, in der das Kunstwerk aktuell ausgestellt ist
      *
-     * @return int|null Die Galerie-ID
+     * @return int Die Galerie-ID
      */
     function getGalleryid ()
     {
