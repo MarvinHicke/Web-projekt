@@ -6,25 +6,18 @@ error_reporting(E_ALL);
 $pageTitle = 'Startseite · Art Gallery';
 
 require_once __DIR__ . '/includes/bootstrap.php';
+require_once __DIR__ . '/includes/mock-data.php';
 require_once __DIR__ . '/repositories/artworkRepository.php';
 require_once __DIR__ . '/repositories/artistRepository.php';
 require_once __DIR__ . '/repositories/reviewRepository.php';
 require_once __DIR__ . '/includes/boxes/top-works-box.php';
 require_once __DIR__ . '/includes/boxes/most-reviewed-artists-box.php';
 require_once __DIR__ . '/includes/boxes/most-recent-reviews-box.php';
-
-$db = new dbaccess();
-$db->connect();
-
-$artworkRepository = new artworkRepository($db);
-$artistRepository = new artistRepository($db);
-$reviewRepository = new reviewRepository($db);
-
-$topArtworks = $artworkRepository->getTopArtworks(3);
-$mostReviewedArtists = $artistRepository->getMostReviewedArtists(3);
-$latestReviews = $reviewRepository->getLatestReviewsWithArtwork(3);
-
 require_once __DIR__ . '/includes/header.php';
+
+$topArtworks = $artworks ?? [];
+$mostReviewedArtists = $artists ?? [];
+$latestReviews = $reviews ?? [];
 ?>
 
 <section class="hero">
