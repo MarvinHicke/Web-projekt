@@ -1,117 +1,103 @@
 <?php
 require_once __DIR__ . '/../includes/bootstrap.php';
+/*
 require_once __DIR__ . '/../repositories/artworkRepository.php';
 require_once __DIR__ . '/../repositories/artistRepository.php';
 require_once __DIR__ . '/../repositories/genreRepository.php';
 require_once __DIR__ . '/../repositories/subjectRepository.php';
 require_once __DIR__ . '/../repositories/galleryRepository.php';
 require_once __DIR__ . '/../repositories/reviewRepository.php';
+*/
+require_once __DIR__ . '/../includes/mock-data.php';
 
 $artworkId = (int) ($_GET['id'] ?? 0);
+$selectedArtwork = null;
 
-$db = new dbaccess();
-$db->connect();
+foreach ($artworks as $artwork) {
+    $currentId = (int) ($artwork['id'] ?? $artwork['ArtWorkID'] ?? 0);
 
-$artworkRepository = new artworkRepository($db);
-$artistRepository = new artistRepository($db);
-$genreRepository = new genreRepository($db);
-$subjectRepository = new subjectRepository($db);
-$galleryRepository = new galleryRepository($db);
-$reviewRepository = new reviewRepository($db);
+    if ($currentId === $artworkId) {
+        $selectedArtwork = $artwork;
+        break;
+    }
+}
 
-$artwork = $artworkId > 0 ? $artworkRepository->getById($artworkId) : null;
-
-if ($artwork === null) {
+if ($selectedArtwork === null) {
     $pageTitle = 'Kunstwerk nicht gefunden';
     require_once __DIR__ . '/../includes/header.php';
     ?>
+
     <section class="page-heading">
         <h1>Kunstwerk nicht gefunden</h1>
         <p>Die angefragte ID ist ungültig oder das Kunstwerk existiert nicht.</p>
         <a class="button-link" href="<?= e(base_url('pages/browse-artworks.php')); ?>">Zurück zu Kunstwerke durchsuchen</a>
     </section>
+
     <?php
     require_once __DIR__ . '/../includes/footer.php';
     exit;
 }
 
-$artist = $artistRepository->getById((int) $artwork->getArtistid());
-$genres = $genreRepository->getGenresForArtwork($artworkId);
-$subjects = $subjectRepository->getSubjectsForArtwork($artworkId);
-$gallery = $artwork->getGalleryid() ? $galleryRepository->getById((int) $artwork->getGalleryid()) : null;
-$reviews = $reviewRepository->getForArtwork($artworkId);
-$ratingInfo = $reviewRepository->getAverageRatingArtwork($artworkId);
+$title = (string) ($selectedArtwork['title'] ?? $selectedArtwork['Title'] ?? 'Unbekanntes Kunstwerk');
+$artistId = (int) ($selectedArtwork['artist_id'] ?? $selectedArtwork['ArtistID'] ?? 0);
+$artistName = trim((string) ($selectedArtwork['artist_first_name'] ?? $selectedArtwork['FirstName'] ?? '') . ' ' . (string) ($selectedArtwork['artist_last_name'] ?? $selectedArtwork['LastName'] ?? ''));
+$year = (string) ($selectedArtwork['year'] ?? $selectedArtwork['YearOfWork'] ?? 'Unbekannt');
+$image = (string) ($selectedArtwork['image'] ?? $selectedArtwork['ImageFileName'] ?? '');
+$largeImage = (string) ($selectedArtwork['large_image'] ?? $image);
+$genre = (string) ($selectedArtwork['genre'] ?? 'Nicht hinterlegt');
+$subjects = $selectedArtwork['subjects'] ?? [];
+$gallery = (string) ($selectedArtwork['gallery'] ?? 'Keine Galerie hinterlegt');
+$averageRating = $selectedArtwork['average_rating'] ?? null;
 
-$averageRating = $ratingInfo['AvgRating'] ?? null;
-$totalReviews = $ratingInfo['TotalReviews'] ?? count($reviews);
+$artworkReviews = [];
 
-$pageTitle = $artwork->getTitle() . ' · Kunstwerk';
+foreach ($reviews as $review) {
+    $reviewArtworkId = (int) ($review['artwork_id'] ?? $review['ArtWorkId'] ?? 0);
+
+    if ($reviewArtworkId === $artworkId) {
+        $artworkReviews[] = $review;
+    }
+}
+
+$pageTitle = $title . ' · Kunstwerk';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <section class="artwork-detail-layout">
     <div class="artwork-image-panel">
         <img
-            src="<?= e(artworkImageUrl($artwork->getImagefilename(), 'large')); ?>"
-            alt="<?= e($artwork->getTitle()); ?>"
+            src="<?= e($image !== '' ? base_url($image) : artworkImageUrl('', 'large')); ?>"
+            alt="<?= e($title); ?>"
         >
 
-        <a href="<?= e(artworkImageUrl($artwork->getImagefilename(), 'large')); ?>" target="_blank" rel="noopener">
+        <a href="<?= e($largeImage !== '' ? base_url($largeImage) : artworkImageUrl('', 'large')); ?>" target="_blank" rel="noopener">
             Große Bildversion öffnen
         </a>
     </div>
 
     <div class="artwork-info-panel">
         <p class="eyebrow">Einzelansicht eines Kunstwerks</p>
-        <h1><?= e($artwork->getTitle()); ?></h1>
+        <h1><?= e($title); ?></h1>
 
         <dl class="detail-list">
             <dt>Künstler</dt>
             <dd>
-                <?php if ($artist !== null): ?>
-                    <a href="<?= e(artistDetailUrl((int) $artist->getId())); ?>">
-                        <?= e($artist->getFirstName() . ' ' . $artist->getLastName()); ?>
-                    </a>
-                <?php else: ?>
-                    Unbekannt
-                <?php endif; ?>
+                <a href="<?= e(artistDetailUrl($artistId)); ?>">
+                    <?= e($artistName !== '' ? $artistName : 'Unbekannter Künstler'); ?>
+                </a>
             </dd>
 
             <dt>Jahr</dt>
-            <dd><?= e((string) $artwork->getYearofwork()); ?></dd>
-
-            <dt>Typ</dt>
-            <dd><?= e((string) $artwork->getArtworktype()); ?></dd>
-
-            <dt>Medium</dt>
-            <dd><?= e((string) $artwork->getMedium()); ?></dd>
-
-            <dt>Größe</dt>
-            <dd><?= e((string) $artwork->getWidth()); ?> × <?= e((string) $artwork->getHeight()); ?></dd>
+            <dd><?= e($year); ?></dd>
 
             <dt>Galerie</dt>
-            <dd>
-                <?php if ($gallery !== null): ?>
-                    <?= e($gallery->getGalleryName()); ?>
-                    <?php if ($gallery->getGalleryCountry()): ?>
-                        <small><?= e($gallery->getGalleryCountry()); ?></small>
-                    <?php endif; ?>
-                <?php else: ?>
-                    Keine Galerie hinterlegt
-                <?php endif; ?>
-            </dd>
+            <dd><?= e($gallery); ?></dd>
 
             <dt>Genre</dt>
             <dd>
-                <?php if (empty($genres)): ?>
-                    Keine Genres hinterlegt
-                <?php endif; ?>
-
-                <?php foreach ($genres as $genre): ?>
-                    <a class="tag" href="<?= e(base_url('pages/browse-genre.php') . '?id=' . urlencode((string) $genre->getGenreID())); ?>">
-                        <?= e($genre->getGenreName()); ?>
-                    </a>
-                <?php endforeach; ?>
+                <a class="tag" href="<?= e(base_url('pages/browse-genre.php') . '?name=' . urlencode($genre)); ?>">
+                    <?= e($genre); ?>
+                </a>
             </dd>
 
             <dt>Themen</dt>
@@ -121,8 +107,8 @@ require_once __DIR__ . '/../includes/header.php';
                 <?php endif; ?>
 
                 <?php foreach ($subjects as $subject): ?>
-                    <a class="tag" href="<?= e(base_url('pages/browse-subject.php') . '?id=' . urlencode((string) $subject->getSubjectid())); ?>">
-                        <?= e($subject->getSubjectname()); ?>
+                    <a class="tag" href="<?= e(base_url('pages/browse-subject.php') . '?name=' . urlencode((string) $subject)); ?>">
+                        <?= e((string) $subject); ?>
                     </a>
                 <?php endforeach; ?>
             </dd>
@@ -131,7 +117,6 @@ require_once __DIR__ . '/../includes/header.php';
             <dd>
                 <?php if ($averageRating !== null): ?>
                     <?= e(number_format((float) $averageRating, 1, ',', '.')); ?>/5
-                    <small>(<?= e((string) $totalReviews); ?> Bewertungen)</small>
                 <?php else: ?>
                     Noch keine Bewertung
                 <?php endif; ?>
@@ -140,10 +125,8 @@ require_once __DIR__ . '/../includes/header.php';
 
         <div class="favorite-box">
             <p><strong>Favorit</strong></p>
-            <p>Die Favoritenfunktion wird später mit dem User-Zustand verbunden.</p>
-            <a class="button-link" href="<?= e(base_url('pages/add-favorite.php') . '?type=artwork&id=' . urlencode((string) $artworkId)); ?>">
-                Zu Favoriten hinzufügen
-            </a>
+            <p>Die Favoritenfunktion wird später mit dem User-Zustand von Team E verbunden.</p>
+            <button type="button">Zu Favoriten hinzufügen</button>
         </div>
     </div>
 </section>
@@ -151,15 +134,20 @@ require_once __DIR__ . '/../includes/header.php';
 <section class="reviews-section">
     <h2>Bewertungen</h2>
 
-    <?php if (empty($reviews)): ?>
+    <?php if (empty($artworkReviews)): ?>
         <p>Für dieses Kunstwerk gibt es noch keine Bewertungen.</p>
     <?php endif; ?>
 
-    <?php foreach ($reviews as $review): ?>
+    <?php foreach ($artworkReviews as $review): ?>
         <article class="review-card">
-            <h3>Bewertung: <?= e((string) $review->getRating()); ?>/5</h3>
-            <p><?= e($review->getComment()); ?></p>
-            <small><?= e($review->getReviewDateFormatted()); ?></small>
+            <h3>
+                <?= e((string) ($review['user'] ?? 'Unbekannter Nutzer')); ?>
+                ·
+                <?= e((string) ($review['rating'] ?? '')); ?>/5
+            </h3>
+
+            <p><?= e((string) ($review['text'] ?? $review['comment'] ?? '')); ?></p>
+            <small><?= e((string) ($review['date'] ?? $review['ReviewDate'] ?? '')); ?></small>
         </article>
     <?php endforeach; ?>
 </section>
@@ -167,14 +155,14 @@ require_once __DIR__ . '/../includes/header.php';
 <section class="sort-panel">
     <h2>Benötigte Datenquellen / Queries für Team A</h2>
     <ul>
-        <li>Kunstwerk nach ID: Titel, Jahr, Bilddatei, Typ, Medium, Größe, Künstler-ID und Galerie-ID.</li>
+        <li>Kunstwerk nach ID: Titel, Jahr, Bilddatei, Galerie, Künstler-ID.</li>
         <li>Künstler nach Künstler-ID für den Künstlerlink.</li>
-        <li>Genres über die N:M-Beziehung ArtworkGenres.</li>
-        <li>Themen über die N:M-Beziehung ArtworkSubjects.</li>
+        <li>Genres und Themen zum Kunstwerk.</li>
         <li>Galerie nach GalleryID, da Gallery statt OriginalHome angezeigt werden soll.</li>
-        <li>Bewertungen nach ArtworkID und Durchschnittsbewertung aus Reviews.</li>
+        <li>Bewertungen nach ArtworkID und Durchschnittsbewertung.</li>
         <li>Favoritenstatus später über Session/User-Zustand von Team E.</li>
     </ul>
 </section>
 
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
