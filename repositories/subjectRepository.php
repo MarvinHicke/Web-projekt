@@ -30,6 +30,18 @@ class subjectRepository
         return $subjects;
     }
 
+    public function getById($id)
+    {
+        $sql = "SELECT * FROM subjects WHERE subjectid = :id";
+
+        $stmt = $this->db->preparedStatement($sql);
+
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? new Subject($row) : null;
+    }
+
     public function getAllForBrowse()
     {
         $sql = "SELECT * FROM subjects ORDER BY SubjectName ASC";

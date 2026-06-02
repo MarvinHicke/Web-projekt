@@ -29,6 +29,18 @@ class genreRepository
         return $genres;
     }
 
+    public function getById($id)
+    {
+        $sql = "SELECT * FROM genres WHERE genreid = :id";
+
+        $stmt = $this->db->preparedStatement($sql);
+
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? new Genre($row) : null;
+    }
+
     public function getAllForBrowse()
     {
         $sql = "SELECT * FROM genres ORDER BY Era ASC, GenreName ASC";
