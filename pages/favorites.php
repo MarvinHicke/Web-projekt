@@ -57,7 +57,7 @@ require_once __DIR__ . "/../includes/header.php";
 <p>Hier werden später deine favorisierten Kunstwerke und Künstler angezeigt.</p>
 
 <h2>Favorisierte Kunstwerke</h2>
-<?php if(empty($favoriteArtworkIds)) : ?>
+<?php if(empty($favoriteArtworks)) : ?>
     <?php
     $alertType="info";
     $alertMessage="Du hast noch keine Kunstwerke favorisiert.";
@@ -82,7 +82,7 @@ require_once __DIR__ . "/../includes/header.php";
 <?php endif; ?>
 
 <h2>Favorisierte Künstler</h2>
-<?php if(empty($favoriteArtistIds)) : ?>
+<?php if(empty($favoriteArtists)) : ?>
     <?php
     $alertType="info";
     $alertMessage="Du hast noch keine Künstler favorisiert.";
