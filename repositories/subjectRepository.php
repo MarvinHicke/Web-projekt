@@ -43,6 +43,23 @@ class subjectRepository
     }
 
     /**
+     * Sucht ein bestimmtes Thema anhand seiner ID
+     *
+     * @param int $id Die ID des Themas
+     * @return subject Das gefundene subject-Objekt oder null falls nichts existiert
+     */
+    public function getById($id)
+    {
+        $sql = "SELECT * FROM subjects WHERE SubjectId = :id";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? new subject($row) : null;
+    }
+
+    /**
      * Holt alle Themen sortiert nach Name für die Übersicht
      *
      * @return array Ein Array aus fertigen subject-Objekten

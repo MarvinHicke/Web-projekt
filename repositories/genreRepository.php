@@ -43,6 +43,23 @@ class genreRepository
     }
 
     /**
+     * Sucht ein bestimmtes Genre anhand seiner ID
+     *
+     * @param int $id Die ID des Genres
+     * @return genre Das gefundene genre-Objekt oder null falls nichts existiert
+     */
+    public function getById($id)
+    {
+        $sql = "SELECT * FROM genres WHERE GenreID = :id";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? new genre($row) : null;
+    }
+
+    /**
      * Holt alle Genres sortiert nach Epoche und Name für die Übersicht
      *
      * @return array Ein Array aus fertigen genre-Objekten

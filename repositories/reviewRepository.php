@@ -14,6 +14,23 @@ class reviewRepository
     }
 
     /**
+     * Sucht eine bestimmte Bewertung anhand ihrer ID
+     *
+     * @param int $id Die ID der Bewertung
+     * @return review Das gefundene review-Objekt oder null falls nichts existiert
+     */
+    public function getById($id)
+    {
+        $sql = "SELECT * FROM reviews WHERE ReviewId = :id";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? new review($row) : null;
+    }
+
+    /**
      * Erstellt eine neue Instanz des reviewRepository
      *
      * @param object $db Das Datenbank-Zugriffsobjekt (dbaccess)
