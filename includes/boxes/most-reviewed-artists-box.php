@@ -1,37 +1,32 @@
 <?php
 require_once __DIR__ . '/../helpers.php';
 
-/**
- * Renders the Most Reviewed Artists box on the homepage.
- * Needed data later:
- * artist id, first name, last name, review count, image optional.
- * Link:
- * every item links to artist.php?id=ARTIST_ID
- */
 function renderMostReviewedArtistsBox(array $artists): void
 {
-    usort($artists, static function (array $a, array $b): int {
-        return ($b['review_count'] <=> $a['review_count']);
-    });
-
-    $topArtists = array_slice($artists, 0, 3);
     ?>
     <section class="data-box">
-        <h2>Most-reviewed artists</h2>
-        <p class="box-note">Artists with many reviews.</p>
+        <h2>Meistbewertete Künstler</h2>
+        <p class="box-note">Künstler mit vielen Bewertungen.</p>
 
-        <ul class="clean-list">
-            <?php foreach ($topArtists as $artist): ?>
-                <li>
-                    <a href="<?= e(artistUrl((int) $artist['id'])); ?>">
-                        <strong>
-                            <?= e((string) $artist['first_name'] . ' ' . (string) $artist['last_name']); ?>
-                        </strong>
-                        <small><?= e((string) $artist['review_count']); ?> reviews</small>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
+        <?php if (empty($artists)): ?>
+            <p>Keine Künstler gefunden.</p>
+        <?php else: ?>
+            <ul class="clean-list">
+                <?php foreach ($artists as $artist): ?>
+                    <?php
+                    $id = (int) ($artist['ArtistID'] ?? $artist['id'] ?? 0);
+                    $artistName = trim((string) ($artist['FirstName'] ?? $artist['first_name'] ?? '') . ' ' . (string) ($artist['LastName'] ?? $artist['last_name'] ?? ''));
+                    $reviewCount = (int) ($artist['ReviewCount'] ?? $artist['review_count'] ?? 0);
+                    ?>
+                    <li>
+                        <a href="<?= e(artistDetailUrl($id)); ?>">
+                            <strong><?= e($artistName !== '' ? $artistName : 'Unbekannter Künstler'); ?></strong>
+                            <small><?= e((string) $reviewCount); ?> Bewertungen</small>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
     </section>
     <?php
 }

@@ -1,58 +1,33 @@
 <?php
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
+$pageTitle = 'Browse Subject';
+
 require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../repositories/subjectRepository.php';
+
+$subjectRepository = new subjectRepository(db());
+$subjects = $subjectRepository->findAll();
+
+require_once __DIR__.'/../includes/header.php';
+
 ?>
-<!DOCTYPE html>
-<html lang="de">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Browse Subject</title>
-    <meta name="Browse all Subject" content="Das ist die Seite die alle enthaltenen Themen anzeigt.">
-</head>
+<section class="page-heading">
+    <h1>Subjects durchsuchen</h1>
+    <p>Entdecken sie Subjects</p>
+</section>
 
-<body>
-<h1>Browse Subject</h1>
-<p>
-    Hier findet man eine Listenübersicht aller Themen. <br>
-    Diese sind nach Thema sortiert (nicht extern sotierbar).
-</p>
+<section class="container my-4">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <?php foreach ($subjects as $subject): ?>
+            <?php include __DIR__ . '/../components/subject-card.php'; ?>
+        <?php endforeach; ?>
+    </div>
+</section>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th>Thema</th>
-        <th>Bild</th>
-        <th>Link</th>
-    </tr>
-    </thead>
 
-    <tbody>
-    <tr>
-        <td>Thema 1</td>
-        <td><img src="https://www.ri-fa.de/wp-content/uploads/2022/10/ri-fa-platzhalter-produkt-1500x1500-1.jpg" width="50" alt="Platzhalter Bilder"></td>
-        <td><a href="thema1.php">Link zur zukünftigen Seite</a></td>
-    </tr>
-    <tr>
-        <td>Thema 2</td>
-        <td><img src="https://www.ri-fa.de/wp-content/uploads/2022/10/ri-fa-platzhalter-produkt-1500x1500-1.jpg" width="50" alt="Platzhalter Bilder"></td>
-        <td><a href="thema2.php">Link zur zukünftigen Seite</a></td>
-    </tr>
-    <tr>
-        <td>Thema 3</td>
-        <td><img src="https://www.ri-fa.de/wp-content/uploads/2022/10/ri-fa-platzhalter-produkt-1500x1500-1.jpg" width="50" alt="Platzhalter Bilder"></td>
-        <td><a href="thema3.php">Link zur zukünftigen Seite</a></td>
-    </tr>
-    <tr>
-        <td>Thema 4</td>
-        <td><img src="https://www.ri-fa.de/wp-content/uploads/2022/10/ri-fa-platzhalter-produkt-1500x1500-1.jpg" width="50" alt="Platzhalter Bilder"></td>
-        <td><a href="thema4.php">Link zur zukünftigen Seite</a></td>
-    </tr>
-    <tr>
-        <td>Thema 5</td>
-        <td><img src="https://www.ri-fa.de/wp-content/uploads/2022/10/ri-fa-platzhalter-produkt-1500x1500-1.jpg" width="50" alt="Platzhalter Bilder"></td>
-        <td><a href="thema5.php">Link zur zukünftigen Seite</a></td>
-    </tr>
-    </tbody>
-</table>
-
-</body>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>
