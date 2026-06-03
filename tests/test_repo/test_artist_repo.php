@@ -58,13 +58,29 @@ if (!empty($sortArtist))
             break;
         }
 
-        echo $sort['FirstName'] . " " . $sort['LastName'] . "<br>";
+        echo $sort->getFirstName() . " " . $sort->getLastName() . "<br>";
         $i++;
     }
 }
 else
 {
     echo "Ergebnis: Keine Kunstwerke gefunden.<br>";
+}
+
+echo "<h2>Methode: searchByLastName('Pic')</h2>";
+
+$searchedArtists = $artistRepo->searchByLastName('Pic');
+
+if (!empty($searchedArtists))
+{
+    foreach ($searchedArtists as $artist)
+    {
+        echo "Treffer: " . $artist->getFirstName() . " " . $artist->getLastName() . "<br>";
+    }
+}
+else
+{
+    echo "Ergebnis: Keine passenden Künstler gefunden.<br>";
 }
 
 $db->close();

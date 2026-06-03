@@ -1,6 +1,10 @@
 <?php
 
-class artist {
+/**
+ * Repräsentiert einen Künstler mit seinen Details aus der Datenbank
+ */
+class artist
+{
     private $id;
     private $firstName;
     private $lastName;
@@ -8,6 +12,11 @@ class artist {
     private $gender;
     private $birthYear;
 
+    /**
+     * Erstellt ein Artist-Objekt anhand eines Datensatzes aus der Datenbank
+     *
+     * @param array $data Array mit Datenbankwerten
+     */
     public function __construct($data)
     {
         $this->id = $data['ArtistID'];
@@ -20,35 +29,63 @@ class artist {
 
     // Getter
 
+    /**
+     * Gibt den Vornamen des Künstlers zurück
+     *
+     * @return string Der Vorname
+     */
     public function getFirstName()
     {
         return $this->firstName;
     }
 
+    /**
+     * Gibt den Nachname des Künstlers zurück
+     *
+     * @return string Der Nachname
+     */
     public function getLastName()
     {
         return $this->lastName;
     }
 
+    /**
+     * Gibt die Nationalität des Künstlers zurück
+     *
+     * @return string Die Nationalität
+     */
     public function getNationality()
     {
         return $this->nationality;
     }
 
+    /**
+     * Gibt das Geschlecht des Künstlers zurück
+     *
+     * @return string Das Geschlecht
+     */
     public function getGender()
     {
         return $this->gender;
     }
 
+    /**
+     * Gibt das Geburtsjahr des Künstlers zurück
+     *
+     * @return int Das Geburtsjahr
+     */
     public function getBirthYear()
     {
         return $this->birthYear;
     }
 
+    /**
+     * Gibt die eindeutige ID des Künstlers zurück
+     *
+     * @return int Die ID
+     */
     public function getId()
     {
         return $this->id;
     }
 }
-
-?>

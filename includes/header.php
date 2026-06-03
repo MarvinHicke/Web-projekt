@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/helpers.php';
+require_once __DIR__ . '/init.php';
 
 $pageTitle = $pageTitle ?? 'Art Gallery';
 $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
@@ -31,10 +31,16 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
         <nav class="utility-nav" aria-label="Hilfsnavigation">
             <ul>
                 <li><a href="<?= base_url('pages/favorites.php') ?>">Favoriten anzeigen</a></li>
-                <li><a href="<?= base_url('pages/account.php') ?>">Mein Konto</a></li>
-                <li><a href="<?= base_url('pages/manage-users.php') ?>">Benutzer verwalten</a></li>
-                <li><a href="<?= base_url('pages/register.php') ?>">Registrieren</a></li>
-                <li><a href="<?= base_url('pages/login.php') ?>">Anmelden</a></li>
+                <?php if (isLoggedIn()): ?>
+                    <li><a href="<?= base_url('pages/account.php') ?>"><?= e(getCurrentUsername()) ?></a></li>
+                    <?php if (isAdmin()): ?>
+                        <li><a href="<?= base_url('pages/manage-users.php') ?>">Benutzer verwalten</a></li>
+                    <?php endif; ?>
+                    <li><a href="<?= base_url('pages/logout.php') ?>">Abmelden</a></li>
+                <?php else: ?>
+                    <li><a href="<?= base_url('pages/register.php') ?>">Registrieren</a></li>
+                    <li><a href="<?= base_url('pages/login.php') ?>">Anmelden</a></li>
+                <?php endif; ?>
             </ul>
         </nav>
     </div>
@@ -47,17 +53,16 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
             <li><a href="<?= base_url('pages/advanced-search.php') ?>">Erweiterte Suche</a></li>
 
             <li class="dropdown">
-                <a href="<?= base_url('pages/artworks.php')?>">Durchsuchen</a>
+                <a href="<?= base_url('pages/browse-artworks.php')?>">Durchsuchen</a>
                 <ul class="dropdown-menu">
                     <li><a href="<?= base_url('pages/browse-artworks.php')?>">Kunstwerke</a></li>
                     <li><a href="<?= base_url('pages/browse-artists.php')?>">Künstler</a></li>
-                    <li><a href="<?= base_url('pages/browse-museums.php')?>">Museen</a></li>
+                    <li><a href="<?= base_url('pages/browse-genre.php')?>">Genre</a></li>
                 </ul>
             </li>
         </ul>
     </nav>
-
-    <form class="global-search" action="<?= base_url('search-results.php')?>" method="get" role="search">
+   <form class="global-search" action="<?= base_url('pages/search-results.php')?>" method="get" role="search">
         <label class="sr-only" for="global-search-input">Kunstwerke oder Künstler suchen</label>
         <input
             id="global-search-input"

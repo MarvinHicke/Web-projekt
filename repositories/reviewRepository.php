@@ -50,6 +50,42 @@ class reviewRepository
         return $stmt->fetch();
     }
 
+    public function addReview($artworkId, $customerId, $rating, $comment)
+    {
+        $currentDate = date('d.m.Y H:i:s');
+        $sql = "INSERT INTO reviews (ArtWorkId, CustomerId, ReviewDate, Rating, Comment) 
+                VALUES (:artworkId, :customerId, :reviewDate, :rating, :comment)";
+
+        $stmt = $this->db->preparedStatement($sql);
+        return $stmt->execute
+        ([
+            'artworkId' => $artworkId,
+            'customerId' => $customerId,
+            'reviewDate' => $currentDate,
+            'rating' => $rating,
+            'comment' => $comment
+        ]);
+    }
+
+    public function deleteReview($reviewId)
+    {
+        $sql = "DELETE FROM reviews WHERE ReviewId = :reviewId";
+        $stmt = $this->db->preparedStatement($sql);
+        return $stmt->execute(['reviewId' => $reviewId]);
+    }
+
+    public function hasUserReviewedArtwork($artworkId, $customerId)
+    {
+        $sql = "SELECT COUNT(*) as Count FROM reviews WHERE ArtWorkId = :artworkId AND CustomerId = :customerId";
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute
+        ([
+            'artworkId' => $artworkId,
+            'customerId' => $customerId
+        ]);
+
+        return $stmt->fetch()['Count'] > 0;
+    }
 
 }
 

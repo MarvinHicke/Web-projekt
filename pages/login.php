@@ -1,11 +1,13 @@
 <?php
 require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../repositories/customerRepository.php';
 $pageTitle = "Anmelden";
 $errors=[];
 $successMessage="";
 $email="";
 
-if($_SERVER["REQUEST_METHOD"] === "POST")
+if(($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST")
 {
     $email=trim((string) ($_POST["email"] ?? ""));
     $password= (string) ($_POST["password"] ?? "");
@@ -24,13 +26,23 @@ if($_SERVER["REQUEST_METHOD"] === "POST")
     }
     if(empty($errors))
     {
-        /* Später:
-        * 1. User anhand der E-Mail aus der Datenbank laden.
-        * 2. Gespeicherten Passwort-Hash des Users holen.
-        * 3. Eingegebenes Passwort mit password_verify() prüfen.
-        * 4. Bei Erfolg User-ID und Rolle in der Session speichern.
-        */
-        $successMessage="Die Eingaben sind gültig. Die echte Anmeldung folgt später.";
+        $customerRepository = new customerRepository(db());
+        $user = $customerRepository->GetByUsername($email);
+
+        if (!$user || (int)($user['State'] ?? 0) !== 1 || !password_verify($password, (string)$user['Pass'])) {
+            $errors[] = "E-Mail oder Passwort ist falsch.";
+        } else {
+            $_SESSION['user'] = [
+                'CustomerID' => (int)$user['CustomerID'],
+                'UserName' => (string)$user['UserName'],
+                'Type' => (int)$user['Type'],
+                'FirstName' => (string)($user['FirstName'] ?? ''),
+                'LastName' => (string)($user['LastName'] ?? ''),
+            ];
+
+            header('Location: ' . base_url('index.php'));
+            exit;
+        }
     }
 }
 require_once __DIR__ . '/../includes/header.php';

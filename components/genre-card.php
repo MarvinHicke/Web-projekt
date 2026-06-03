@@ -4,17 +4,17 @@
 
             <h2 class="h5 card-title">
                 <?= htmlspecialchars(
-                    $artist->getFirstName() . ' ' . $artist->getLastName()
+                    $genre->getAllForBrowse()
                 ) ?>
             </h2>
 
             <p class="card-text text-muted">
-                Artist ID: <?= htmlspecialchars($artist->getId()) ?>
+                Genre ID: <?= htmlspecialchars($genre->getId()) ?>
             </p>
 
             <?php
             $buttonText = 'Ansehen';
-            $buttonHref = 'single-artist.php?id=' . urlencode($artist->getArtistid());
+            $buttonHref = 'single-genre.php?id=' . urlencode($genre->getGenreid());
             $buttonVariant = 'primary';
             include __DIR__ . '/button.php';
             ?>

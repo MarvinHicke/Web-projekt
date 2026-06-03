@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../repositories/customerRepository.php';
 $pageTitle = "Registrieren";
 $errors=[];
 $successMessage="";
@@ -9,7 +11,7 @@ $email="";
 $nameMaxLength=50;
 $emailMaxLength=100;
 $passwordMinLength=8;
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
     $firstName=trim((string) ($_POST["firstName"] ?? ""));
     $lastName=trim((string) ($_POST["lastName"] ?? ""));
     $email=trim((string) ($_POST["email"] ?? ""));
@@ -63,8 +65,39 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if(empty($errors))
     {
         $passwordHash=password_hash($password,PASSWORD_DEFAULT);
+        $customerRepository = new customerRepository(db());
 
-        $successMessage="Die Eingaben sind gültig. Das Paswort kann sicher gespeichert werden.";
+        if ($customerRepository->GetByUsername($email)) {
+            $errors[] = "Diese E-Mail ist bereits registriert.";
+        } else {
+            $created = $customerRepository->create(
+                [
+                    'FirstName' => $firstName,
+                    'LastName' => $lastName,
+                    'Email' => $email,
+                ],
+                [
+                    'UserName' => $email,
+                    'Pass' => $passwordHash,
+                ]
+            );
+
+            if ($created) {
+                $user = $customerRepository->GetByUsername($email);
+                $_SESSION['user'] = [
+                    'CustomerID' => (int)$user['CustomerID'],
+                    'UserName' => (string)$user['UserName'],
+                    'Type' => (int)$user['Type'],
+                    'FirstName' => (string)($user['FirstName'] ?? ''),
+                    'LastName' => (string)($user['LastName'] ?? ''),
+                ];
+
+                header('Location: ' . base_url('index.php'));
+                exit;
+            }
+
+            $errors[] = "Die Registrierung konnte nicht gespeichert werden.";
+        }
     }
 }
 require_once __DIR__ . "/../includes/header.php";

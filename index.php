@@ -5,6 +5,7 @@ error_reporting(E_ALL);
 
 $pageTitle = 'Startseite · Art Gallery';
 
+require_once __DIR__ . '/includes/init.php';
 require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/mock-data.php';
 require_once __DIR__ . '/repositories/artworkRepository.php';

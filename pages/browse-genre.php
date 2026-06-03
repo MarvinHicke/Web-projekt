@@ -1,61 +1,33 @@
-<!DOCTYPE html>
-<html lang="de">
+<?php
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
 
-<head>
-    <meta charset="UTF-8">
-    <title>Browse Genre</title>
-    <meta name="Browse all Genre" content="Das ist die Seite die alle enthaltenen Genre anzeigt.">
-</head>
+$pageTitle = 'Browse Genre';
 
-<body>
-<h1>Browse Genre</h1>
-<p>
-    Hier findet man eine Listenübersicht aller Genres. <br>
-    Diese sind nach Epoche und Genre Name sortiert (nicht extern sotierbar).
-</p>
+require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../repositories/genreRepository.php';
 
-<table class="table">
-    <thead>
-    <tr>
-        <th>Genre Name</th>
-        <th>Epoche</th>
-        <th>Bild</th>
-        <th>Link</th>
-    </tr>
-    </thead>
+$genreRepository = new genreRepository(db());
+$genres = $genreRepository->findAll();
 
-    <tbody>
-    <tr>
-        <td>Genre Name 1</td>
-        <td>Epoche 1</td>
-        <td><img src="https://www.ri-fa.de/wp-content/uploads/2022/10/ri-fa-platzhalter-produkt-1500x1500-1.jpg" width="50" alt="Platzhalter Bilder"></td>
-        <td><a href="genre1.php">Link zur zukünftigen Seite</a></td>
-    </tr>
-    <tr>
-        <td>Genre Name 2</td>
-        <td>Epoche 2</td>
-        <td><img src="https://www.ri-fa.de/wp-content/uploads/2022/10/ri-fa-platzhalter-produkt-1500x1500-1.jpg" width="50" alt="Platzhalter Bilder"></td>
-        <td><a href="genre2.php">Link zur zukünftigen Seite</a></td>
-    </tr>
-    <tr>
-        <td>Genre Name 3</td>
-        <td>Epoche 3</td>
-        <td><img src="https://www.ri-fa.de/wp-content/uploads/2022/10/ri-fa-platzhalter-produkt-1500x1500-1.jpg" width="50" alt="Platzhalter Bilder"></td>
-        <td><a href="genre3.php">Link zur zukünftigen Seite</a></td>
-    </tr>
-    <tr>
-        <td>Genre Name 4</td>
-        <td>Epoche 4</td>
-        <td><img src="https://www.ri-fa.de/wp-content/uploads/2022/10/ri-fa-platzhalter-produkt-1500x1500-1.jpg" width="50" alt="Platzhalter Bilder"></td>
-        <td><a href="genre4.php">Link zur zukünftigen Seite</a></td>
-    </tr>
-    <tr>
-        <td>Genre Name 5</td>
-        <td>Epoche 5</td>
-        <td><img src="https://www.ri-fa.de/wp-content/uploads/2022/10/ri-fa-platzhalter-produkt-1500x1500-1.jpg" width="50" alt="Platzhalter Bilder"></td>
-        <td><a href="genre4.php">Link zur zukünftigen Seite</a></td>
-    </tr>
-    </tbody>
-</table>
+require_once __DIR__.'/../includes/header.php';
 
-</body>
+?>
+
+<section class="page-heading">
+    <h1>Genre durchsuchen</h1>
+    <p>Entdecken sie Genres</p>
+</section>
+
+<section class="container my-4">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <?php foreach ($genres as $genre): ?>
+            <?php include __DIR__ . '/../components/artist-card.php'; ?>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

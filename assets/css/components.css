@@ -1,19 +1,11 @@
-/* ===== Fonts ===== */
-
-@font-face
-{
-    font-family: 'Italic';
-    src: url('../fonts/GoogleSans-Italic-VariableFont_GRAD,opsz,wght.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
 /* ===== Components ===== */
 
 body
 {
     font-family: 'Italic', sans-serif;
 }
+
+/* ===== Components: header ===== */
 .page-header {
     padding-bottom: 1rem;
     border-bottom: 1px solid #dee2e6;
@@ -26,6 +18,8 @@ body
 .page-subtitle {
     color: #6c757d;
 }
+
+/* ===== Components: card ===== */
 
 .ui-card {
     transition: transform 0.15s ease-in-out;
@@ -40,8 +34,56 @@ body
     object-fit: cover;
 }
 
+/* ===== Components: suchen ===== */
+
+.search-bar{
+    margin-bottom: 1rem;
+}
+
+/* ===== Components: sortieren ===== */
 .sort-bar {
     padding: 1rem;
     border: 1px solid #dee2e6;
     border-radius: 0.5rem;
 }
+
+/* ===== Components: sternbewertung ===== */
+
+.star-rating{
+    font-size: 1.2rem;
+}
+.star-filled{
+    color: gold;
+}
+
+/* ===== Components: Accordion ===== */
+.accordion-item{
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.accordion-toggle{
+    width: 100%;
+    padding: 1rem;
+    background: #f8f9fa;
+    border: none;
+    text-align: left;
+}
+
+.accordion-content{
+    padding: 1rem;
+}
+
+/* ===== Components: Modal ===== */
+.custom-modal{
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.custom-modal-content{
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+}
+
