@@ -10,29 +10,33 @@ require_once __DIR__ . '/../helpers.php';
  */
 function renderMostRecentReviewsBox(array $reviews): void
 {
-    usort($reviews, static function (array $a, array $b): int {
-        return strcmp((string) $b['date'], (string) $a['date']);
-    });
-
-    $recentReviews = array_slice($reviews, 0, 3);
     ?>
     <section class="data-box">
-        <h2>Most-recent reviews</h2>
-        <p class="box-note">Newest community opinions.</p>
+        <h2>Neueste Bewertungen</h2>
+        <p class="box-note">Aktuelle Bewertungen aus der Datenbank.</p>
 
-        <ul class="clean-list">
-            <?php foreach ($recentReviews as $review): ?>
-                <li>
-                    <a href="<?= e(artworkUrl((int) $review['artwork_id'])); ?>">
-                        <strong><?= e((string) $review['artwork_title']); ?></strong>
-                        <span><?= e((string) $review['text']); ?></span>
-                        <small>
-                            <?= e((string) $review['user']); ?> · <?= e((string) $review['rating']); ?>/5
-                        </small>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
+        <?php if (empty($reviews)): ?>
+            <p>Keine Bewertungen gefunden.</p>
+        <?php else: ?>
+            <ul class="clean-list">
+                <?php foreach ($reviews as $review): ?>
+                    <?php
+                    $artworkId = (int) ($review['ArtWorkId'] ?? $review['artwork_id'] ?? 0);
+                    $title = (string) ($review['Title'] ?? $review['artwork_title'] ?? 'Unbekanntes Kunstwerk');
+                    $comment = (string) ($review['Comment'] ?? $review['text'] ?? '');
+                    $rating = (string) ($review['Rating'] ?? $review['rating'] ?? '');
+                    $date = (string) ($review['ReviewDate'] ?? $review['date'] ?? '');
+                    ?>
+                    <li>
+                        <a href="<?= e(artworkDetailUrl($artworkId)); ?>">
+                            <strong><?= e($title); ?></strong>
+                            <span><?= e($comment !== '' ? $comment : 'Keine Beschreibung'); ?></span>
+                            <small><?= e($rating); ?>/5 · <?= e($date); ?></small>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
     </section>
     <?php
 }
