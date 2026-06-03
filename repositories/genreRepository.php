@@ -2,20 +2,33 @@
 
 require_once __DIR__ . '/../model/genre.php';
 
+/**
+ * Repository für Datenbankabfragen rund um die Genres
+ */
 class genreRepository
 {
     private $db;
 
+    /**
+     * Erstellt eine neue Instanz des genreRepository
+     *
+     * @param object $db Das Datenbank-Zugriffsobjekt (dbaccess)
+     */
     public function __construct($db)
     {
         $this->db = $db;
     }
 
+    /**
+     * Holt alle Genres aus der Datenbank
+     *
+     * @return array Ein Array aus fertigen genre-Objekten
+     */
     public function findAll()
     {
         $sql = "SELECT * FROM genres";
 
-        $stmt = $this->db->preparedstatement($sql);
+        $stmt = $this->db->preparedStatement($sql);
         $stmt->execute();
 
         $rows = $stmt->fetchAll();
@@ -29,6 +42,11 @@ class genreRepository
         return $genres;
     }
 
+    /**
+     * Holt alle Genres sortiert nach Epoche und Name für die Übersicht
+     *
+     * @return array Ein Array aus fertigen genre-Objekten
+     */
     public function getAllForBrowse()
     {
         $sql = "SELECT * FROM genres ORDER BY Era ASC, GenreName ASC";
@@ -38,6 +56,12 @@ class genreRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Holt alle Genres die einem bestimmten Kunstwerk zugeordnet sind
+     *
+     * @param int $artworkId Die ID des Kunstwerks
+     * @return array Ein Array aus fertigen genre-Objekten
+     */
     public function getGenresForArtwork($artworkId)
     {
         $sql = "SELECT g.* FROM genres g, ArtworkGenres ag 
