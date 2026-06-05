@@ -7,11 +7,14 @@ $pageTitle = 'Kunstwerke durchsuchen';
 $sort = safeParam((string) ($_GET['sort'] ?? 'title'), ['title', 'artist', 'year'], 'title');
 $direction = safeParam(strtolower((string) ($_GET['direction'] ?? 'asc')), ['asc', 'desc'], 'asc');
 
-$db = new dbaccess();
-$db->connect();
-
-$artworkRepository = new artworkRepository($db);
-$artworks = $artworkRepository->getAllSorted($sort, $direction);
+try {
+    $db = new dbaccess();
+    $db->connect();
+    $artworkRepository = new artworkRepository($db);
+    $artworks = $artworkRepository->getAllSorted($sort, $direction);
+} catch (Exception $e) {
+    $artworks = [];
+}
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
@@ -48,11 +51,13 @@ require_once __DIR__ . '/../includes/header.php';
     <section class="artwork-card-grid" aria-label="Liste der Kunstwerke">
         <?php foreach ($artworks as $artwork): ?>
             <?php
-            $artworkId = (int) ($artwork['ArtWorkID'] ?? 0);
-            $title = (string) ($artwork['Title'] ?? 'Unbekanntes Kunstwerk');
-            $artistName = trim((string) ($artwork['FirstName'] ?? '') . ' ' . (string) ($artwork['LastName'] ?? ''));
-            $year = (string) ($artwork['YearOfWork'] ?? '');
-            $imageFileName = (string) ($artwork['ImageFileName'] ?? '');
+            $artworkId = $artwork->getArtworkid();
+            $title = $artwork->getTitle();
+            $artistName = trim(
+                ($artwork->getFirstName() ?? '') . ' ' . ($artwork->getLastName() ?? '')
+            );
+            $year = $artwork->getYearofwork();
+            $imageFileName = $artwork->getImagefilename();
             ?>
 
             <article class="artwork-card-link-wrapper">

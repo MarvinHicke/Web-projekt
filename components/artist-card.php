@@ -14,7 +14,7 @@
 
             <?php
             $buttonText = 'Ansehen';
-            $buttonHref = 'single-artist.php?id=' . urlencode($artist->getArtistid());
+            $buttonHref = 'single-artist.php?id=' . urlencode($artist->getId());
             $buttonVariant = 'primary';
             include __DIR__ . '/button.php';
             ?>
