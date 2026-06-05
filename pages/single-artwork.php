@@ -1,28 +1,56 @@
 <?php
 require_once __DIR__ . '/../includes/bootstrap.php';
-/*
+require_once __DIR__ . '/../includes/mock-data.php';
 require_once __DIR__ . '/../repositories/artworkRepository.php';
 require_once __DIR__ . '/../repositories/artistRepository.php';
-require_once __DIR__ . '/../repositories/genreRepository.php';
-require_once __DIR__ . '/../repositories/subjectRepository.php';
-require_once __DIR__ . '/../repositories/galleryRepository.php';
-require_once __DIR__ . '/../repositories/reviewRepository.php';
-*/
-require_once __DIR__ . '/../includes/mock-data.php';
 
 $artworkId = (int) ($_GET['id'] ?? 0);
+
 $selectedArtwork = null;
 
 foreach ($artworks as $artwork) {
     $currentId = (int) ($artwork['id'] ?? $artwork['ArtWorkID'] ?? 0);
-
     if ($currentId === $artworkId) {
         $selectedArtwork = $artwork;
         break;
     }
 }
 
+$fromDb = false;
+
 if ($selectedArtwork === null) {
+    try {
+        $db = new dbaccess();
+        $db->connect();
+        $artworkRepository = new artworkRepository($db);
+        $artworkObj = $artworkRepository->getById($artworkId);
+
+        if ($artworkObj !== null) {
+            $fromDb = true;
+            $artistRepository = new artistRepository($db);
+            $artistObj = $artistRepository->getById($artworkObj->getArtistid());
+
+            $title = $artworkObj->getTitle();
+            $artistId = $artworkObj->getArtistid();
+            $artistName = $artistObj
+                ? trim($artistObj->getFirstName() . ' ' . $artistObj->getLastName())
+                : 'Unbekannter Künstler';
+            $year = $artworkObj->getYearofwork() ?? 'Unbekannt';
+            $imageFileName = $artworkObj->getImagefilename();
+            $image = $imageFileName !== '' ? artworkImageUrl($imageFileName, 'medium') : '';
+            $largeImage = $imageFileName !== '' ? artworkImageUrl($imageFileName, 'large') : '';
+            $genre = 'Nicht hinterlegt';
+            $subjects = [];
+            $gallery = 'Keine Galerie hinterlegt';
+            $averageRating = null;
+            $artworkReviews = [];
+        }
+    } catch (Exception $e) {
+        $selectedArtwork = null;
+    }
+}
+
+if (!$fromDb && $selectedArtwork === null) {
     $pageTitle = 'Kunstwerk nicht gefunden';
     require_once __DIR__ . '/../includes/header.php';
     ?>
@@ -38,24 +66,25 @@ if ($selectedArtwork === null) {
     exit;
 }
 
-$title = (string) ($selectedArtwork['title'] ?? $selectedArtwork['Title'] ?? 'Unbekanntes Kunstwerk');
-$artistId = (int) ($selectedArtwork['artist_id'] ?? $selectedArtwork['ArtistID'] ?? 0);
-$artistName = trim((string) ($selectedArtwork['artist_first_name'] ?? $selectedArtwork['FirstName'] ?? '') . ' ' . (string) ($selectedArtwork['artist_last_name'] ?? $selectedArtwork['LastName'] ?? ''));
-$year = (string) ($selectedArtwork['year'] ?? $selectedArtwork['YearOfWork'] ?? 'Unbekannt');
-$image = (string) ($selectedArtwork['image'] ?? $selectedArtwork['ImageFileName'] ?? '');
-$largeImage = (string) ($selectedArtwork['large_image'] ?? $image);
-$genre = (string) ($selectedArtwork['genre'] ?? 'Nicht hinterlegt');
-$subjects = $selectedArtwork['subjects'] ?? [];
-$gallery = (string) ($selectedArtwork['gallery'] ?? 'Keine Galerie hinterlegt');
-$averageRating = $selectedArtwork['average_rating'] ?? null;
+if (!$fromDb) {
+    $title = (string) ($selectedArtwork['title'] ?? $selectedArtwork['Title'] ?? 'Unbekanntes Kunstwerk');
+    $artistId = (int) ($selectedArtwork['artist_id'] ?? $selectedArtwork['ArtistID'] ?? 0);
+    $artistName = trim((string) ($selectedArtwork['artist_first_name'] ?? $selectedArtwork['FirstName'] ?? '') . ' ' . (string) ($selectedArtwork['artist_last_name'] ?? $selectedArtwork['LastName'] ?? ''));
+    $year = (string) ($selectedArtwork['year'] ?? $selectedArtwork['YearOfWork'] ?? 'Unbekannt');
+    $image = (string) ($selectedArtwork['image'] ?? $selectedArtwork['ImageFileName'] ?? '');
+    $largeImage = (string) ($selectedArtwork['large_image'] ?? $image);
+    $genre = (string) ($selectedArtwork['genre'] ?? 'Nicht hinterlegt');
+    $subjects = $selectedArtwork['subjects'] ?? [];
+    $gallery = (string) ($selectedArtwork['gallery'] ?? 'Keine Galerie hinterlegt');
+    $averageRating = $selectedArtwork['average_rating'] ?? null;
 
-$artworkReviews = [];
+    $artworkReviews = [];
 
-foreach ($reviews as $review) {
-    $reviewArtworkId = (int) ($review['artwork_id'] ?? $review['ArtWorkId'] ?? 0);
-
-    if ($reviewArtworkId === $artworkId) {
-        $artworkReviews[] = $review;
+    foreach ($reviews as $review) {
+        $reviewArtworkId = (int) ($review['artwork_id'] ?? $review['ArtWorkId'] ?? 0);
+        if ($reviewArtworkId === $artworkId) {
+            $artworkReviews[] = $review;
+        }
     }
 }
 
