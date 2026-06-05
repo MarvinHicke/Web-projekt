@@ -82,8 +82,8 @@ class customerRepository
     {
         try
         {
-            $sqlLogon = "INSERT INTO customerlogon (UserName, Pass, Type, State)
-                     VALUES (:userName, :pass, 1, 1)";
+            $sqlLogon = "INSERT INTO customerlogon (UserName, Pass, Salt, Type, State, DateJoined, DateLastModified)
+                        VALUES (:userName, :pass, '', 1, 1, NOW(), NOW())";
 
             $stmtL = $this->db->preparedStatement($sqlLogon);
             $stmtL->execute
