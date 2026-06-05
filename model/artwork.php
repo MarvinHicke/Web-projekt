@@ -21,6 +21,8 @@ class artwork
     private $galleryid;
     private $artworklink;
     private $googlelink;
+    private $firstname;
+    private $lastname;
 
     /**
      * Erstellt ein neues Artwork-Objekt anhand eines Datenbank-Datensatzes
@@ -44,6 +46,8 @@ class artwork
         $this->galleryid = $data['GalleryID'];
         $this->artworklink = $data['ArtWorkLink'];
         $this->googlelink = $data['GoogleLink'];
+        $this->firstname = $data['FirstName'] ?? null;
+        $this->lastname = $data['LastName'] ?? null;
     }
 
     // Getter
@@ -75,7 +79,11 @@ class artwork
      */
     function getImagefilename ()
     {
-        return $this->imagefilename;
+        $name = $this->imagefilename;
+        if (is_numeric($name) && strlen($name) < 6) {
+            $name = str_pad($name, 6, '0', STR_PAD_LEFT);
+        }
+        return $name;
     }
 
     /**
@@ -196,5 +204,25 @@ class artwork
     function getGooglelink ()
     {
         return $this->googlelink;
+    }
+
+    /**
+     * Gibt den Vornamen des Künstlers zurück
+     *
+     * @return string|null Der Vorname
+     */
+    function getFirstName ()
+    {
+        return $this->firstname;
+    }
+
+    /**
+     * Gibt den Nachnamen des Künstlers zurück
+     *
+     * @return string|null Der Nachname
+     */
+    function getLastName ()
+    {
+        return $this->lastname;
     }
 }
