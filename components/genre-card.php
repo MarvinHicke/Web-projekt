@@ -3,18 +3,16 @@
         <div class="card-body">
 
             <h2 class="h5 card-title">
-                <?= htmlspecialchars(
-                    $genre->getAllForBrowse()
-                ) ?>
+                <?= htmlspecialchars($genre->getGenreName()) ?>
             </h2>
 
             <p class="card-text text-muted">
-                Genre ID: <?= htmlspecialchars($genre->getId()) ?>
+                Epoche: <?= htmlspecialchars($genre->getEra()) ?>
             </p>
 
             <?php
             $buttonText = 'Ansehen';
-            $buttonHref = 'single-genre.php?id=' . urlencode($genre->getGenreid());
+            $buttonHref = 'single-genre.php?id=' . urlencode($genre->getGenreID());
             $buttonVariant = 'primary';
             include __DIR__ . '/button.php';
             ?>
