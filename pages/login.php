@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../repositories/customerRepository.php';
 $pageTitle = "Anmelden";
@@ -80,7 +79,7 @@ require_once __DIR__ . '/../includes/header.php';
     ?>
 <?php endif; ?>
 
-<form method="POST" novalidate>
+<form method="POST">
     <div>
         <label for="email">E-Mail</label>
         <input
