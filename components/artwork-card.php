@@ -35,6 +35,18 @@
                 ?>
             <?php endif; ?>
 
+            <?php if (($showRemoveFavoriteButton ?? false) === true): ?>
+                <div class="mt-2">
+                    <?php
+                    $buttonText = 'Aus Favoriten entfernen';
+                    $buttonHref = base_url('pages/remove-favorite.php')
+                            . '?type=artwork&id=' . urlencode((string) $artwork->getArtworkid());
+                    $buttonVariant = 'danger';
+                    include __DIR__ . '/button.php';
+                    ?>
+                </div>
+            <?php endif; ?>
+
         </div>
     </div>
 </article>

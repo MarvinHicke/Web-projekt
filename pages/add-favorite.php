@@ -24,7 +24,7 @@ $id=(int) ($_GET["id"] ?? 0);
 $allowedTypes=["artwork","artist"];
 $redirectTarget = (string) ($_GET["redirect"] ?? "favorites.php");
 
-$allowedRedirects = ["favorites.php", "browse-artists.php", "browse-artworks.php"];
+$allowedRedirects = ["favorites.php", "browse-artists.php", "browse-artworks.php", "single-artist.php", "single-artwork.php"];
 
 if (!in_array($redirectTarget, $allowedRedirects, true)) {
     $redirectTarget = "favorites.php";
@@ -39,7 +39,14 @@ if($id<=0)
     header("Location: " . $redirectTarget);
     exit;
 }
+
+if ($redirectTarget === "single-artwork.php" && $type === "artwork")
+{
+    $redirectTarget = "single-artwork.php?id=" . urlencode((string) $id);
+}
+
 $favoriteKey=$type==="artwork"?"artworks":"artists";
+
 if (!in_array($id, $_SESSION["favorites"][$favoriteKey], true))
 {
     $_SESSION["favorites"][$favoriteKey][] = $id;

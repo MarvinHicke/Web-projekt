@@ -54,7 +54,7 @@ require_once __DIR__ . "/../includes/header.php";
 ?>
 
 <h1>Favoriten</h1>
-<p>Hier werden später deine favorisierten Kunstwerke und Künstler angezeigt.</p>
+<p>Hier sehen Sie ihre favorisierten Künstler und Kunstwerke.</p>
 
 <h2>Favorisierte Kunstwerke</h2>
 <?php if(empty($favoriteArtworks)) : ?>
@@ -66,16 +66,9 @@ require_once __DIR__ . "/../includes/header.php";
 <?php else: ?>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         <?php foreach ($favoriteArtworks as $artwork): ?>
-            <?php include __DIR__ . '/../components/artwork-card.php'; ?>
-        <?php endforeach; ?>
-    </div>
-    <div class="mt-3">
-        <?php foreach ($favoriteArtworks as $artwork): ?>
             <?php
-            $buttonText = 'Aus Favoriten entfernen: ' . $artwork->getTitle();
-            $buttonHref = 'remove-favorite.php?type=artwork&id=' . urlencode((string) $artwork->getArtworkid());
-            $buttonVariant = 'danger';
-            include __DIR__ . '/../components/button.php';
+            $showRemoveFavoriteButton = true;
+            include __DIR__ . '/../components/artwork-card.php';
             ?>
         <?php endforeach; ?>
     </div>
@@ -91,18 +84,9 @@ require_once __DIR__ . "/../includes/header.php";
 <?php else: ?>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         <?php foreach ($favoriteArtists as $artist): ?>
-            <?php include __DIR__ . '/../components/artist-card.php'; ?>
-        <?php endforeach; ?>
-    </div>
-    <div class="mt-3">
-        <?php foreach ($favoriteArtists as $artist): ?>
             <?php
-            $artistName = $artist->getFirstName() . ' ' . $artist->getLastName();
-
-            $buttonText = 'Aus Favoriten entfernen: ' . $artistName;
-            $buttonHref = 'remove-favorite.php?type=artist&id=' . urlencode((string) $artist->getId());
-            $buttonVariant = 'danger';
-            include __DIR__ . '/../components/button.php';
+            $showRemoveFavoriteButton = true;
+            include __DIR__ . '/../components/artist-card.php';
             ?>
         <?php endforeach; ?>
     </div>

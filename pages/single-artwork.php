@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/mock-data.php';
 require_once __DIR__ . '/../repositories/artworkRepository.php';
 require_once __DIR__ . '/../repositories/artistRepository.php';
@@ -7,6 +7,19 @@ require_once __DIR__ . '/../repositories/artistRepository.php';
 $artworkId = (int) ($_GET['id'] ?? 0);
 
 $selectedArtwork = null;
+
+if (!isset($_SESSION["favorites"]))
+{
+    $_SESSION["favorites"] = [];
+}
+
+if (!isset($_SESSION["favorites"]["artworks"]))
+{
+    $_SESSION["favorites"]["artworks"] = [];
+}
+
+$favoriteArtworkIds = array_map('intval', $_SESSION["favorites"]["artworks"]);
+$isFavoriteArtwork = $artworkId > 0 && in_array($artworkId, $favoriteArtworkIds, true);
 
 foreach ($artworks as $artwork) {
     $currentId = (int) ($artwork['id'] ?? $artwork['ArtWorkID'] ?? 0);
@@ -154,8 +167,29 @@ require_once __DIR__ . '/../includes/header.php';
 
         <div class="favorite-box">
             <p><strong>Favorit</strong></p>
-            <p>Die Favoritenfunktion wird später mit dem User-Zustand von Team E verbunden.</p>
-            <button type="button">Zu Favoriten hinzufügen</button>
+
+            <?php if ($isFavoriteArtwork): ?>
+                <p>Dieses Kunstwerk ist bereits in Ihren Favoriten.</p>
+
+                <?php
+                $buttonText = 'Favoriten anzeigen';
+                $buttonHref = base_url('pages/favorites.php');
+                $buttonVariant = 'primary';
+                include __DIR__ . '/../components/button.php';
+                ?>
+
+            <?php else: ?>
+                <p>Fügen Sie dieses Kunstwerk Ihrer Favoritenliste hinzu.</p>
+
+                <?php
+                $buttonText = 'Zu Favoriten hinzufügen';
+                $buttonHref = base_url('pages/add-favorite.php')
+                        . '?type=artwork&id=' . urlencode((string) $artworkId)
+                        . '&redirect=single-artwork.php';
+                $buttonVariant = 'outline-primary';
+                include __DIR__ . '/../components/button.php';
+                ?>
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -193,5 +227,4 @@ require_once __DIR__ . '/../includes/header.php';
     </ul>
 </section>
 
-<?php require_once __DIR__ . '/../includes/footer.php'; ?>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
