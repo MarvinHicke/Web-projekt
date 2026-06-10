@@ -3,13 +3,13 @@
 require_once __DIR__ . "/../../repositories/customerRepository.php";
 require_once __DIR__ . '/../../includes/dbaccess.php';
 
-
 $db = new dbaccess();
 $db->connect();
 
 $customerRepo = new customerRepository($db);
 
-$cData = [
+$cData =
+    [
     'FirstName' => 'Max',
     'LastName'  => 'Mustermann',
     'Address'   => 'Musterstraße 1',
@@ -90,7 +90,6 @@ if ($customerRepo->updatePassword($id, $newHash))
     echo "Test 5 (updatePassword) FEHLGESCHLAGEN.\n";
 }
 
-
 if ($customerRepo->updateState($id, 0))
 {
     $checkUser = $customerRepo->GetById($id);
@@ -106,7 +105,8 @@ if ($customerRepo->updateState($id, 0))
     echo "Test 6 (updateState) FEHLGESCHLAGEN.\n";
 }
 
-if ($customerRepo->elevateToAdmin($id)) {
+if ($customerRepo->elevateToAdmin($id))
+{
     $checkUser = $customerRepo->GetById($id);
     if ($checkUser && (int)$checkUser['Type'] === 2)
     {
@@ -120,7 +120,6 @@ if ($customerRepo->elevateToAdmin($id)) {
     echo "Test 7 (elevateToAdmin) FEHLGESCHLAGEN.\n";
 }
 
-
 $allUsers = $customerRepo->findAll();
 if (is_array($allUsers) && count($allUsers) > 0)
 {
@@ -129,3 +128,5 @@ if (is_array($allUsers) && count($allUsers) > 0)
 {
     echo "Test 8 (findAll) FEHLGESCHLAGEN.\n";
 }
+
+$db->close();

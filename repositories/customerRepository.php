@@ -1,7 +1,4 @@
 <?php
-//
-// Test-Klassen müssen aktuallisiert werden c - s!
-//
 
 /**
  * Repository für Datenbankabfragen rund um Kunden (Customers) und deren Login-Daten.
@@ -91,6 +88,8 @@ class customerRepository
                 'userName' => $lData['UserName'],
                 'pass' => $lData['Pass']
             ]);
+
+            $customerId = $this->db->getPdo()->lastInsertId();
 
             $sqlId = "SELECT MAX(CustomerID) AS MaxID FROM customerlogon";
             $stmtId = $this->db->preparedStatement($sqlId);
