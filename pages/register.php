@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../repositories/customerRepository.php';
 $pageTitle = "Registrieren";
@@ -7,13 +6,27 @@ $errors=[];
 $successMessage="";
 $firstName="";
 $lastName="";
+$address="";
+$city="";
+$region="";
+$country="";
+$postal="";
+$phone="";
 $email="";
+
 $nameMaxLength=50;
+$textMaxLength=255;
 $emailMaxLength=100;
 $passwordMinLength=8;
 if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
     $firstName=trim((string) ($_POST["firstName"] ?? ""));
     $lastName=trim((string) ($_POST["lastName"] ?? ""));
+    $address = trim((string) ($_POST["address"] ?? ""));
+    $city = trim((string) ($_POST["city"] ?? ""));
+    $region=trim((string) ($_POST["region"] ?? ""));
+    $country = trim((string) ($_POST["country"] ?? ""));
+    $postal=trim((string) ($_POST["postal"] ?? ""));
+    $phone=trim((string) ($_POST["phone"] ?? ""));
     $email=trim((string) ($_POST["email"] ?? ""));
     $password= (string) ($_POST["password"] ?? "");
     $confirmPassword= (string) ($_POST["confirmPassword"] ?? "");
@@ -33,6 +46,49 @@ if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
     if(strlen($lastName)>$nameMaxLength)
     {
         $errors[]="Der Nachname darf maximal " . $nameMaxLength . " Zeichen lang sein";
+    }
+    if ($address === "")
+    {
+        $errors[] = "Bitte geben Sie eine Adresse ein.";
+    }
+
+    if (strlen($address) > $textMaxLength)
+    {
+        $errors[] = "Die Adresse darf maximal " . $textMaxLength . " Zeichen lang sein.";
+    }
+
+    if ($city === "")
+    {
+        $errors[] = "Bitte geben Sie eine Stadt ein.";
+    }
+
+    if (strlen($city) > $textMaxLength)
+    {
+        $errors[] = "Die Stadt darf maximal " . $textMaxLength . " Zeichen lang sein.";
+    }
+
+    if ($country === "")
+    {
+        $errors[] = "Bitte geben Sie ein Land ein.";
+    }
+
+    if (strlen($country) > $textMaxLength)
+    {
+        $errors[] = "Das Land darf maximal " . $textMaxLength . " Zeichen lang sein.";
+    }
+    if (strlen($region) > $textMaxLength)
+    {
+        $errors[] = "Die Region darf maximal " . $textMaxLength . " Zeichen lang sein.";
+    }
+
+    if (strlen($postal) > $textMaxLength)
+    {
+        $errors[] = "Die Postleitzahl darf maximal " . $textMaxLength . " Zeichen lang sein.";
+    }
+
+    if (strlen($phone) > $textMaxLength)
+    {
+        $errors[] = "Die Telefonnummer darf maximal " . $textMaxLength . " Zeichen lang sein.";
     }
     if($email==="")
     {
@@ -74,6 +130,12 @@ if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
                 [
                     'FirstName' => $firstName,
                     'LastName' => $lastName,
+                    'Address' => $address,
+                    'City' => $city,
+                    'Region' => $region,
+                    'Country' => $country,
+                    'Postal' => $postal,
+                    'Phone' => $phone,
                     'Email' => $email,
                 ],
                 [
@@ -122,7 +184,7 @@ require_once __DIR__ . "/../includes/header.php";
     ?>
 <?php endif; ?>
 
-<form method="POST" novalidate>
+<form method="POST">
     <div>
         <label for="firstName">Vorname</label>
         <input
@@ -144,6 +206,75 @@ require_once __DIR__ . "/../includes/header.php";
             required
             maxlength="<?= $nameMaxLength ?>"
             value="<?= e($lastName) ?>"
+        >
+    </div>
+
+    <div>
+        <label for="address">Adresse</label>
+        <input
+                type="text"
+                id="address"
+                name="address"
+                required
+                maxlength="<?= $textMaxLength ?>"
+                value="<?= e($address) ?>"
+        >
+    </div>
+
+    <div>
+        <label for="city">Stadt</label>
+        <input
+                type="text"
+                id="city"
+                name="city"
+                required
+                maxlength="<?= $textMaxLength ?>"
+                value="<?= e($city) ?>"
+        >
+    </div>
+
+    <div>
+        <label for="region">Region</label>
+        <input
+                type="text"
+                id="region"
+                name="region"
+                maxlength="<?= $textMaxLength ?>"
+                value="<?= e($region) ?>"
+        >
+    </div>
+
+    <div>
+        <label for="country">Land</label>
+        <input
+                type="text"
+                id="country"
+                name="country"
+                required
+                maxlength="<?= $textMaxLength ?>"
+                value="<?= e($country) ?>"
+        >
+    </div>
+
+    <div>
+        <label for="postal">Postleitzahl</label>
+        <input
+                type="text"
+                id="postal"
+                name="postal"
+                maxlength="<?= $textMaxLength ?>"
+                value="<?= e($postal) ?>"
+        >
+    </div>
+
+    <div>
+        <label for="phone">Telefon</label>
+        <input
+                type="tel"
+                id="phone"
+                name="phone"
+                maxlength="<?= $textMaxLength ?>"
+                value="<?= e($phone) ?>"
         >
     </div>
 

@@ -37,7 +37,12 @@ class reviewRepository
      */
     public function getForArtwork($artworkId)
     {
-        $sql = "SELECT * FROM reviews WHERE ArtWorkId = :id ORDER BY ReviewDate DESC";
+        $sql = "SELECT r.*, c.FirstName, c.LastName, cl.UserName
+        FROM reviews r
+        LEFT JOIN customers c ON r.CustomerId = c.CustomerID
+        LEFT JOIN customerlogon cl ON r.CustomerId = cl.CustomerID
+        WHERE r.ArtWorkId = :id
+        ORDER BY r.ReviewDate DESC";
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute(['id' => $artworkId]);
 
@@ -98,7 +103,7 @@ class reviewRepository
      */
     public function addReview($artworkId, $customerId, $rating, $comment)
     {
-        $currentDate = date('d.m.Y H:i:s');
+        $currentDate = date('Y.m.d H:i:s');
         $sql = "INSERT INTO reviews (ArtWorkId, CustomerId, ReviewDate, Rating, Comment) 
                 VALUES (:artworkId, :customerId, :reviewDate, :rating, :comment)";
 

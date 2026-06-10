@@ -131,15 +131,24 @@ class customerRepository
      */
     public function update($id, $data)
     {
-        $sql = "UPDATE customers 
-                SET FirstName = :firstName, LastName = :lastName, Address = :address, 
-                    City = :city, Region = :region, Country = :country, 
-                    Postal = :postal, Phone = :phone, Email = :email 
-                WHERE CustomerID = :id";
+        $sql = "UPDATE customers c
+            JOIN customerlogon cl ON c.CustomerID = cl.CustomerID
+            SET c.FirstName = :firstName,
+                c.LastName = :lastName,
+                c.Address = :address,
+                c.City = :city,
+                c.Region = :region,
+                c.Country = :country,
+                c.Postal = :postal,
+                c.Phone = :phone,
+                c.Email = :email,
+                cl.UserName = :userName,
+                cl.DateLastModified = NOW()
+            WHERE c.CustomerID = :id";
 
         $stmt = $this->db->preparedStatement($sql);
-        return $stmt->execute
-        ([
+
+        return $stmt->execute([
             'firstName' => $data['FirstName'],
             'lastName'  => $data['LastName'],
             'address'   => $data['Address'],
@@ -149,6 +158,7 @@ class customerRepository
             'postal'    => $data['Postal'],
             'phone'     => $data['Phone'],
             'email'     => $data['Email'],
+            'userName'  => $data['Email'],
             'id'        => $id
         ]);
     }
@@ -162,10 +172,14 @@ class customerRepository
      */
     public function updatePassword($id, $hashedPassword)
     {
-        $sql = "UPDATE customerlogon SET Pass = :pass WHERE CustomerID = :id";
+        $sql = "UPDATE customerlogon 
+            SET Pass = :pass,
+                DateLastModified = NOW()
+            WHERE CustomerID = :id";
+
         $stmt = $this->db->preparedStatement($sql);
-        return $stmt->execute
-        ([
+
+        return $stmt->execute([
             'pass' => $hashedPassword,
             'id' => $id
         ]);
