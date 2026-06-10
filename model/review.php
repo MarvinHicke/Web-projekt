@@ -11,6 +11,7 @@ class review
     private $comment;
     private $reviewDate;
     private $customerId;
+    private $customerName;
 
     /**
      * Erstellt ein neues Review-Objekt anhand eines Datenbank-Datensatzes
@@ -25,6 +26,20 @@ class review
         $this->rating = $row['Rating'] ?? 0;
         $this->comment = $row['Comment'] ?? '';
         $this->reviewDate = $row['ReviewDate'] ?? '';
+
+        $firstName = trim((string) ($row['FirstName'] ?? ''));
+        $lastName = trim((string) ($row['LastName'] ?? ''));
+        $userName = (string) ($row['UserName'] ?? '');
+
+        $fullName = trim($firstName . ' ' . $lastName);
+
+        if ($fullName !== '') {
+            $this->customerName = $fullName;
+        } elseif ($userName !== '') {
+            $this->customerName = $userName;
+        } else {
+            $this->customerName = 'Unbekannter Nutzer';
+        }
     }
 
     // Getter
@@ -97,5 +112,15 @@ class review
     public function getReviewDateFormatted()
     {
         return date('d.m.Y', strtotime($this->reviewDate));
+    }
+
+    /**
+     * Gibt den Anzeigenamen des Kunden zurück, der die Bewertung geschrieben hat
+     *
+     * @return string Der Kundenname oder Benutzername
+     */
+    public function getCustomerName()
+    {
+        return $this->customerName;
     }
 }
