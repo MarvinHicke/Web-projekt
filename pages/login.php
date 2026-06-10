@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../repositories/customerRepository.php';
 $pageTitle = "Anmelden";
@@ -29,15 +28,28 @@ if(($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST")
         $customerRepository = new customerRepository(db());
         $user = $customerRepository->GetByUsername($email);
 
-        if (!$user || (int)($user['State'] ?? 0) !== 1 || !password_verify($password, (string)$user['Pass'])) {
+        $passwordIsValid = false;
+
+        if ($user && (int)($user['State'] ?? 0) === 1) {
+            $storedPassword = (string)($user['Pass'] ?? '');
+            $passwordInfo = password_get_info($storedPassword);
+
+            if (($passwordInfo['algo'] ?? 0) !== 0) {
+                $passwordIsValid = password_verify($password, $storedPassword);
+            } else {
+                $passwordIsValid = hash_equals($storedPassword, $password);
+            }
+        }
+
+        if (!$user || (int)($user['State'] ?? 0) !== 1 || !$passwordIsValid) {
             $errors[] = "E-Mail oder Passwort ist falsch.";
         } else {
             $_SESSION['user'] = [
-                'CustomerID' => (int)$user['CustomerID'],
-                'UserName' => (string)$user['UserName'],
-                'Type' => (int)$user['Type'],
-                'FirstName' => (string)($user['FirstName'] ?? ''),
-                'LastName' => (string)($user['LastName'] ?? ''),
+                    'CustomerID' => (int)$user['CustomerID'],
+                    'UserName' => (string)($user['UserName'] ?? $user['Email'] ?? $email),
+                    'Type' => (int)$user['Type'],
+                    'FirstName' => (string)($user['FirstName'] ?? ''),
+                    'LastName' => (string)($user['LastName'] ?? ''),
             ];
 
             header('Location: ' . base_url('index.php'));
@@ -67,7 +79,7 @@ require_once __DIR__ . '/../includes/header.php';
     ?>
 <?php endif; ?>
 
-<form method="POST" novalidate>
+<form method="POST">
     <div>
         <label for="email">E-Mail</label>
         <input
