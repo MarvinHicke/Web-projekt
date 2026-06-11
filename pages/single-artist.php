@@ -47,13 +47,33 @@ try {
 $firstName   = (string) ($artistRow['FirstName']   ?? '');
 $lastName    = (string) ($artistRow['LastName']     ?? '');
 $fullName    = trim($firstName . ' ' . $lastName);
-$nationality = (string) ($artistRow['Nationality'] ?? '');
-$details     = cleanHtml($artistRow['Details']     ?? '');
-$artistLink  = (string) ($artistRow['ArtistLink']  ?? '');
+$nationality = (string) ($artistRow['Nationality'] ?? $artistRow['nationality'] ?? '');
+// Details and ArtistLink — try multiple casing variants (DB column names vary)
+$details     = cleanHtml(
+    $artistRow['Details']     ??
+    $artistRow['details']     ??
+    $artistRow['Description'] ?? ''
+);
+$artistLink  = (string) (
+    $artistRow['ArtistLink']  ??
+    $artistRow['artistlink']  ??
+    $artistRow['Artistlink']  ??
+    $artistRow['Link']        ?? ''
+);
 
-// Date: try BirthYear + DeathYear, or a single "BirthYear" range string
-$birthYear   = (string) ($artistRow['BirthYear']   ?? '');
-$deathYear   = (string) ($artistRow['DeathYear']   ?? '');
+// Date — try BirthYear with multiple casing variants (DB column names vary)
+$birthYear   = (string) (
+    $artistRow['BirthYear']   ??
+    $artistRow['birthyear']   ??
+    $artistRow['Birthyear']   ??
+    $artistRow['birth_year']  ?? ''
+);
+$deathYear   = (string) (
+    $artistRow['DeathYear']   ??
+    $artistRow['deathyear']   ??
+    $artistRow['Deathyear']   ??
+    $artistRow['death_year']  ?? ''
+);
 if ($birthYear !== '' && $deathYear !== '') {
     $dateString = $birthYear . ' – ' . $deathYear;
 } elseif ($birthYear !== '') {
