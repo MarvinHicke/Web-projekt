@@ -148,7 +148,7 @@ if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
                 $user = $customerRepository->GetByUsername($email);
                 $_SESSION['user'] = [
                     'CustomerID' => (int)$user['CustomerID'],
-                    'UserName' => (string)$user['UserName'],
+                    'UserName' => (string)($user['UserName'] ?? $user['Email'] ?? $email),
                     'Type' => (int)$user['Type'],
                     'FirstName' => (string)($user['FirstName'] ?? ''),
                     'LastName' => (string)($user['LastName'] ?? ''),
