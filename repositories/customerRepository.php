@@ -131,20 +131,20 @@ class customerRepository
      */
     public function update($id, $data)
     {
-        $sql = "UPDATE customers c
-            JOIN customerlogon cl ON c.CustomerID = cl.CustomerID
-            SET c.FirstName = :firstName,
-                c.LastName = :lastName,
-                c.Address = :address,
-                c.City = :city,
-                c.Region = :region,
-                c.Country = :country,
-                c.Postal = :postal,
-                c.Phone = :phone,
-                c.Email = :email,
-                cl.UserName = :userName,
-                cl.DateLastModified = NOW()
-            WHERE c.CustomerID = :id";
+        $sql = "UPDATE customers c, customerlogon cl
+                SET c.FirstName = :firstName,
+                    c.LastName = :lastName,
+                    c.Address = :address,
+                    c.City = :city,
+                    c.Region = :region,
+                    c.Country = :country,
+                    c.Postal = :postal,
+                    c.Phone = :phone,
+                    c.Email = :email,
+                    cl.UserName = :userName,
+                    cl.DateLastModified = NOW()
+                WHERE c.CustomerID = cl.CustomerID 
+                  AND c.CustomerID = :id";
 
         $stmt = $this->db->preparedStatement($sql);
 

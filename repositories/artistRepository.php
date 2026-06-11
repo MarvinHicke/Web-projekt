@@ -72,9 +72,9 @@ class artistRepository
     public function getMostReviewedArtists($limit = 3)
     {
         $sql =
-            "SELECT a.*, 
-               (SELECT COUNT(r.ReviewId) 
-                FROM reviews r, artworks aw 
+            "SELECT a.*,
+               (SELECT COUNT(r.ReviewId)
+                FROM reviews r, artworks aw
                 WHERE r.ArtWorkId = aw.ArtWorkID AND aw.ArtistID = a.ArtistID) as ReviewCount
             FROM artists a
             ORDER BY ReviewCount DESC
@@ -123,13 +123,17 @@ class artistRepository
      * Sucht künstler deren Nachname mit einem bestimmten Suchwort beginnt
      *
      * @param string $keyword Das Suchwort
+     * @param string $direction Die Sortierreihenfolge ('ASC' oder 'DESC'). Standard ist 'ASC'
      * @return array Ein Array aus dem Treffer des Suchbegriffs
      */
-    public function searchByLastName($keyword)
+    public function searchByLastName($keyword, $direction = 'ASC')
     {
         $searchString = $keyword . '%';
+        $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
 
-        $sql = "SELECT * FROM artists WHERE LastName LIKE :keyword ORDER BY LastName ASC";
+        $sql = "SELECT * FROM artists
+                WHERE LastName LIKE :keyword
+                ORDER BY LastName " . $dir;
 
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute(['keyword' => $searchString]);
