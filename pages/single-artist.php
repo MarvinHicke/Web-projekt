@@ -1,110 +1,89 @@
 <?php
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
-require_once __DIR__ . '/../repositories/artistRepository.php';
 require_once __DIR__ . '/../repositories/artworkRepository.php';
- 
+
 $artistId = (int) ($_GET['id'] ?? 0);
- 
+
 if ($artistId <= 0) {
     $pageTitle = 'Künstler nicht gefunden';
     require_once __DIR__ . '/../includes/header.php';
-    ?>
-    <section class="page-heading">
-        <h1>Künstler nicht gefunden</h1>
-        <p>Ungültige Künstler-ID.</p>
-        <a class="button-link" href="<?= e(base_url('pages/browse-artists.php')); ?>">Zurück zur Künstlerübersicht</a>
-    </section>
-    <?php
+    echo '<section class="page-heading"><h1>Ungültige ID</h1>'
+       . '<a class="button-link" href="' . e(base_url('pages/browse-artists.php')) . '">Zurück zur Übersicht</a></section>';
     require_once __DIR__ . '/../includes/footer.php';
     exit;
 }
- 
+
 try {
     $db = new dbaccess();
     $db->connect();
- 
-    // Full raw row to access all DB columns (Details, ArtistLink, etc.)
-    $rawStmt = $db->preparedStatement("SELECT * FROM artists WHERE ArtistID = :id");
-    $rawStmt->execute(['id' => $artistId]);
-    $artistRow = $rawStmt->fetch(PDO::FETCH_ASSOC);
- 
+
+    // Raw SELECT * to capture all DB columns including Details, ArtistLink, BirthYear, DeathYear
+    $stmt = $db->preparedStatement("SELECT * FROM artists WHERE ArtistID = :id");
+    $stmt->execute(['id' => $artistId]);
+    $artistRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
     if (!$artistRow) {
         $pageTitle = 'Künstler nicht gefunden';
         require_once __DIR__ . '/../includes/header.php';
-        ?>
-        <section class="page-heading">
-            <h1>Künstler nicht gefunden</h1>
-            <p>Kein Künstler mit dieser ID gefunden.</p>
-            <a class="button-link" href="<?= e(base_url('pages/browse-artists.php')); ?>">Zurück zur Künstlerübersicht</a>
-        </section>
-        <?php
+        echo '<section class="page-heading"><h1>Künstler nicht gefunden</h1>'
+           . '<a class="button-link" href="' . e(base_url('pages/browse-artists.php')) . '">Zurück zur Übersicht</a></section>';
         require_once __DIR__ . '/../includes/footer.php';
         exit;
     }
- 
-    $artworkRepo = new artworkRepository($db);
-    $artworks    = $artworkRepo->getForArtist($artistId);
- 
+
+    $artworks = (new artworkRepository($db))->getForArtist($artistId);
+
 } catch (Exception $e) {
     $pageTitle = 'Fehler';
     require_once __DIR__ . '/../includes/header.php';
-    ?>
-    <section class="page-heading">
-        <h1>Fehler beim Laden</h1>
-        <p>Die Seite konnte nicht geladen werden.</p>
-        <a class="button-link" href="<?= e(base_url('pages/browse-artists.php')); ?>">Zurück zur Künstlerübersicht</a>
-    </section>
-    <?php
+    echo '<section class="page-heading"><h1>Ladefehler</h1>'
+       . '<a class="button-link" href="' . e(base_url('pages/browse-artists.php')) . '">Zurück</a></section>';
     require_once __DIR__ . '/../includes/footer.php';
     exit;
 }
- 
-// ── computed values ───────────────────────────────────────────────────────────
-$firstName   = (string) ($artistRow['FirstName'] ?? '');
-$lastName    = (string) ($artistRow['LastName'] ?? '');
+
+// ── display values ─────────────────────────────────────────────────────────
+$firstName   = (string) ($artistRow['FirstName']   ?? '');
+$lastName    = (string) ($artistRow['LastName']     ?? '');
 $fullName    = trim($firstName . ' ' . $lastName);
 $nationality = (string) ($artistRow['Nationality'] ?? '');
-$birthYear   = (string) ($artistRow['BirthYear'] ?? '');
-$deathYear   = (string) ($artistRow['DeathYear'] ?? '');       // may not exist
-$details     = (string) ($artistRow['Details'] ?? '');          // biography
-$artistLink  = (string) ($artistRow['ArtistLink'] ?? '');       // Wikipedia etc.
- 
-// Build date string: "1853 – 1890" or just "1853" if no death year
-$dateString = $birthYear;
-if ($deathYear !== '') {
-    $dateString .= ' – ' . $deathYear;
+$details     = cleanHtml($artistRow['Details']     ?? '');
+$artistLink  = (string) ($artistRow['ArtistLink']  ?? '');
+
+// Date: try BirthYear + DeathYear, or a single "BirthYear" range string
+$birthYear   = (string) ($artistRow['BirthYear']   ?? '');
+$deathYear   = (string) ($artistRow['DeathYear']   ?? '');
+if ($birthYear !== '' && $deathYear !== '') {
+    $dateString = $birthYear . ' – ' . $deathYear;
+} elseif ($birthYear !== '') {
+    $dateString = $birthYear;
+} else {
+    $dateString = '';
 }
- 
+
 $artistPhoto = artistImageUrl($artistId, 'medium');
- 
+
 $isFavorited = isset($_SESSION['favorites']['artists'])
                && in_array($artistId, array_map('intval', $_SESSION['favorites']['artists']), true);
- 
+
 $pageTitle = $fullName . ' · Künstler';
 require_once __DIR__ . '/../includes/header.php';
 ?>
- 
-<!-- ===== ARTIST HERO ===== -->
+
 <section class="artist-detail-layout">
- 
-    <!-- Photo panel -->
+
     <div class="artist-image-panel">
-        <img
-            src="<?= e($artistPhoto); ?>"
-            alt="<?= e($fullName); ?>"
-            class="artist-photo"
-        >
+        <img src="<?= e($artistPhoto); ?>" alt="<?= e($fullName); ?>" class="artist-photo img-fluid">
     </div>
- 
-    <!-- Info panel -->
+
     <div class="artist-info-panel">
         <h1><?= e($fullName); ?></h1>
- 
+
         <?php if ($details !== ''): ?>
             <p class="artist-bio"><?= e($details); ?></p>
         <?php endif; ?>
- 
+
         <!-- Favorite button -->
         <?php if (isLoggedIn()): ?>
             <?php if ($isFavorited): ?>
@@ -119,18 +98,18 @@ require_once __DIR__ . '/../includes/header.php';
                 </a>
             <?php endif; ?>
         <?php else: ?>
-            <p class="mb-3">
+            <p class="mb-3 small">
                 <a href="<?= e(base_url('pages/login.php')); ?>">Anmelden</a>, um zu favorisieren.
             </p>
         <?php endif; ?>
- 
-        <!-- Artist Details table -->
-        <table class="detail-table table table-bordered">
-            <caption class="fw-bold text-start pb-2">Künstlerdetails</caption>
+
+        <!-- Details table -->
+        <table class="table table-bordered">
+            <caption class="fw-bold text-start pb-2 caption-top">Künstlerdetails</caption>
             <tbody>
                 <?php if ($dateString !== ''): ?>
                 <tr>
-                    <th scope="row">Datum</th>
+                    <th scope="row" style="width:35%">Datum</th>
                     <td><?= e($dateString); ?></td>
                 </tr>
                 <?php endif; ?>
@@ -154,15 +133,15 @@ require_once __DIR__ . '/../includes/header.php';
         </table>
     </div>
 </section>
- 
+
 <!-- ===== ARTWORKS GRID ===== -->
-<section class="artist-artworks-section mt-5">
+<section class="mt-5">
     <h2>Kunst von <?= e($fullName); ?></h2>
- 
+
     <?php if (empty($artworks)): ?>
         <p class="text-muted">Keine Kunstwerke für diesen Künstler gefunden.</p>
     <?php else: ?>
-        <div class="artwork-card-grid">
+        <div class="row row-cols-2 row-cols-md-4 g-3">
             <?php foreach ($artworks as $artwork): ?>
                 <?php
                 $awId       = $artwork->getArtworkid();
@@ -170,17 +149,16 @@ require_once __DIR__ . '/../includes/header.php';
                 $awYear     = (string) ($artwork->getYearofwork() ?? '');
                 $awFileName = $artwork->getImagefilename();
                 ?>
-                <article class="artwork-card-link-wrapper">
+                <div class="col">
                     <div class="card h-100 text-center">
                         <a href="<?= e(artworkDetailUrl($awId)); ?>">
-                            <img
-                                src="<?= e(artworkImageUrl($awFileName, 'square-small')); ?>"
-                                alt="<?= e($awTitle); ?>"
-                                class="card-img-top artwork-card-image"
-                            >
+                            <img src="<?= e(artworkImageUrl($awFileName, 'square-small')); ?>"
+                                 alt="<?= e($awTitle); ?>"
+                                 class="card-img-top"
+                                 style="height:160px; object-fit:cover;">
                         </a>
-                        <div class="card-body">
-                            <p class="card-text small">
+                        <div class="card-body p-2">
+                            <p class="card-text small mb-2">
                                 <?= e($awTitle); ?>
                                 <?= $awYear !== '' ? ', ' . e($awYear) : ''; ?>
                             </p>
@@ -189,10 +167,10 @@ require_once __DIR__ . '/../includes/header.php';
                             </a>
                         </div>
                     </div>
-                </article>
+                </div>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
 </section>
- 
+
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
