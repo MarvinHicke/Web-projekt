@@ -1,0 +1,10 @@
+# UC 26: Global Apache error pages.
+# If the project directory is renamed, replace /Web-projekt/ in these paths.
+ErrorDocument 400 /Web-projekt/error.php?code=400
+ErrorDocument 401 /Web-projekt/error.php?code=401
+ErrorDocument 403 /Web-projekt/error.php?code=403
+ErrorDocument 404 /Web-projekt/error.php?code=404
+ErrorDocument 500 /Web-projekt/error.php?code=500
+
+# Prevent Apache from exposing directory contents when no index file exists.
+Options -Indexes
