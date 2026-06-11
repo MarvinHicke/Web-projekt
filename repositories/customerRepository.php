@@ -62,7 +62,7 @@ class customerRepository
      */
     public function GetByUsername($username)
     {
-        $sql = "SELECT c.*, cl.Pass, cl.Type, cl.State, cl.CustomerID 
+        $sql = "SELECT c.*, cl.UserName, cl.Pass, cl.Type, cl.State, cl.CustomerID 
                 FROM customers c, customerlogon cl
                 WHERE cl.CustomerID = c.CustomerID AND cl.UserName = :username";
 
