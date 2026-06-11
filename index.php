@@ -24,7 +24,8 @@ try {
 
     $topArtworks         = $artworkRepo->getTopArtworks(5);
     $mostReviewedArtists = $artistRepo->getMostReviewedArtists(3);
-    $latestReviews       = $reviewRepo->getLatestReviews(3);
+    // Use the new method that returns raw arrays with ArtworkTitle
+    $latestReviews       = $reviewRepo->getLatestReviewsWithDetails(3);
 } catch (Exception $e) {
     // DB not available — widgets show empty state
 }
@@ -62,8 +63,8 @@ require_once __DIR__ . '/includes/header.php';
         <div class="carousel-inner">
             <?php foreach ($topArtworks as $i => $work): ?>
                 <?php
-                $id            = (int) ($work['ArtWorkID'] ?? 0);
-                $title         = (string) ($work['Title'] ?? 'Unbekanntes Kunstwerk');
+                $id            = (int)    ($work['ArtWorkID']    ?? 0);
+                $title         = (string) ($work['Title']        ?? 'Unbekanntes Kunstwerk');
                 $imageFileName = (string) ($work['ImageFileName'] ?? '');
                 $rating        = $work['AvgRating'] ?? null;
                 ?>
@@ -73,6 +74,7 @@ require_once __DIR__ . '/includes/header.php';
                             src="<?= e(artworkImageUrl($imageFileName, 'large')); ?>"
                             class="d-block w-100 carousel-img"
                             alt="<?= e($title); ?>"
+                            style="max-height:520px; object-fit:cover;"
                         >
                     </a>
                     <div class="carousel-caption d-none d-md-block">
@@ -80,7 +82,7 @@ require_once __DIR__ . '/includes/header.php';
                         <?php if ($rating !== null): ?>
                             <p>Bewertung: <?= e(number_format((float)$rating, 1, ',', '.')); ?>/5</p>
                         <?php endif; ?>
-                        <a class="btn btn-sm btn-light" href="<?= e(artworkDetailUrl($id)); ?>">Ansehen</a>
+                        <a class="btn btn-sm btn-light mt-1" href="<?= e(artworkDetailUrl($id)); ?>">Ansehen</a>
                     </div>
                 </div>
             <?php endforeach; ?>
