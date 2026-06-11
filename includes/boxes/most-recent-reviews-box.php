@@ -3,10 +3,9 @@ require_once __DIR__ . '/../helpers.php';
 
 /**
  * Renders the Most Recent Reviews box on the homepage.
- * Needed data later:
- * review date, user name, rating, text, artwork id, artwork title.
- * Link:
- * every review links to the reviewed artwork.
+ * Expects $reviews as raw associative arrays containing:
+ *   ReviewId, ArtWorkId, Rating, Comment, ReviewDate, ArtworkTitle
+ * Use reviewRepository->getLatestReviewsWithDetails($limit) to get this data.
  */
 function renderMostRecentReviewsBox(array $reviews): void
 {
@@ -21,17 +20,20 @@ function renderMostRecentReviewsBox(array $reviews): void
             <ul class="clean-list">
                 <?php foreach ($reviews as $review): ?>
                     <?php
-                    $artworkId = (int) ($review['ArtWorkId'] ?? $review['artwork_id'] ?? 0);
-                    $title = (string) ($review['Title'] ?? $review['artwork_title'] ?? 'Unbekanntes Kunstwerk');
-                    $comment = (string) ($review['Comment'] ?? $review['text'] ?? '');
-                    $rating = (string) ($review['Rating'] ?? $review['rating'] ?? '');
-                    $date = (string) ($review['ReviewDate'] ?? $review['date'] ?? '');
+                    $artworkId    = (int)    ($review['ArtWorkId']    ?? 0);
+                    $artworkTitle = (string) ($review['ArtworkTitle'] ?? 'Unbekanntes Kunstwerk');
+                    $comment      = cleanHtml((string) ($review['Comment'] ?? ''));
+                    $rating       = (string) ($review['Rating']       ?? '');
+                    $date         = (string) ($review['ReviewDate']   ?? '');
+                    $dateFormatted = $date ? date('d.m.Y', strtotime($date)) : '';
                     ?>
                     <li>
                         <a href="<?= e(artworkDetailUrl($artworkId)); ?>">
-                            <strong><?= e($title); ?></strong>
-                            <span><?= e($comment !== '' ? $comment : 'Keine Beschreibung'); ?></span>
-                            <small><?= e($rating); ?>/5 · <?= e($date); ?></small>
+                            <strong><?= e($artworkTitle); ?></strong>
+                            <?php if ($comment !== ''): ?>
+                                <span><?= e(mb_strimwidth($comment, 0, 80, '…')); ?></span>
+                            <?php endif; ?>
+                            <small><?= e($rating); ?>/5 · <?= e($dateFormatted); ?></small>
                         </a>
                     </li>
                 <?php endforeach; ?>
