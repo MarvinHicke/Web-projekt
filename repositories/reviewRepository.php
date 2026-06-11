@@ -37,12 +37,7 @@ class reviewRepository
      */
     public function getForArtwork($artworkId)
     {
-        $sql = "SELECT r.*, c.FirstName, c.LastName, cl.UserName
-        FROM reviews r
-        LEFT JOIN customers c ON r.CustomerId = c.CustomerID
-        LEFT JOIN customerlogon cl ON r.CustomerId = cl.CustomerID
-        WHERE r.ArtWorkId = :id
-        ORDER BY r.ReviewDate DESC";
+        $sql = "SELECT * FROM reviews WHERE ArtWorkId = :id ORDER BY ReviewDate DESC";
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute(['id' => $artworkId]);
 
@@ -103,7 +98,7 @@ class reviewRepository
      */
     public function addReview($artworkId, $customerId, $rating, $comment)
     {
-        $currentDate = date('Y.m.d H:i:s');
+        $currentDate = date('d.m.Y H:i:s');
         $sql = "INSERT INTO reviews (ArtWorkId, CustomerId, ReviewDate, Rating, Comment) 
                 VALUES (:artworkId, :customerId, :reviewDate, :rating, :comment)";
 
@@ -151,9 +146,28 @@ class reviewRepository
         return $stmt->fetch()['Count'] > 0;
     }
 
+    /**
+     * Holt die neuesten Bewertungen mit Artwork-Titel für die Startseiten-Box.
+     * Gibt rohe Arrays zurück (kein review-Objekt), damit der Box-Renderer
+     * direkt auf ArtWorkId, ArtworkTitle, Rating, Comment, ReviewDate zugreifen kann.
+     *
+     * @param int $limit Maximale Anzahl Bewertungen (Standard 3)
+     * @return array Array von assoziativen Arrays
+     */
+    public function getLatestReviewsWithDetails($limit = 3)
+    {
+        $sql = "SELECT r.ReviewId, r.ArtWorkId, r.Rating, r.Comment, r.ReviewDate,
+                       a.Title AS ArtworkTitle
+                FROM reviews r
+                JOIN artworks a ON r.ArtWorkId = a.ArtWorkID
+                ORDER BY r.ReviewDate DESC
+                LIMIT :limit";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }
-
-
-
-
-
