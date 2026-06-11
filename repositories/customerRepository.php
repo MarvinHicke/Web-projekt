@@ -21,16 +21,16 @@ class customerRepository
     }
 
     /**
-     * Holt alle Kunden inklusive ihrer zugehörigen Login-Daten aus der Datenbank
+     * Gibt alle Benutzerkonten mit Login-Daten nach CustomerID sortiert zurück.
      *
-     * @return array Ein Array aus Arrays mit den Kunden- und Logon-Daten
+     * @return array Die Benutzerkonten
      */
     public function findAll()
     {
-        $sql = "SELECT c.*, cl.UserName, cl.Type, cl.State, cl.DateJoined
-                FROM customers c, customerlogon cl
-                WHERE c.CustomerID = cl.CustomerID
-                ORDER BY c.LastName ASC, c.FirstName ASC";
+        $sql = "SELECT c.*, cl.UserName, cl.Type, cl.State, cl.DateJoined, cl.DateLastModified
+                FROM customers c
+                JOIN customerlogon cl ON c.CustomerID = cl.CustomerID
+                ORDER BY c.CustomerID ASC";
 
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute();
@@ -187,28 +187,43 @@ class customerRepository
     }
 
     /**
-     * Ändert den Account-Status. Schützt den letzten Admin vor Sperrung
+     * Ändert den Account-Status und aktualisiert das Änderungsdatum.
+     * Schützt den letzten aktiven Admin vor Deaktivierung.
      *
      * @param int $id Die ID des Accounts
-     * @param int $state Der neue Status (1 = Aktiv, 0 = Gesperrt)
-     * @return bool True, wenn der Status geändert wurde, false bei Schutzverletzung des letzten Admins
+     * @param int $state Der neue Status (1 = Aktiv, 0 = Deaktiviert)
+     * @return bool True bei Erfolg, false bei ungültigem Status oder Schutzverletzung
      */
     public function updateState($id, $state)
     {
-        if ($state == 0)
+        $id = (int) $id;
+        $state = (int) $state;
+
+        if ($state !== 0 && $state !== 1)
+        {
+            return false;
+        }
+
+        if ($state === 0)
         {
             $user = $this->GetById($id);
-            if ($user && $user['Type'] == 2)
+
+            if ($user && (int) $user['Type'] === 2 && (int) $user['State'] === 1)
             {
-                if ($this->getActiveAdminCount() <= 1)
+                if ((int) $this->getActiveAdminCount() <= 1)
                 {
                     return false;
                 }
             }
         }
 
-        $sql = "UPDATE customerlogon SET State = :state WHERE CustomerID = :id";
+        $sql = "UPDATE customerlogon
+            SET State = :state,
+                DateLastModified = NOW()
+            WHERE CustomerID = :id";
+
         $stmt = $this->db->preparedStatement($sql);
+
         return $stmt->execute
         ([
             'state' => $state,
@@ -217,16 +232,24 @@ class customerRepository
     }
 
     /**
-     * Erhebt einen normalen Kunden in den Administrator-Status (Type = 2)
+     * Erhebt ein Benutzerkonto in den Administrator-Status und aktualisiert das Änderungsdatum.
      *
-     * @param int $id Die ID des Kunden
+     * @param int $id Die ID des Benutzerkontos
      * @return bool True bei Erfolg, andernfalls false
      */
     public function elevateToAdmin($id)
     {
-        $sql = "UPDATE customerlogon SET Type = 2 WHERE CustomerID = :id";
+        $sql = "UPDATE customerlogon
+            SET Type = 2,
+                DateLastModified = NOW()
+            WHERE CustomerID = :id";
+
         $stmt = $this->db->preparedStatement($sql);
-        return $stmt->execute(['id' => $id]);
+
+        return $stmt->execute
+        ([
+            'id' => (int) $id
+        ]);
     }
 
     /**
@@ -236,31 +259,48 @@ class customerRepository
      */
     public function getActiveAdminCount()
     {
-        $sql = "SELECT COUNT(*) AS Count FROM customerlogon WHERE Type = 2 AND State = 1";
+        $sql = "SELECT COUNT(*) AS Count
+            FROM customerlogon
+            WHERE Type = 2 AND State = 1";
+
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute();
-        return $stmt->fetch()['Count'];
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return (int) $row['Count'];
     }
 
     /**
-     * Stuft einen Administrator zurück zum normalen Kunden (Type = 1). Schützt den letzten Admin vor der Abstufung
+     * Stuft einen Administrator zum normalen Benutzer zurück und aktualisiert das Änderungsdatum.
+     * Schützt den letzten aktiven Admin vor Abstufung.
      *
-     * @param int $id Die ID des Administrators
-     * @return bool True bei Erfolg, false wenn es der letzte aktive Admin ist
+     * @param int $id Die ID des Benutzerkontos
+     * @return bool True bei Erfolg, false bei Schutzverletzung des letzten aktiven Admins
      */
     public function demoteAdmin($id)
     {
-        if($this->getActiveAdminCount() <= 1)
+        $id = (int) $id;
+        $user = $this->GetById($id);
+
+        if ($user && (int) $user['Type'] === 2 && (int) $user['State'] === 1)
         {
-            $user = $this->GetById($id);
-            if($user && $user['Type'] == 2)
+            if ((int) $this->getActiveAdminCount() <= 1)
             {
                 return false;
             }
         }
 
-        $sql = "UPDATE customerlogon SET Type = 1 WHERE CustomerID = :id";
+        $sql = "UPDATE customerlogon
+            SET Type = 1,
+                DateLastModified = NOW()
+            WHERE CustomerID = :id";
+
         $stmt = $this->db->preparedStatement($sql);
-        return $stmt->execute(['id' => $id]);
+
+        return $stmt->execute
+        ([
+            'id' => $id
+        ]);
     }
 }
