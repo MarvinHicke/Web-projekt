@@ -188,12 +188,12 @@ require_once __DIR__ . '/../includes/header.php';
 
         <!-- Favorite -->
         <?php if ($isFavorited): ?>
-            <a class="btn btn-warning btn-sm mb-3"
+            <a class="btn btn-primary btn-sm mb-3"
                href="<?= e(base_url('pages/remove-favorite.php') . '?type=artwork&id=' . urlencode((string) $artworkId) . '&redirect=single-artwork.php'); ?>">
                 ★ Aus Favoriten entfernen
             </a>
         <?php else: ?>
-            <a class="btn btn-outline-warning btn-sm mb-3"
+            <a class="btn btn-outline-primary btn-sm mb-3"
                href="<?= e(base_url('pages/add-favorite.php') . '?type=artwork&id=' . urlencode((string) $artworkId) . '&redirect=single-artwork.php'); ?>">
                 ☆ Zu Favoriten hinzufügen
             </a>
@@ -349,7 +349,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <strong class="ms-2"><?= e($reviewerName); ?></strong>
                             <span class="text-muted ms-2 small"><?= e($reviewerLocation); ?></span>
                             <?php if ($isOwn): ?>
-                                <span class="badge text-bg-info ms-1">Deine Bewertung</span>
+                                <span class="review-own-badge ms-1">Deine Bewertung</span>
                             <?php endif; ?>
                         </div>
                         <small class="text-muted"><?= e($formatted); ?></small>

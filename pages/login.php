@@ -60,45 +60,51 @@ if(($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST")
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<h1>Anmelden</h1>
-<p>Melden Sie sich mit Ihrer E-Mail und Ihrem Passwort an</p>
+<section class="page-heading">
+    <h1>Anmelden</h1>
+    <p>Melden Sie sich mit Ihrer E-Mail und Ihrem Passwort an.</p>
+</section>
 
-<?php foreach ($errors as $error): ?>
-    <?php
-    $alertType = "danger";
-    $alertMessage = $error;
-    include __DIR__ . "/../components/alert-box.php";
-    ?>
-<?php endforeach; ?>
+<section class="data-box auth-panel">
+    <?php foreach ($errors as $error): ?>
+        <?php
+        $alertType = "danger";
+        $alertMessage = $error;
+        include __DIR__ . "/../components/alert-box.php";
+        ?>
+    <?php endforeach; ?>
 
-<?php if ($successMessage !== ""): ?>
-    <?php
-    $alertType = "success";
-    $alertMessage = $successMessage;
-    include __DIR__ . "/../components/alert-box.php";
-    ?>
-<?php endif; ?>
+    <form method="POST" class="auth-form">
+        <div class="mb-3">
+            <label for="email" class="form-label">E-Mail</label>
+            <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-control"
+                    required
+                    maxlength="100"
+                    value="<?= e($email) ?>"
+            >
+        </div>
 
-<form method="POST">
-    <div>
-        <label for="email">E-Mail</label>
-        <input
-                type="email"
-                id="email"
-                name="email"
-                required
-                maxlength="100"
-                value="<?= e($email) ?>"
-        >
-    </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Passwort</label>
+            <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    class="form-control"
+                    required
+                    minlength="8"
+            >
+        </div>
 
-    <div>
-        <label for="password">Passwort</label>
-        <input type="password" id="password" name="password" required minlength="8">
-    </div>
-
-    <button type="submit">Login</button>
-</form>
+        <button type="submit" class="btn btn-primary">
+            Anmelden
+        </button>
+    </form>
+</section>
 
 <?php
 require_once __DIR__ . '/../includes/footer.php';

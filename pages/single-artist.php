@@ -106,12 +106,12 @@ require_once __DIR__ . '/../includes/header.php';
 
         <!-- Favorite button -->
         <?php if ($isFavorited): ?>
-            <a class="btn btn-warning btn-sm mb-3"
+            <a class="btn btn-primary btn-sm mb-3"
                href="<?= e(base_url('pages/remove-favorite.php') . '?type=artist&id=' . urlencode((string) $artistId) . '&redirect=single-artist.php'); ?>">
                 ★ Aus Favoriten entfernen
             </a>
         <?php else: ?>
-            <a class="btn btn-outline-warning btn-sm mb-3"
+            <a class="btn btn-outline-primary btn-sm mb-3"
                href="<?= e(base_url('pages/add-favorite.php') . '?type=artist&id=' . urlencode((string) $artistId) . '&redirect=single-artist.php'); ?>">
                 ☆ Zu Favoriten hinzufügen
             </a>

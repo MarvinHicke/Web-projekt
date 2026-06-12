@@ -236,8 +236,10 @@ $pageTitle = "Mein Konto";
 require_once __DIR__ . "/../includes/header.php";
 ?>
 
-<h1>Mein Konto</h1>
-<p>Hier können Sie Ihre Kontodaten ansehen und bearbeiten.</p>
+<section class="page-heading">
+    <h1>Mein Konto</h1>
+    <p>Hier können Sie Ihre Kontodaten ansehen und bearbeiten.</p>
+</section>
 
 <?php if (!empty($profileErrors)): ?>
     <div class="alert alert-danger">
@@ -271,219 +273,227 @@ require_once __DIR__ . "/../includes/header.php";
     </div>
 <?php endif; ?>
 
-<h2>Kontodaten</h2>
-<ul>
-    <li>
-        <strong>Name:</strong>
-        <?= e($fullName !== '' ? $fullName : 'Nicht angegeben') ?>
-    </li>
-    <li>
-        <strong>Adresse:</strong>
-        <?= e($address !== '' ? $address : 'Nicht angegeben') ?>
-    </li>
-    <li>
-        <strong>Stadt:</strong>
-        <?= e($city !== '' ? $city : 'Nicht angegeben') ?>
-    </li>
-    <li>
-        <strong>Region:</strong>
-        <?= e($region !== '' ? $region : 'Nicht angegeben') ?>
-    </li>
-    <li>
-        <strong>Land:</strong>
-        <?= e($country !== '' ? $country : 'Nicht angegeben') ?>
-    </li>
-    <li>
-        <strong>Postleitzahl:</strong>
-        <?= e($postal !== '' ? $postal : 'Nicht angegeben') ?>
-    </li>
-    <li>
-        <strong>Telefon:</strong>
-        <?= e($phone !== '' ? $phone : 'Nicht angegeben') ?>
-    </li>
-    <li>
-        <strong>E-Mail:</strong>
-        <?= e($email !== '' ? $email : 'Nicht angegeben') ?>
-    </li>
-    <li>
-        <strong>Rolle:</strong>
-        <?= e($roleLabel) ?>
-    </li>
-    <li>
-        <strong>Mitglied seit:</strong>
-        <?= e($dateJoinedLabel) ?>
-    </li>
-</ul>
+<section class="data-box account-section">
+    <h2>Kontodaten</h2>
 
-<h2>Kontodaten bearbeiten</h2>
+    <ul class="account-data-list">
+        <li>
+            <strong>Name:</strong>
+            <?= e($fullName !== '' ? $fullName : 'Nicht angegeben') ?>
+        </li>
+        <li>
+            <strong>Adresse:</strong>
+            <?= e($address !== '' ? $address : 'Nicht angegeben') ?>
+        </li>
+        <li>
+            <strong>Stadt:</strong>
+            <?= e($city !== '' ? $city : 'Nicht angegeben') ?>
+        </li>
+        <li>
+            <strong>Region:</strong>
+            <?= e($region !== '' ? $region : 'Nicht angegeben') ?>
+        </li>
+        <li>
+            <strong>Land:</strong>
+            <?= e($country !== '' ? $country : 'Nicht angegeben') ?>
+        </li>
+        <li>
+            <strong>Postleitzahl:</strong>
+            <?= e($postal !== '' ? $postal : 'Nicht angegeben') ?>
+        </li>
+        <li>
+            <strong>Telefon:</strong>
+            <?= e($phone !== '' ? $phone : 'Nicht angegeben') ?>
+        </li>
+        <li>
+            <strong>E-Mail:</strong>
+            <?= e($email !== '' ? $email : 'Nicht angegeben') ?>
+        </li>
+        <li>
+            <strong>Rolle:</strong>
+            <?= e($roleLabel) ?>
+        </li>
+        <li>
+            <strong>Mitglied seit:</strong>
+            <?= e($dateJoinedLabel) ?>
+        </li>
+    </ul>
+</section>
 
-<form method="post">
-    <input type="hidden" name="formType" value="profile">
+<section class="data-box account-section">
+    <h2>Kontodaten bearbeiten</h2>
 
-    <div>
-        <label class="form-label" for="firstName">Vorname</label>
-        <input
-                class="form-control"
-                type="text"
-                id="firstName"
-                name="firstName"
-                maxlength="<?= $nameMaxLength ?>"
-                value="<?= e($firstName) ?>"
-                required
-        >
-    </div>
+    <form method="post" class="account-form">
+        <input type="hidden" name="formType" value="profile">
 
-    <div>
-        <label class="form-label" for="lastName">Nachname</label>
-        <input
-                class="form-control"
-                type="text"
-                id="lastName"
-                name="lastName"
-                maxlength="<?= $nameMaxLength ?>"
-                value="<?= e($lastName) ?>"
-                required
-        >
-    </div>
+        <div>
+            <label class="form-label" for="firstName">Vorname</label>
+            <input
+                    class="form-control"
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    maxlength="<?= $nameMaxLength ?>"
+                    value="<?= e($firstName) ?>"
+                    required
+            >
+        </div>
 
-    <div>
-        <label class="form-label" for="address">Adresse</label>
-        <input
-                class="form-control"
-                type="text"
-                id="address"
-                name="address"
-                maxlength="<?= $textMaxLength ?>"
-                value="<?= e($address) ?>"
-                required
-        >
-    </div>
+        <div>
+            <label class="form-label" for="lastName">Nachname</label>
+            <input
+                    class="form-control"
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    maxlength="<?= $nameMaxLength ?>"
+                    value="<?= e($lastName) ?>"
+                    required
+            >
+        </div>
 
-    <div>
-        <label class="form-label" for="city">Stadt</label>
-        <input
-                class="form-control"
-                type="text"
-                id="city"
-                name="city"
-                maxlength="<?= $textMaxLength ?>"
-                value="<?= e($city) ?>"
-                required
-        >
-    </div>
+        <div>
+            <label class="form-label" for="address">Adresse</label>
+            <input
+                    class="form-control"
+                    type="text"
+                    id="address"
+                    name="address"
+                    maxlength="<?= $textMaxLength ?>"
+                    value="<?= e($address) ?>"
+                    required
+            >
+        </div>
 
-    <div>
-        <label class="form-label" for="region">Region</label>
-        <input
-                class="form-control"
-                type="text"
-                id="region"
-                name="region"
-                maxlength="<?= $textMaxLength ?>"
-                value="<?= e($region) ?>"
-        >
-    </div>
+        <div>
+            <label class="form-label" for="city">Stadt</label>
+            <input
+                    class="form-control"
+                    type="text"
+                    id="city"
+                    name="city"
+                    maxlength="<?= $textMaxLength ?>"
+                    value="<?= e($city) ?>"
+                    required
+            >
+        </div>
 
-    <div>
-        <label class="form-label" for="country">Land</label>
-        <input
-                class="form-control"
-                type="text"
-                id="country"
-                name="country"
-                maxlength="<?= $textMaxLength ?>"
-                value="<?= e($country) ?>"
-                required
-        >
-    </div>
+        <div>
+            <label class="form-label" for="region">Region</label>
+            <input
+                    class="form-control"
+                    type="text"
+                    id="region"
+                    name="region"
+                    maxlength="<?= $textMaxLength ?>"
+                    value="<?= e($region) ?>"
+            >
+        </div>
 
-    <div>
-        <label class="form-label" for="postal">Postleitzahl</label>
-        <input
-                class="form-control"
-                type="text"
-                id="postal"
-                name="postal"
-                maxlength="<?= $textMaxLength ?>"
-                value="<?= e($postal) ?>"
-        >
-    </div>
+        <div>
+            <label class="form-label" for="country">Land</label>
+            <input
+                    class="form-control"
+                    type="text"
+                    id="country"
+                    name="country"
+                    maxlength="<?= $textMaxLength ?>"
+                    value="<?= e($country) ?>"
+                    required
+            >
+        </div>
 
-    <div>
-        <label class="form-label" for="phone">Telefon</label>
-        <input
-                class="form-control"
-                type="tel"
-                id="phone"
-                name="phone"
-                maxlength="<?= $textMaxLength ?>"
-                value="<?= e($phone) ?>"
-        >
-    </div>
+        <div>
+            <label class="form-label" for="postal">Postleitzahl</label>
+            <input
+                    class="form-control"
+                    type="text"
+                    id="postal"
+                    name="postal"
+                    maxlength="<?= $textMaxLength ?>"
+                    value="<?= e($postal) ?>"
+            >
+        </div>
 
-    <div>
-        <label class="form-label" for="email">E-Mail</label>
-        <input
-                class="form-control"
-                type="email"
-                id="email"
-                name="email"
-                maxlength="<?= $emailMaxLength ?>"
-                value="<?= e($email) ?>"
-                required
-        >
-    </div>
+        <div>
+            <label class="form-label" for="phone">Telefon</label>
+            <input
+                    class="form-control"
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    maxlength="<?= $textMaxLength ?>"
+                    value="<?= e($phone) ?>"
+            >
+        </div>
 
-    <button type="submit" class="btn btn-primary">
-        Kontodaten speichern
-    </button>
-</form>
+        <div>
+            <label class="form-label" for="email">E-Mail</label>
+            <input
+                    class="form-control"
+                    type="email"
+                    id="email"
+                    name="email"
+                    maxlength="<?= $emailMaxLength ?>"
+                    value="<?= e($email) ?>"
+                    required
+            >
+        </div>
 
-<h2>Passwort ändern</h2>
+        <button type="submit" class="btn btn-primary">
+            Kontodaten speichern
+        </button>
+    </form>
+</section>
 
-<form method="post">
-    <input type="hidden" name="formType" value="password">
+<section class="data-box account-section">
+    <h2>Passwort ändern</h2>
 
-    <div>
-        <label class="form-label" for="currentPassword">Aktuelles Passwort</label>
-        <input
-                class="form-control"
-                type="password"
-                id="currentPassword"
-                name="currentPassword"
-                required
-        >
-    </div>
+    <form method="post" class="account-form">
+        <input type="hidden" name="formType" value="password">
 
-    <div>
-        <label class="form-label" for="newPassword">Neues Passwort</label>
-        <input
-                class="form-control"
-                type="password"
-                id="newPassword"
-                name="newPassword"
-                minlength="<?= $passwordMinLength ?>"
-                required
-        >
-    </div>
+        <div>
+            <label class="form-label" for="currentPassword">Aktuelles Passwort</label>
+            <input
+                    class="form-control"
+                    type="password"
+                    id="currentPassword"
+                    name="currentPassword"
+                    required
+            >
+        </div>
 
-    <div>
-        <label class="form-label" for="confirmNewPassword">Neues Passwort bestätigen</label>
-        <input
-                class="form-control"
-                type="password"
-                id="confirmNewPassword"
-                name="confirmNewPassword"
-                minlength="<?= $passwordMinLength ?>"
-                required
-        >
-    </div>
+        <div>
+            <label class="form-label" for="newPassword">Neues Passwort</label>
+            <input
+                    class="form-control"
+                    type="password"
+                    id="newPassword"
+                    name="newPassword"
+                    minlength="<?= $passwordMinLength ?>"
+                    required
+            >
+        </div>
 
-    <button type="submit" class="btn btn-primary">
-        Passwort speichern
-    </button>
-</form>
+        <div>
+            <label class="form-label" for="confirmNewPassword">Neues Passwort bestätigen</label>
+            <input
+                    class="form-control"
+                    type="password"
+                    id="confirmNewPassword"
+                    name="confirmNewPassword"
+                    minlength="<?= $passwordMinLength ?>"
+                    required
+            >
+        </div>
 
+        <button type="submit" class="btn btn-primary">
+            Passwort speichern
+        </button>
+    </form>
+</section>
+
+<section class="data-box account-section account-reviews-section">
 <h2>Meine Reviews</h2>
 
 <?php if (empty($ownReviews)): ?>
@@ -493,7 +503,7 @@ require_once __DIR__ . "/../includes/header.php";
     include __DIR__ . '/../components/alert-box.php';
     ?>
 <?php else: ?>
-    <div class="list-group mb-4">
+    <div class="account-review-list">
         <?php foreach ($ownReviews as $review): ?>
             <?php
             $reviewArtworkId = (int) ($review['ArtWorkId'] ?? 0);
@@ -521,16 +531,22 @@ require_once __DIR__ . "/../includes/header.php";
             }
             ?>
 
-            <article class="list-group-item">
+            <article class="account-review-item">
                 <h3 class="h5 mb-1">
                     <a href="<?= e(artworkDetailUrl($reviewArtworkId)); ?>">
                         <?= e($reviewTitle); ?>
                     </a>
                 </h3>
 
-                <p class="mb-1 text-muted">
-                    <?= e($artistName); ?> · <?= e($reviewDate); ?>
-                </p>
+                <div class="account-review-meta">
+                    <span>
+                        <strong>Künstler:</strong> <?= e($artistName); ?>
+                    </span>
+
+                    <span>
+                        <strong>Bewertet am:</strong> <?= e($reviewDate); ?>
+                    </span>
+                </div>
 
                 <p class="mb-2">
                     <span class="text-warning">
@@ -551,22 +567,28 @@ require_once __DIR__ . "/../includes/header.php";
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
+</section>
 
-<h2>Meine Favoriten</h2>
-<p>Hier kannst du deine favorisierten Künstler und Kunstwerke ansehen.</p>
+<section class="data-box account-section account-favorites-section">
+    <h2>Meine Favoriten</h2>
+    <p>Hier kannst du deine favorisierten Künstler und Kunstwerke ansehen.</p>
 
-<?php
-$buttonText = 'Favoriten anzeigen';
-$buttonHref = base_url('pages/favorites.php');
-$buttonVariant = 'primary';
-include __DIR__ . '/../components/button.php';
-?>
-<?php
-$buttonText = 'Abmelden';
-$buttonHref = base_url('pages/logout.php');
-$buttonVariant = 'danger';
-include __DIR__ . '/../components/button.php';
-?>
+    <div class="account-action-row">
+        <?php
+        $buttonText = 'Favoriten anzeigen';
+        $buttonHref = base_url('pages/favorites.php');
+        $buttonVariant = 'primary';
+        include __DIR__ . '/../components/button.php';
+        ?>
+
+        <?php
+        $buttonText = 'Abmelden';
+        $buttonHref = base_url('pages/logout.php');
+        $buttonVariant = 'danger';
+        include __DIR__ . '/../components/button.php';
+        ?>
+    </div>
+</section>
 
 <?php
 require_once __DIR__ . "/../includes/footer.php";

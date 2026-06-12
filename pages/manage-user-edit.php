@@ -339,11 +339,10 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-    <h1>Benutzer bearbeiten</h1>
-
-    <p class="text-muted">
-        Hier können Profildaten eines Benutzerkontos verwaltet werden.
-    </p>
+    <section class="page-heading manage-user-edit-heading">
+        <h1>Benutzer bearbeiten</h1>
+        <p>Hier können Profildaten, Status, Rolle und Passwort eines Benutzerkontos verwaltet werden.</p>
+    </section>
 
 <?php foreach ($errors as $error): ?>
     <?php
@@ -364,27 +363,65 @@ require_once __DIR__ . '/../includes/header.php';
 <?php if ($selectedUser): ?>
     <?php
     $typeLabel = 'User';
+    $typeClass = 'manage-badge-user';
+
     if ((int) $selectedUser['Type'] === 2)
     {
         $typeLabel = 'Admin';
+        $typeClass = 'manage-badge-admin';
     }
 
     $stateLabel = 'Deaktiviert';
+    $stateClass = 'manage-badge-inactive';
+
     if ((int) $selectedUser['State'] === 1)
     {
         $stateLabel = 'Aktiv';
+        $stateClass = 'manage-badge-active';
+    }
+
+    $selectedUserFullName = trim((string) ($selectedUser['FirstName'] ?? '') . ' ' . (string) ($selectedUser['LastName'] ?? ''));
+
+    if ($selectedUserFullName === '')
+    {
+        $selectedUserFullName = 'Name unbekannt';
     }
     ?>
 
-    <section class="mt-4">
+    <section class="data-box manage-user-edit-section user-edit-summary">
+        <h2>Ausgewählter Benutzer</h2>
+
+        <div class="user-edit-summary-grid">
+            <div>
+                <strong>Name</strong>
+                <span><?= e($selectedUserFullName); ?></span>
+            </div>
+
+            <div>
+                <strong>E-Mail / Benutzername</strong>
+                <span><?= e((string) $selectedUser['UserName']); ?></span>
+            </div>
+
+            <div>
+                <strong>Rolle</strong>
+                <span class="manage-badge <?= e($typeClass); ?>">
+                    <?= e($typeLabel); ?>
+                </span>
+            </div>
+
+            <div>
+                <strong>Status</strong>
+                <span class="manage-badge <?= e($stateClass); ?>">
+                    <?= e($stateLabel); ?>
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <section class="data-box manage-user-edit-section user-edit-profile-section">
         <h2>Profildaten</h2>
 
-        <p>
-            Ausgewählter Benutzer:
-            <strong><?= e((string) $selectedUser['UserName']); ?></strong>
-        </p>
-
-        <form method="post" action="<?= e(base_url('pages/manage-user-edit.php?id=' . (int) $selectedUserId)); ?>">
+        <form method="post" class="manage-edit-form" action="<?= e(base_url('pages/manage-user-edit.php?id=' . (int) $selectedUserId)); ?>">
             <input type="hidden" name="formType" value="profile">
 
             <div class="row">
@@ -513,7 +550,7 @@ require_once __DIR__ . '/../includes/header.php';
         </form>
     </section>
 
-    <section class="mt-5">
+    <section class="data-box manage-user-edit-section user-edit-status-section">
         <h2>Status und Rolle</h2>
 
         <p class="text-muted">
@@ -534,7 +571,7 @@ require_once __DIR__ . '/../includes/header.php';
         }
         ?>
 
-        <form method="post" action="<?= e(base_url('pages/manage-user-edit.php?id=' . (int) $selectedUserId)); ?>">
+        <form method="post" class="manage-edit-form" action="<?= e(base_url('pages/manage-user-edit.php?id=' . (int) $selectedUserId)); ?>">
             <input type="hidden" name="formType" value="statusRole">
 
             <div class="row">
@@ -569,14 +606,14 @@ require_once __DIR__ . '/../includes/header.php';
         </form>
     </section>
 
-    <section class="mt-5">
+    <section class="data-box manage-user-edit-section user-edit-password-section">
         <h2>Passwort setzen</h2>
 
         <p class="text-muted">
             Als Admin können Sie für diesen Benutzer ein neues Passwort vergeben.
         </p>
 
-        <form method="post" action="<?= e(base_url('pages/manage-user-edit.php?id=' . (int) $selectedUserId)); ?>">
+        <form method="post" class="manage-edit-form" action="<?= e(base_url('pages/manage-user-edit.php?id=' . (int) $selectedUserId)); ?>">
             <input type="hidden" name="formType" value="adminPassword">
 
             <div class="mb-3">
@@ -610,11 +647,11 @@ require_once __DIR__ . '/../includes/header.php';
     </section>
 <?php endif; ?>
 
-    <div class="mt-4">
+    <div class="manage-user-edit-actions">
         <?php
         $buttonText = 'Zurück zur Benutzerliste';
         $buttonHref = base_url('pages/manage-users.php');
-        $buttonVariant = 'secondary';
+        $buttonVariant = 'primary';
         require __DIR__ . '/../components/button.php';
         ?>
     </div>
