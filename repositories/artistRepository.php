@@ -148,5 +148,80 @@ class artistRepository
 
         return $artists;
     }
+
+    /**
+     * Holt eine Liste aller eindeutigen Nationalitäten für das Dropdown-Menü der erweiterten Suche.
+     *
+     * @return array Ein Array von Strings mit den Nationalitäten.
+     */
+    public function getNationalities()
+    {
+        $sql = "SELECT DISTINCT Nationality FROM artists 
+                WHERE Nationality IS NOT NULL AND Nationality != '' 
+                ORDER BY Nationality ASC";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute();
+
+        $nationalities = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC))
+        {
+            $nationalities[] = $row['Nationality'];
+        }
+        return $nationalities;
+    }
+
+    /**
+     * Erweiterte Suche für Künstler mit dynamischen Suche
+     *
+     * @param string $name Suchbegriff für Vor- oder Nachname
+     * @param int $yearMin Frühestes Lebensjahr
+     * @param int $yearMax Spätestes Lebensjahr
+     * @param string $nationality Die Nationalität
+     * @param string $direction Sortierrichtung
+     * @return array Ein Array aus artist-Objekten, die den Kriterien entsprechen
+     */
+    public function advancedSearch($name = '', $yearMin = null, $yearMax = null, $nationality = '', $direction = 'ASC')
+    {
+        $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
+        $sql = "SELECT * FROM artists WHERE 1=1";
+        $params = [];
+
+        if (!empty($name))
+        {
+            $sql .= " AND (FirstName LIKE :name1 OR LastName LIKE :name2)";
+            $params['name1'] = '%' . $name . '%';
+            $params['name2'] = '%' . $name . '%';
+        }
+        if (!empty($nationality))
+        {
+            $sql .= " AND Nationality = :nationality";
+            $params['nationality'] = $nationality;
+        }
+
+        if (!empty($yearMin))
+        {
+            $sql .= " AND (YearOfDeath >= :yearMin OR YearOfDeath IS NULL)";
+            $params['yearMin'] = (int)$yearMin;
+        }
+        if (!empty($yearMax))
+        {
+            $sql .= " AND YearOfBirth <= :yearMax";
+            $params['yearMax'] = (int)$yearMax;
+        }
+
+        $sql .= " ORDER BY LastName $dir, FirstName $dir";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute($params);
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $artists = [];
+        foreach ($rows as $row)
+        {
+            $artists[] = new artist($row);
+        }
+        return $artists;
+    }
 }
 

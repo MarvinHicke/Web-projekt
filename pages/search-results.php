@@ -1,163 +1,159 @@
 <?php
 require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../model/helper.php';
 require_once __DIR__ . '/../repositories/artworkRepository.php';
 require_once __DIR__ . '/../repositories/artistRepository.php';
- 
+
 $pageTitle = 'Suchergebnisse';
- 
-$query = trim((string) ($_GET['q'] ?? ''));
-$sort  = safeParam((string) ($_GET['sort'] ?? 'relevance'), ['relevance', 'title', 'artist'], 'relevance');
- 
-$artistResults  = [];
-$artworkResults = [];
- 
-if (mb_strlen($query) >= 3) {
-    try {
-        $db = new dbaccess();
-        $db->connect();
- 
-        $artworkRepo = new artworkRepository($db);
-        $artistRepo  = new artistRepository($db);
- 
-        // Search artists by last name
-        $artistObjs = $artistRepo->searchByLastName($query);
-        foreach ($artistObjs as $artist) {
-            $artistResults[] = [
-                'ArtistID'  => $artist->getId(),
-                'FirstName' => $artist->getFirstName(),
-                'LastName'  => $artist->getLastName(),
-            ];
-        }
- 
-        // Search artworks by title
-        $artworkObjs = $artworkRepo->searchByTitle($query);
-        foreach ($artworkObjs as $artwork) {
-            $artworkResults[] = [
-                'ArtWorkID'     => $artwork->getArtworkid(),
-                'Title'         => $artwork->getTitle(),
-                'FirstName'     => $artwork->getFirstName(),
-                'LastName'      => $artwork->getLastName(),
-                'YearOfWork'    => $artwork->getYearofwork(),
-                'ImageFileName' => $artwork->getImagefilename(),
-            ];
-        }
- 
-    } catch (Exception $e) {
-        // DB not available — results stay empty
-    }
- 
-    if ($sort === 'title') {
-        usort($artworkResults, static function (array $a, array $b): int {
-            return strcmp((string) ($a['Title'] ?? ''), (string) ($b['Title'] ?? ''));
-        });
-    }
- 
-    if ($sort === 'artist') {
-        usort($artworkResults, static function (array $a, array $b): int {
-            return strcmp((string) ($a['LastName'] ?? ''), (string) ($b['LastName'] ?? ''));
-        });
-    }
+
+$query = isset($_GET['q']) ? trim($_GET['q']) : '';
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'title';
+$direction = isset($_GET['dir']) ? $_GET['dir'] : 'ASC';
+$searchType = isset($_GET['search_type']) ? $_GET['search_type'] : '';
+
+if ($query !== '')
+{
+    $searchType = '';
 }
- 
+
+$artistResults = [];
+$artworkResults = [];
+
+try
+{
+    $db = new dbaccess();
+    $db->connect();
+
+    $artworkRepo = new artworkRepository($db);
+    $artistRepo  = new artistRepository($db);
+
+    if ($searchType === 'artist') {
+        $name = isset($_GET['artist_name']) ? trim($_GET['artist_name']) : '';
+        $nationality = isset($_GET['nationality']) ? $_GET['nationality'] : '';
+        $yearMin = !empty($_GET['year_min']) ? (int)$_GET['year_min'] : null;
+        $yearMax = !empty($_GET['year_max']) ? (int)$_GET['year_max'] : null;
+
+        $artistResults = $artistRepo->advancedSearch($name, $yearMin, $yearMax, $nationality, $direction);
+    }
+    elseif ($searchType === 'artwork')
+    {
+        $title = isset($_GET['artwork_title']) ? trim($_GET['artwork_title']) : '';
+        $genreId = !empty($_GET['genre']) ? (int)$_GET['genre'] : null;
+        $yearMin = !empty($_GET['year_min']) ? (int)$_GET['year_min'] : null;
+        $yearMax = !empty($_GET['year_max']) ? (int)$_GET['year_max'] : null;
+
+        $artworkResults = $artworkRepo->advancedSearch($title, $yearMin, $yearMax, $genreId, $sort, $direction);
+
+    }
+    elseif (mb_strlen($query) >= 3)
+    {
+        $artistResults  = $artistRepo->searchByLastName($query, $direction);
+        $artworkResults = $artworkRepo->searchByTitle($query, $sort, $direction);
+    }
+
+    $db->close();
+} catch (Exception $e)
+{}
+
 require_once __DIR__ . '/../includes/header.php';
 ?>
- 
-<section class="page-heading">
-    <h1>Suchergebnisse</h1>
-    <p>Die Suche ist global erreichbar und sucht ab mindestens drei Zeichen nach Künstlernachnamen oder Kunstwerktiteln.</p>
-</section>
- 
-<section class="sort-panel" aria-label="Suchformular">
-    <form method="get" action="<?= e(base_url('pages/search-results.php')); ?>">
-        <label for="search-page-input">Suchbegriff</label>
- 
-        <input
-            id="search-page-input"
-            type="search"
-            name="q"
-            minlength="3"
-            value="<?= e($query); ?>"
-            placeholder="z. B. Gogh oder Mona"
-        >
- 
-        <label for="sort">Sortierung</label>
-        <select id="sort" name="sort">
-            <option value="relevance" <?= $sort === 'relevance' ? 'selected' : ''; ?>>Relevanz</option>
-            <option value="title"     <?= $sort === 'title'     ? 'selected' : ''; ?>>Titel</option>
-            <option value="artist"    <?= $sort === 'artist'    ? 'selected' : ''; ?>>Künstler</option>
-        </select>
- 
-        <button type="submit">Suchen</button>
-    </form>
-</section>
- 
-<?php if ($query !== '' && mb_strlen($query) < 3): ?>
-    <section class="message">Bitte geben Sie mindestens drei Zeichen ein.</section>
-<?php endif; ?>
- 
-<?php if ($query === ''): ?>
-    <section class="message">Bitte geben Sie einen Suchbegriff ein.</section>
-<?php endif; ?>
- 
-<?php if (mb_strlen($query) >= 3): ?>
-    <section class="result-grid" aria-label="Suchergebnisse">
- 
-        <div class="result-column">
-            <h2>Künstler</h2>
- 
-            <?php if (empty($artistResults)): ?>
-                <p>Keine Künstler gefunden.</p>
-            <?php else: ?>
-                <?php foreach ($artistResults as $artist): ?>
-                    <?php
-                    $artistId   = (int) ($artist['ArtistID'] ?? 0);
-                    $artistName = trim((string) ($artist['FirstName'] ?? '') . ' ' . (string) ($artist['LastName'] ?? ''));
-                    ?>
-                    <article class="mini-card">
-                        <img
-                            src="<?= e(artistImageUrl($artistId, 'medium')); ?>"
-                            alt="<?= e($artistName); ?>"
-                        >
-                        <div>
-                            <h3><?= e($artistName !== '' ? $artistName : 'Unbekannter Künstler'); ?></h3>
-                            <a href="<?= e(artistDetailUrl($artistId)); ?>">Künstler öffnen</a>
-                        </div>
-                    </article>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
- 
-        <div class="result-column">
-            <h2>Kunstwerke</h2>
- 
-            <?php if (empty($artworkResults)): ?>
-                <p>Keine Kunstwerke gefunden.</p>
-            <?php else: ?>
-                <?php foreach ($artworkResults as $artwork): ?>
-                    <?php
-                    $artworkId   = (int) ($artwork['ArtWorkID'] ?? 0);
-                    $title       = (string) ($artwork['Title'] ?? 'Unbekanntes Kunstwerk');
-                    $artistName  = trim((string) ($artwork['FirstName'] ?? '') . ' ' . (string) ($artwork['LastName'] ?? ''));
-                    $year        = (string) ($artwork['YearOfWork'] ?? '');
-                    $imgFileName = (string) ($artwork['ImageFileName'] ?? '');
-                    ?>
-                    <article class="mini-card">
-                        <img
-                            src="<?= e(artworkImageUrl($imgFileName, 'square-small')); ?>"
-                            alt="<?= e($title); ?>"
-                        >
-                        <div>
-                            <h3><?= e($title); ?></h3>
-                            <p><?= e($artistName !== '' ? $artistName : 'Unbekannter Künstler'); ?></p>
-                            <p><?= e($year !== '' ? $year : 'Jahr unbekannt'); ?></p>
-                            <a href="<?= e(artworkDetailUrl($artworkId)); ?>">Kunstwerk öffnen</a>
-                        </div>
-                    </article>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
- 
+
+<!-- Notizen -->
+<!-- https://www.w3schools.com/html/html_comments.asp -->
+<!-- https://getbootstrap.com/docs/5.3/forms/form-control/ -->
+
+    <section class="page-heading">
+        <h1>Suchergebnisse</h1>
+        <p>Die Suche ist global erreichbar und sucht ab mindestens drei Zeichen nach Künstlernachnamen oder Kunstwerktiteln.</p>
     </section>
+
+    <section class="sort-panel" aria-label="Suchformular">
+        <form method="get" action="search-results.php">
+
+            <?php
+            if ($searchType !== '')
+            {
+                foreach ($_GET as $key => $value)
+                {
+                    if ($key !== 'q' && $key !== 'sort' && $value !== '')
+                    {
+                        echo '<input type="hidden" name="' . htmlspecialchars($key) . '" value="' . htmlspecialchars($value) . '">';
+                    }
+                }
+            }
+            ?>
+
+            <label for="search-page-input">Suchbegriff</label>
+            <input id="search-page-input" type="search" name="q" value="<?php echo htmlspecialchars($query); ?>" placeholder="z. B. Gogh oder Mona">
+
+            <label for="sort">Sortierung</label>
+            <select id="sort" name="sort">
+                <option value="title"  <?php if($sort === 'title') echo 'selected'; ?>>Titel</option>
+                <option value="artist" <?php if($sort === 'artist') echo 'selected'; ?>>Künstler</option>
+                <option value="year"   <?php if($sort === 'year') echo 'selected'; ?>>Jahr</option>
+            </select>
+
+            <button type="submit">Suchen</button>
+        </form>
+    </section>
+
+    <hr>
+
+<?php if ($query !== '' && mb_strlen($query) < 3): ?>
+    <div class="message">Bitte geben Sie mindestens drei Zeichen ein.</div>
 <?php endif; ?>
- 
+
+<?php if ($query === '' && $searchType === ''): ?>
+    <div class="message">Bitte geben Sie einen Suchbegriff ein.</div>
+<?php endif; ?>
+
+<?php if ($searchType !== '' || mb_strlen($query) >= 3): ?>
+
+    <?php if (empty($artistResults) && empty($artworkResults)): ?>
+        <div class="message">Keine Künstler oder Kunstwerke für diese Suche gefunden.</div>
+    <?php else: ?>
+
+        <?php if (!empty($artistResults)): ?>
+            <h2>Künstler</h2>
+            <div style="margin-bottom: 2rem;">
+                <?php foreach ($artistResults as $artist): ?>
+                    <article class="mini-card" style="margin-bottom: 1rem;">
+                        <?php
+                        $bildPfad = Helper::getImagePath($artist->getId(), 'artists', 'square-medium');
+                        ?>
+                        <img src="../<?php echo htmlspecialchars($bildPfad); ?>" alt="Portrait des Künstlers">
+                        <div>
+                            <h3><?php echo htmlspecialchars($artist->getFirstName() . ' ' . $artist->getLastName()); ?></h3>
+                            <a href="single-artist.php?id=<?php echo $artist->getId(); ?>">Künstler öffnen</a>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($artworkResults)): ?>
+            <h2>Kunstwerke</h2>
+            <div>
+                <?php foreach ($artworkResults as $artwork): ?>
+                    <article class="mini-card" style="margin-bottom: 1rem;">
+                        <?php
+                        $dateinameOhneEndung = str_replace('.jpg', '', $artwork->getImagefilename());
+                        $bildPfad = Helper::getImagePath($dateinameOhneEndung, 'artworks', 'square-small');
+                        ?>
+                        <img src="../<?php echo htmlspecialchars($bildPfad); ?>" alt="Bild des Kunstwerks">
+                        <div>
+                            <h3><?php echo htmlspecialchars($artwork->getTitle()); ?></h3>
+                            <p><?php echo htmlspecialchars($artwork->getFirstName() . ' ' . $artwork->getLastName()); ?></p>
+                            <p><?php echo htmlspecialchars($artwork->getYearofwork()); ?></p>
+                            <a href="single-artwork.php?id=<?php echo $artwork->getArtworkid(); ?>">Kunstwerk öffnen</a>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+    <?php endif; ?>
+<?php endif; ?>
+
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
