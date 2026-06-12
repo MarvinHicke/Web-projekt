@@ -44,18 +44,7 @@ try {
     $reviewRepo      = new reviewRepository($db);
     $ratingData      = $reviewRepo->getAverageRatingArtwork($artworkId);
 
-    // Reviews with customer city + country via JOIN
-    $reviewStmt = $db->preparedStatement(
-        "SELECT r.ReviewId, r.Rating, r.Comment, r.ReviewDate, r.CustomerId,
-                c.City, c.Country, cl.UserName
-         FROM reviews r
-         LEFT JOIN customers c         ON r.CustomerId = c.CustomerID
-         LEFT JOIN customerlogon cl    ON r.CustomerId = cl.CustomerID
-         WHERE r.ArtWorkId = :id
-         ORDER BY r.ReviewDate DESC"
-    );
-    $reviewStmt->execute(['id' => $artworkId]);
-    $reviewRows = $reviewStmt->fetchAll(PDO::FETCH_ASSOC);
+    $reviewRows = $reviewRepo->getForArtworkWithCustomerData($artworkId);
 
 } catch (Exception $e) {
     $pageTitle = 'Fehler';
@@ -69,24 +58,50 @@ try {
 // ── handle add-review POST (PRG pattern) ─────────────────────────────────────
 $reviewErrors = [];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_review'])) {
-    if (!isLoggedIn()) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_review']))
+{
+    if (!isLoggedIn())
+    {
         $reviewErrors[] = 'Nur angemeldete Nutzer können Bewertungen abgeben.';
-    } else {
+    }
+    else
+    {
         $loggedInId = (int) ($_SESSION['user']['CustomerID'] ?? 0);
-        $rating     = (int) ($_POST['rating']  ?? 0);
-        $comment    = trim((string) ($_POST['comment'] ?? ''));
+        $rating = filter_var($_POST['rating'] ?? null, FILTER_VALIDATE_INT);
+        $comment = trim(strip_tags((string) ($_POST['comment'] ?? '')));
 
-        if ($rating < 1 || $rating > 5)  $reviewErrors[] = 'Bewertung muss zwischen 1 und 5 liegen.';
-        if ($comment === '')              $reviewErrors[] = 'Kommentar darf nicht leer sein.';
+        if ($loggedInId <= 0)
+        {
+            $reviewErrors[] = 'Der angemeldete Benutzer konnte nicht erkannt werden.';
+        }
 
-        if (empty($reviewErrors)) {
-            if ($reviewRepo->hasUserReviewedArtwork($artworkId, $loggedInId)) {
+        if ($rating === false || $rating < 1 || $rating > 5)
+        {
+            $reviewErrors[] = 'Bewertung muss zwischen 1 und 5 liegen.';
+        }
+
+        if ($comment === '')
+        {
+            $reviewErrors[] = 'Kommentar darf nicht leer sein.';
+        }
+
+        if (empty($reviewErrors))
+        {
+            if ($reviewRepo->hasUserReviewedArtwork($artworkId, $loggedInId))
+            {
                 $reviewErrors[] = 'Sie haben dieses Kunstwerk bereits bewertet.';
-            } else {
-                $reviewRepo->addReview($artworkId, $loggedInId, $rating, $comment);
-                header('Location: ' . base_url('pages/single-artwork.php') . '?id=' . $artworkId . '&reviewed=1');
-                exit;
+            }
+            else
+            {
+                $reviewAdded = $reviewRepo->addReview($artworkId, $loggedInId, (int) $rating, $comment);
+
+                if ($reviewAdded)
+                {
+                    header('Location: ' . base_url('pages/single-artwork.php') . '?id=' . $artworkId . '&review=added#reviews');
+                    exit;
+                }
+
+                $reviewErrors[] = 'Die Bewertung konnte nicht gespeichert werden.';
             }
         }
     }
@@ -268,7 +283,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <strong><?= e(number_format($averageRating, 1, ',', '.')); ?>/5</strong>
                             <span class="text-muted small">(<?= $totalReviews; ?> Bewertungen)</span>
                         <?php else: ?>
-                            <span class="text-muted">Noch keine Bewertung</span>
+                            <span class="text-muted"></span>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -278,11 +293,19 @@ require_once __DIR__ . '/../includes/header.php';
 </article>
 
 <!-- ===== REVIEWS ===== -->
-<section class="reviews-section mt-5">
+<section id="reviews" class="reviews-section mt-5">
     <h2>Bewertungen</h2>
 
-    <?php if (isset($_GET['reviewed'])): ?>
+    <?php if ((string) ($_GET['review'] ?? '') === 'added'): ?>
         <div class="alert alert-success">Ihre Bewertung wurde gespeichert.</div>
+    <?php endif; ?>
+
+    <?php if ((string) ($_GET['review'] ?? '') === 'deleted'): ?>
+        <div class="alert alert-success">Die Bewertung wurde gelöscht.</div>
+    <?php endif; ?>
+
+    <?php if ((string) ($_GET['review'] ?? '') === 'delete-error'): ?>
+        <div class="alert alert-danger">Die Bewertung konnte nicht gelöscht werden.</div>
     <?php endif; ?>
 
     <?php if (empty($reviewRows)): ?>
@@ -290,25 +313,43 @@ require_once __DIR__ . '/../includes/header.php';
     <?php else: ?>
         <?php foreach ($reviewRows as $row): ?>
             <?php
-            $stars     = max(0, min(5, (int) ($row['Rating'] ?? 0)));
+            $stars = max(0, min(5, (int) ($row['Rating'] ?? 0)));
             $formatted = !empty($row['ReviewDate']) ? date('d.m.Y', strtotime($row['ReviewDate'])) : '';
-            $username  = (string) ($row['UserName'] ?? 'Unbekannt');
-            $city      = (string) ($row['City']     ?? '');
-            $country   = (string) ($row['Country']  ?? '');
-            $location  = implode(', ', array_filter([$city, $country]));
-            $isOwn     = $loggedInId > 0 && (int)($row['CustomerId'] ?? -1) === $loggedInId;
+            $city = trim((string) ($row['City'] ?? ''));
+            $country = trim((string) ($row['Country'] ?? ''));
+            $reviewerName = trim((string) ($row['ReviewerFirstName'] ?? '') . ' ' . (string) ($row['ReviewerLastName'] ?? ''));
+
+            if ($reviewerName === '')
+            {
+                $reviewerName = 'Unbekannter Reviewer';
+            }
+
+            $reviewerLocation = 'Ort unbekannt';
+
+            if ($city !== '' && $country !== '')
+            {
+                $reviewerLocation = $city . ' (' . $country . ')';
+            }
+            elseif ($city !== '')
+            {
+                $reviewerLocation = $city;
+            }
+            elseif ($country !== '')
+            {
+                $reviewerLocation = $country;
+            }
+
+            $isOwn = $loggedInId > 0 && (int) ($row['CustomerId'] ?? -1) === $loggedInId;
             ?>
             <article class="card mb-3">
                 <div class="card-body">
                     <div class="d-flex justify-content-between flex-wrap gap-2">
                         <div>
                             <span class="text-warning fs-5"><?= str_repeat('★', $stars) . str_repeat('☆', 5 - $stars); ?></span>
-                            <strong class="ms-2"><?= e($username); ?></strong>
+                            <strong class="ms-2"><?= e($reviewerName); ?></strong>
+                            <span class="text-muted ms-2 small"><?= e($reviewerLocation); ?></span>
                             <?php if ($isOwn): ?>
                                 <span class="badge text-bg-info ms-1">Deine Bewertung</span>
-                            <?php endif; ?>
-                            <?php if ($location !== ''): ?>
-                                <span class="text-muted ms-2 small"><?= e($location); ?></span>
                             <?php endif; ?>
                         </div>
                         <small class="text-muted"><?= e($formatted); ?></small>
@@ -344,7 +385,13 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
                     <div class="mb-3">
                         <label for="comment" class="form-label fw-bold">Kommentar</label>
-                        <textarea id="comment" name="comment" class="form-control" rows="4" required><?= e((string)($_POST['comment'] ?? '')); ?></textarea>
+                        <textarea
+                                id="comment"
+                                name="comment"
+                                class="form-control"
+                                rows="4"
+                                required
+                        ><?= e((string) ($_POST['comment'] ?? '')); ?></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Bewertung speichern</button>
                 </form>
