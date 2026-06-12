@@ -81,11 +81,13 @@ class artworkRepository
      */
     public function getTopArtworks($limit = 3)
     {
-        $sql = "SELECT a.*, 
+        $sql = "SELECT a.*, art.FirstName, art.LastName,
                    (SELECT IF(COUNT(r.ReviewId) >= 3, AVG(r.Rating), NULL) 
                     FROM reviews r 
                     WHERE r.ArtWorkId = a.ArtWorkID) as AvgRating
             FROM artworks a
+            JOIN artists art ON a.ArtistID = art.ArtistID
+            WHERE a.ImageFileName IS NOT NULL AND a.ImageFileName != ''
             ORDER BY AvgRating DESC
             LIMIT :limit";
 
@@ -262,4 +264,3 @@ class artworkRepository
         return $artworks;
     }
 }
-

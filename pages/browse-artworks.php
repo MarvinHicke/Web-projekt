@@ -63,7 +63,7 @@ require_once __DIR__ . '/../includes/header.php';
             <article class="artwork-card-link-wrapper">
                 <a class="artwork-card-link" href="<?= e(artworkDetailUrl($artworkId)); ?>">
                     <img
-                        src="<?= e(artworkImageUrl($imageFileName, 'square-small')); ?>"
+                        src="<?= e(artworkImageUrl($imageFileName, 'square-medium')); ?>"
                         alt="<?= e($title); ?>"
                         class="artwork-card-image"
                     >
