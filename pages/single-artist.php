@@ -105,22 +105,16 @@ require_once __DIR__ . '/../includes/header.php';
         <?php endif; ?>
 
         <!-- Favorite button -->
-        <?php if (isLoggedIn()): ?>
-            <?php if ($isFavorited): ?>
-                <a class="btn btn-warning btn-sm mb-3"
-                   href="<?= e(base_url('pages/remove-favorite.php') . '?type=artist&id=' . $artistId); ?>">
-                    ★ Aus Favoriten entfernen
-                </a>
-            <?php else: ?>
-                <a class="btn btn-outline-warning btn-sm mb-3"
-                   href="<?= e(base_url('pages/add-favorite.php') . '?type=artist&id=' . $artistId); ?>">
-                    ☆ Zu Favoriten hinzufügen
-                </a>
-            <?php endif; ?>
+        <?php if ($isFavorited): ?>
+            <a class="btn btn-warning btn-sm mb-3"
+               href="<?= e(base_url('pages/remove-favorite.php') . '?type=artist&id=' . urlencode((string) $artistId) . '&redirect=single-artist.php'); ?>">
+                ★ Aus Favoriten entfernen
+            </a>
         <?php else: ?>
-            <p class="mb-3 small">
-                <a href="<?= e(base_url('pages/login.php')); ?>">Anmelden</a>, um zu favorisieren.
-            </p>
+            <a class="btn btn-outline-warning btn-sm mb-3"
+               href="<?= e(base_url('pages/add-favorite.php') . '?type=artist&id=' . urlencode((string) $artistId) . '&redirect=single-artist.php'); ?>">
+                ☆ Zu Favoriten hinzufügen
+            </a>
         <?php endif; ?>
 
         <!-- Details table -->
