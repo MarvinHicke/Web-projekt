@@ -52,16 +52,11 @@ try
         $artworkResults = $artworkRepo->searchByTitle($query, $sort, $direction);
     }
 
-    $db->close();
 } catch (Exception $e)
 {}
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
-
-<!-- Notizen -->
-<!-- https://www.w3schools.com/html/html_comments.asp -->
-<!-- https://getbootstrap.com/docs/5.3/forms/form-control/ -->
 
     <section class="page-heading">
         <h1>Suchergebnisse</h1>
@@ -139,12 +134,15 @@ require_once __DIR__ . '/../includes/header.php';
                     <article class="mini-card" style="margin-bottom: 1rem;">
                         <?php
                         $dateinameOhneEndung = str_replace('.jpg', '', $artwork->getImagefilename());
-                        $bildPfad = Helper::getImagePath($dateinameOhneEndung, 'artworks', 'square-small');
+                        $bildPfad = Helper::getImagePath($dateinameOhneEndung, 'works', 'square-small');
+
+                        $kuenstler = isset($artistRepo) ? $artistRepo->getById($artwork->getArtistId()) : null;
+                        $kuenstlerName = $kuenstler ? $kuenstler->getFirstName() . ' ' . $kuenstler->getLastName() : 'Unbekannter Künstler';
                         ?>
                         <img src="../<?php echo htmlspecialchars($bildPfad); ?>" alt="Bild des Kunstwerks">
                         <div>
                             <h3><?php echo htmlspecialchars($artwork->getTitle()); ?></h3>
-                            <p><?php echo htmlspecialchars($artwork->getFirstName() . ' ' . $artwork->getLastName()); ?></p>
+                            <p><?php echo htmlspecialchars($kuenstlerName); ?></p>
                             <p><?php echo htmlspecialchars($artwork->getYearofwork()); ?></p>
                             <a href="single-artwork.php?id=<?php echo $artwork->getArtworkid(); ?>">Kunstwerk öffnen</a>
                         </div>
@@ -156,4 +154,10 @@ require_once __DIR__ . '/../includes/header.php';
     <?php endif; ?>
 <?php endif; ?>
 
-<?php require_once __DIR__ . '/../includes/footer.php'; ?>
+<?php
+if (isset($db))
+{
+    $db->close();
+}
+require_once __DIR__ . '/../includes/footer.php';
+?>

@@ -74,6 +74,23 @@ class artworkRepository
     }
 
     /**
+     * Sucht ein bestimmtes Kunstwerk anhand seiner ID
+     *
+     * @param int $id Die eindeutige Datenbank-ID des Kunstwerks
+     * @return artwork Das gefundene artwork-Objekt oder null, falls die ID nicht existiert
+     */
+    public function getByIdOrigin($id)
+    {
+        $sql = "SELECT * FROM artworks WHERE ArtWorkID = :id";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? new artwork($row) : null;
+    }
+
+    /**
      * Holt die am besten bewerteten Kunstwerke mit mind. 3 Bewertungen
      *
      * @param int $limit Die maximale Anzahl der zurückgegebenen Kunstwerke (Standard ist 3)
