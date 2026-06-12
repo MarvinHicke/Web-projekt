@@ -280,5 +280,73 @@ class artworkRepository
 
         return $artworks;
     }
+
+    /**
+     * Erweiterte Suche für Kunstwerke mit dynamischen Suchkriterien
+     */
+    public function advancedSearch($title = '', $yearMin = null, $yearMax = null, $genreId = null, $sortBy = 'title', $direction = 'ASC')
+    {
+        $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
+
+        switch (strtolower($sortBy)) {
+            case 'year':
+                $orderClause = "a.YearOfWork $dir";
+                break;
+            case 'artist':
+                $orderClause = "art.LastName $dir, art.FirstName $dir";
+                break;
+            case 'title':
+            default:
+                $orderClause = "a.Title $dir";
+                break;
+        }
+
+        $fromClause = "artworks a, artists art";
+        $whereClause = "a.ArtistID = art.ArtistID";
+        $params = [];
+
+        if (!empty($genreId))
+        {
+            $fromClause .= ", ArtworkGenres ag";
+            $whereClause .= " AND a.ArtWorkID = ag.ArtWorkID AND ag.GenreID = :genreId";
+            $params['genreId'] = (int)$genreId;
+        }
+
+        if (!empty($title))
+        {
+            $whereClause .= " AND a.Title LIKE :title";
+            $params['title'] = '%' . $title . '%';
+        }
+
+        if (!empty($yearMin))
+        {
+            $whereClause .= " AND a.YearOfWork >= :yearMin";
+            $params['yearMin'] = (int)$yearMin;
+        }
+
+        if (!empty($yearMax))
+        {
+            $whereClause .= " AND a.YearOfWork <= :yearMax";
+            $params['yearMax'] = (int)$yearMax;
+        }
+
+        $sql = "SELECT a.*, art.FirstName, art.LastName 
+                FROM $fromClause 
+                WHERE $whereClause 
+                ORDER BY $orderClause";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute($params);
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $artworks = [];
+
+        foreach ($rows as $row)
+        {
+            $artworks[] = new artwork($row);
+        }
+
+        return $artworks;
+    }
 }
 
