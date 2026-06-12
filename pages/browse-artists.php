@@ -16,6 +16,7 @@ require_once __DIR__ . '/../repositories/artistRepository.php';
 $sort = safeParam((string) ($_GET['sort'] ?? 'firstName'), ['firstName', 'lastName'], 'firstName');
 $direction = safeParam(strtolower((string) ($_GET['direction'] ?? 'asc')), ['asc', 'desc'], 'asc');
 
+/*
 try {
     $db = new dbaccess();
     $db->connect();
@@ -24,16 +25,26 @@ try {
 } catch (Exception $e) {
     $artists = [];
 }
+*/
+
+try {
+    $db = new dbaccess();
+    $db->connect();
+    $artistRepository = new artistRepository($db);
+    $artists = $artistRepository->getAllSorted($sort, $direction);
+} catch (Throwable $e) {
+    die($e->getMessage());
+}
 
 $_SESSION["favorites"] ??= [];
 $_SESSION["favorites"]["artists"] ??= [];
 
 $favoriteArtistIds = array_map('intval', $_SESSION["favorites"]["artists"]);
 
-
 require_once __DIR__.'/../includes/header.php';
 
 ?>
+
 
 <section class="page-heading">
     <h1>Künstler durchsuchen</h1>
@@ -66,20 +77,27 @@ require_once __DIR__.'/../includes/header.php';
     <section class="artist-card-grid" aria-label="Liste der Artists">
         <?php foreach ($artists as $artist): ?>
             <?php
-            $showAddFavoriteButton = !in_array((int) $artist->getId(), $favoriteArtistIds, true);
             $artistId = $artist->getId();
-            $firstName = $artist->getFirstName();
-            $lastName = $artist->getLastName();
+
             $artistName = trim(
                     ($artist->getFirstName() ?? '') . ' ' . ($artist->getLastName() ?? '')
             );
+
+            if ($artistName === '') {
+                $artistName = 'Unbekannter Künstler';
+            }
+
             $imageFileName = $artist->getImagefilename();
+
+            $imageUrl = $imageFileName
+                    ? artistImageUrl($imageFileName, 'square-small')
+                    : base_url('images/artists/square-medium/');
             ?>
 
             <article class="artist-card-link-wrapper">
                 <a class="artist-card-link" href="<?= e(artistDetailUrl($artistId)); ?>">
                     <img
-                            src="<?= e(artistImageUrl($imageFileName, 'square-small')); ?>"
+                            src="<?= e($imageUrl); ?>"
                             alt="<?= e($artistName); ?>"
                             class="artist-card-image"
                     >

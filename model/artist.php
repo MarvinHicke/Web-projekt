@@ -26,6 +26,14 @@ class artist
         $this->nationality = $data['Nationality'];
         $this->gender      = isset($data['Gender']) ? $data['Gender'] : (isset($data['gender']) ? $data['gender'] : 'unbekannt');
         $this->birthYear   = isset($data['BirthYear']) ? $data['BirthYear'] : (isset($data['birthyear']) ? $data['birthyear'] : null);
+
+        $this->imageFilename =
+            $data['ImageFileName']
+            ?? $data['ImageFilename']
+            ?? $data['imageFilename']
+            ?? $data['imagefilename']
+            ?? $data['ArtistID']
+            ?? null;
     }
 
     // Getter
@@ -90,12 +98,18 @@ class artist
         return $this->id;
     }
 
-    function getImagefilename ()
+    public function getImagefilename()
     {
         $name = $this->imageFilename;
-        if (is_numeric($name) && strlen($name) < 6) {
-            $name = str_pad($name, 6, '0', STR_PAD_LEFT);
+
+        if ($name === null || $name === '') {
+            return null;
         }
+
+        if (is_numeric($name) && strlen((string) $name) < 6) {
+            $name = str_pad((string) $name, 6, '0', STR_PAD_LEFT);
+        }
+
         return $name;
     }
 }

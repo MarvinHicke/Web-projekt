@@ -100,23 +100,22 @@ class artistRepository
      * @param string $direction Die Sortierrichtung ('ASC' oder 'DESC'). Standard ist 'ASC'
      * @return array Ein Array aus fertigen artwork-Objekten.
      */
-    public function getAllSorted($sortBy = 'FirstName', $direction = 'ASC')
+    public function getAllSorted($sortBy = 'firstName', $direction = 'ASC')
     {
         $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
 
         switch (strtolower($sortBy)) {
-            case 'artistFirstName':
-                $orderClause = "art.FirstName $dir, art.LastName $dir";
-                break;
-            case 'artistLastName':
+            case 'lastname':
                 $orderClause = "art.LastName $dir, art.FirstName $dir";
                 break;
+
+            case 'firstname':
             default:
-                $orderClause = "art.FirstName $dir";
+                $orderClause = "art.FirstName $dir, art.LastName $dir";
                 break;
         }
 
-        $sql = "SELECT art.*, art.FirstName, art.LastName 
+        $sql = "SELECT art.*
             FROM artists art
             ORDER BY $orderClause";
 
@@ -124,10 +123,9 @@ class artistRepository
         $stmt->execute();
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $artworks = [];
+        $artists = [];
 
-        foreach ($rows as $row)
-        {
+        foreach ($rows as $row) {
             $artists[] = new artist($row);
         }
 

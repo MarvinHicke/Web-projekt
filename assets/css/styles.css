@@ -361,13 +361,13 @@ small {
 
 /* D-Bereich: Browse Artworks */
 
-.artwork-card-grid {
+.artwork-card-grid, .artist-card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 20px;
 }
 
-.artwork-card-link-wrapper {
+.artwork-card-link-wrapper, .artist-card-link-wrapper {
     background: #ffffff;
     border: 1px solid #e3d8c8;
     border-radius: 16px;
@@ -375,37 +375,37 @@ small {
     transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.artwork-card-link-wrapper:hover {
+.artwork-card-link-wrapper:hover, .artist-card-link-wrapper:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 24px rgba(45, 33, 24, 0.12);
 }
 
-.artwork-card-link {
+.artwork-card-link, .artist-card-link {
     display: block;
     color: inherit;
     text-decoration: none;
 }
 
-.artwork-card-link:hover {
+.artwork-card-link:hover, .artist-card-link:hover {
     text-decoration: none;
 }
 
-.artwork-card-image {
+.artwork-card-image, .artist-card-image {
     width: 100%;
     height: 220px;
     object-fit: cover;
 }
 
-.artwork-card-content {
+.artwork-card-content, .artist-card-content {
     padding: 16px;
 }
 
-.artwork-card-content h2 {
+.artwork-card-content h2, .artist-card-content h2 {
     font-size: 1.1rem;
     margin: 0 0 10px;
 }
 
-.artwork-card-content p {
+.artwork-card-content p, .artist-card-content p {
     margin: 0 0 6px;
 }
 
