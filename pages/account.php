@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../repositories/customerRepository.php';
+require_once __DIR__ . '/../repositories/reviewRepository.php';
 
 if (!isLoggedIn()) {
     header('Location: ' . base_url('pages/login.php'));
@@ -9,7 +10,10 @@ if (!isLoggedIn()) {
 
 $currentUser = $_SESSION['user'];
 
-$customerRepository = new customerRepository(db());
+$db = db();
+
+$customerRepository = new customerRepository($db);
+$reviewRepository = new reviewRepository($db);
 
 $profileErrors = [];
 $profileSuccessMessage = '';
@@ -24,6 +28,8 @@ if (!$accountUser)
 {
     $accountUser = $currentUser;
 }
+
+$ownReviews = $reviewRepository->getForCustomerWithArtworkData((int) $currentUser['CustomerID']);
 
 $firstName = (string) ($accountUser['FirstName'] ?? '');
 $lastName = (string) ($accountUser['LastName'] ?? '');
@@ -479,7 +485,72 @@ require_once __DIR__ . "/../includes/header.php";
 </form>
 
 <h2>Meine Reviews</h2>
-<p>Hier werden später deine eigenen Bewertungen angezeigt.</p>
+
+<?php if (empty($ownReviews)): ?>
+    <?php
+    $alertType = 'info';
+    $alertMessage = 'Du hast noch keine Bewertungen geschrieben.';
+    include __DIR__ . '/../components/alert-box.php';
+    ?>
+<?php else: ?>
+    <div class="list-group mb-4">
+        <?php foreach ($ownReviews as $review): ?>
+            <?php
+            $reviewArtworkId = (int) ($review['ArtWorkId'] ?? 0);
+            $reviewTitle = (string) ($review['ArtworkTitle'] ?? 'Unbekanntes Kunstwerk');
+            $reviewRating = max(1, min(5, (int) ($review['Rating'] ?? 1)));
+            $reviewComment = cleanHtml((string) ($review['Comment'] ?? ''));
+            $reviewDateRaw = (string) ($review['ReviewDate'] ?? '');
+            $reviewDate = 'Datum unbekannt';
+
+            if ($reviewDateRaw !== '')
+            {
+                $timestamp = strtotime($reviewDateRaw);
+
+                if ($timestamp !== false)
+                {
+                    $reviewDate = date('d.m.Y', $timestamp);
+                }
+            }
+
+            $artistName = trim((string) ($review['ArtistFirstName'] ?? '') . ' ' . (string) ($review['ArtistLastName'] ?? ''));
+
+            if ($artistName === '')
+            {
+                $artistName = 'Unbekannter Künstler';
+            }
+            ?>
+
+            <article class="list-group-item">
+                <h3 class="h5 mb-1">
+                    <a href="<?= e(artworkDetailUrl($reviewArtworkId)); ?>">
+                        <?= e($reviewTitle); ?>
+                    </a>
+                </h3>
+
+                <p class="mb-1 text-muted">
+                    <?= e($artistName); ?> · <?= e($reviewDate); ?>
+                </p>
+
+                <p class="mb-2">
+                    <span class="text-warning">
+                        <?= str_repeat('★', $reviewRating) . str_repeat('☆', 5 - $reviewRating); ?>
+                    </span>
+                    <span class="ms-1">
+                        <?= e((string) $reviewRating); ?>/5
+                    </span>
+                </p>
+
+                <details>
+                    <summary>Kommentar anzeigen</summary>
+                    <p class="mt-2 mb-0">
+                        <?= nl2br(e($reviewComment)); ?>
+                    </p>
+                </details>
+            </article>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
 
 <h2>Meine Favoriten</h2>
 <p>Hier kannst du deine favorisierten Künstler und Kunstwerke ansehen.</p>

@@ -50,6 +50,38 @@ class reviewRepository
     }
 
     /**
+     * Holt alle Bewertungen für ein Kunstwerk inklusive Stadt und Land des Reviewers.
+     *
+     * @param int $artworkId Die ID des Kunstwerks
+     * @return array Bewertungen als assoziative Arrays
+     */
+    public function getForArtworkWithCustomerData($artworkId)
+    {
+        $sql = "SELECT r.ReviewId,
+                       r.ArtWorkId,
+                       r.CustomerId,
+                       r.Rating,
+                       r.Comment,
+                       r.ReviewDate,
+                       c.FirstName AS ReviewerFirstName,
+                       c.LastName AS ReviewerLastName,
+                       c.City,
+                       c.Country
+                FROM reviews r
+                LEFT JOIN customers c ON r.CustomerId = c.CustomerID
+                WHERE r.ArtWorkId = :id
+                ORDER BY r.ReviewDate DESC";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute
+        ([
+            'id' => (int) $artworkId
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * Holt alle Bewertungen für ein bestimmtes Kunstwerk sortiert nach Datum
      *
      * @param int $artworkId Die ID des Kunstwerks
@@ -98,7 +130,7 @@ class reviewRepository
      */
     public function addReview($artworkId, $customerId, $rating, $comment)
     {
-        $currentDate = date('d.m.Y H:i:s');
+        $currentDate = date('Y-m-d H:i:s');
         $sql = "INSERT INTO reviews (ArtWorkId, CustomerId, ReviewDate, Rating, Comment) 
                 VALUES (:artworkId, :customerId, :reviewDate, :rating, :comment)";
 
@@ -166,6 +198,38 @@ class reviewRepository
         $stmt = $this->db->preparedStatement($sql);
         $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
         $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Holt alle Bewertungen eines Kunden inklusive Kunstwerk- und Künstlerdaten.
+     *
+     * @param int $customerId Die ID des Kunden
+     * @return array Bewertungen als assoziative Arrays
+     */
+    public function getForCustomerWithArtworkData($customerId)
+    {
+        $sql = "SELECT r.ReviewId,
+                   r.ArtWorkId,
+                   r.CustomerId,
+                   r.ReviewDate,
+                   r.Rating,
+                   r.Comment,
+                   a.Title AS ArtworkTitle,
+                   art.FirstName AS ArtistFirstName,
+                   art.LastName AS ArtistLastName
+                FROM reviews r
+                JOIN artworks a ON r.ArtWorkId = a.ArtWorkID
+                JOIN artists art ON a.ArtistID = art.ArtistID
+                WHERE r.CustomerId = :customerId
+                ORDER BY r.ReviewDate DESC, r.ReviewId DESC";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute
+        ([
+            'customerId' => (int) $customerId
+        ]);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

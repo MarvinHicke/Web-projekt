@@ -57,10 +57,17 @@ class artworkRepository
      */
     public function getById($id)
     {
-        $sql = "SELECT * FROM artworks WHERE ArtWorkID = :id";
+        $sql = "SELECT a.*, art.FirstName, art.LastName
+            FROM artworks a
+            JOIN artists art ON a.ArtistID = art.ArtistID
+            WHERE a.ArtWorkID = :id";
 
         $stmt = $this->db->preparedStatement($sql);
-        $stmt->execute(['id' => $id]);
+        $stmt->execute
+        ([
+            'id' => (int) $id
+        ]);
+
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return $row ? new artwork($row) : null;
