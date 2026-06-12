@@ -3,7 +3,7 @@ ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-$pageTitle = 'Browse Artists';
+$pageTitle = 'Künstler durchsuchen';
 
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
@@ -22,7 +22,7 @@ try {
     $artistRepository = new artistRepository($db);
     $artists = $artistRepository->getAllSorted($sort, $direction);
 } catch (Exception $e) {
-    $artworks = [];
+    $artists = [];
 }
 
 $_SESSION["favorites"] ??= [];
@@ -67,7 +67,6 @@ require_once __DIR__.'/../includes/header.php';
         <?php foreach ($artists as $artist): ?>
             <?php
             $showAddFavoriteButton = !in_array((int) $artist->getId(), $favoriteArtistIds, true);
-            include __DIR__ . '/../components/artist-card.php';
             $artistId = $artist->getId();
             $firstName = $artist->getFirstName();
             $lastName = $artist->getLastName();
@@ -82,7 +81,7 @@ require_once __DIR__.'/../includes/header.php';
                     <img
                             src="<?= e(artistImageUrl($imageFileName, 'square-small')); ?>"
                             alt="<?= e($artistName); ?>"
-                            class="artwork-card-image"
+                            class="artist-card-image"
                     >
 
                     <div class="artist-card-content">

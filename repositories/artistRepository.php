@@ -94,22 +94,37 @@ class artistRepository
     }
 
     /**
-     * Holt alle Künstler sortiert nach Nachname und Vorname
+     * Holt alle Kunstwerke und sortiert sie nach einem bestimmten Kriterium
      *
-     * @param string $direction Die Sortierreihenfolge (ASC oder DESC). Standard ist ASC
-     * @return array Ein Array aus der Datenbankzeilen
+     * @param string $sortBy Das Sortierkriterium ('title', 'year' oder 'artist'). Standard ist 'title'
+     * @param string $direction Die Sortierrichtung ('ASC' oder 'DESC'). Standard ist 'ASC'
+     * @return array Ein Array aus fertigen artwork-Objekten.
      */
-    public function getAllSorted($direction = 'ASC')
+    public function getAllSorted($sortBy = 'FirstName', $direction = 'ASC')
     {
         $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
 
-        $sql = "SELECT * FROM artists ORDER BY LastName " . $dir . ", FirstName " . $dir;
+        switch (strtolower($sortBy)) {
+            case 'artistFirstName':
+                $orderClause = "art.FirstName $dir, art.LastName $dir";
+                break;
+            case 'artistLastName':
+                $orderClause = "art.LastName $dir, art.FirstName $dir";
+                break;
+            default:
+                $orderClause = "art.FirstName $dir";
+                break;
+        }
+
+        $sql = "SELECT art.*, art.FirstName, art.LastName 
+            FROM artists art
+            ORDER BY $orderClause";
 
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute();
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $artists = [];
+        $artworks = [];
 
         foreach ($rows as $row)
         {
