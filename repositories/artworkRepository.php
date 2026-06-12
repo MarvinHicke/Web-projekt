@@ -74,18 +74,37 @@ class artworkRepository
     }
 
     /**
-     * Holt die am besten bewerteten Kunstwerke
+     * Sucht ein bestimmtes Kunstwerk anhand seiner ID
+     *
+     * @param int $id Die eindeutige Datenbank-ID des Kunstwerks
+     * @return artwork Das gefundene artwork-Objekt oder null, falls die ID nicht existiert
+     */
+    public function getByIdOrigin($id)
+    {
+        $sql = "SELECT * FROM artworks WHERE ArtWorkID = :id";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? new artwork($row) : null;
+    }
+
+    /**
+     * Holt die am besten bewerteten Kunstwerke mit mind. 3 Bewertungen
      *
      * @param int $limit Die maximale Anzahl der zurückgegebenen Kunstwerke (Standard ist 3)
      * @return array Ein Array aus Arrays mit den Kunstwerkdaten und der Durchschnittsbewertung (AvgRating).
      */
     public function getTopArtworks($limit = 3)
     {
-        $sql = "SELECT a.*, 
+        $sql = "SELECT a.*, art.FirstName, art.LastName,
                    (SELECT IF(COUNT(r.ReviewId) >= 3, AVG(r.Rating), NULL) 
                     FROM reviews r 
                     WHERE r.ArtWorkId = a.ArtWorkID) as AvgRating
             FROM artworks a
+            JOIN artists art ON a.ArtistID = art.ArtistID
+            WHERE a.ImageFileName IS NOT NULL AND a.ImageFileName != ''
             ORDER BY AvgRating DESC
             LIMIT :limit";
 
@@ -250,6 +269,74 @@ class artworkRepository
 
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute(['keyword' => $searchString]);
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $artworks = [];
+
+        foreach ($rows as $row)
+        {
+            $artworks[] = new artwork($row);
+        }
+
+        return $artworks;
+    }
+
+    /**
+     * Erweiterte Suche für Kunstwerke mit dynamischen Suchkriterien
+     */
+    public function advancedSearch($title = '', $yearMin = null, $yearMax = null, $genreId = null, $sortBy = 'title', $direction = 'ASC')
+    {
+        $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
+
+        switch (strtolower($sortBy)) {
+            case 'year':
+                $orderClause = "a.YearOfWork $dir";
+                break;
+            case 'artist':
+                $orderClause = "art.LastName $dir, art.FirstName $dir";
+                break;
+            case 'title':
+            default:
+                $orderClause = "a.Title $dir";
+                break;
+        }
+
+        $fromClause = "artworks a, artists art";
+        $whereClause = "a.ArtistID = art.ArtistID";
+        $params = [];
+
+        if (!empty($genreId))
+        {
+            $fromClause .= ", ArtworkGenres ag";
+            $whereClause .= " AND a.ArtWorkID = ag.ArtWorkID AND ag.GenreID = :genreId";
+            $params['genreId'] = (int)$genreId;
+        }
+
+        if (!empty($title))
+        {
+            $whereClause .= " AND a.Title LIKE :title";
+            $params['title'] = '%' . $title . '%';
+        }
+
+        if (!empty($yearMin))
+        {
+            $whereClause .= " AND a.YearOfWork >= :yearMin";
+            $params['yearMin'] = (int)$yearMin;
+        }
+
+        if (!empty($yearMax))
+        {
+            $whereClause .= " AND a.YearOfWork <= :yearMax";
+            $params['yearMax'] = (int)$yearMax;
+        }
+
+        $sql = "SELECT a.*, art.FirstName, art.LastName 
+                FROM $fromClause 
+                WHERE $whereClause 
+                ORDER BY $orderClause";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute($params);
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $artworks = [];
