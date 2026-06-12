@@ -98,13 +98,15 @@ class artworkRepository
      */
     public function getTopArtworks($limit = 3)
     {
-        $sql = "SELECT a.*, 
-                   (SELECT AVG(r.Rating) FROM reviews r WHERE r.ArtWorkId = a.ArtWorkID) as AvgRating,
-                   (SELECT COUNT(r.ReviewId) FROM reviews r WHERE r.ArtWorkId = a.ArtWorkID) as TotalReviews
-                FROM artworks a
-                HAVING TotalReviews >= 3
-                ORDER BY AvgRating DESC
-                LIMIT :limit";
+        $sql = "SELECT a.*, art.FirstName, art.LastName,
+                   (SELECT IF(COUNT(r.ReviewId) >= 3, AVG(r.Rating), NULL) 
+                    FROM reviews r 
+                    WHERE r.ArtWorkId = a.ArtWorkID) as AvgRating
+            FROM artworks a
+            JOIN artists art ON a.ArtistID = art.ArtistID
+            WHERE a.ImageFileName IS NOT NULL AND a.ImageFileName != ''
+            ORDER BY AvgRating DESC
+            LIMIT :limit";
 
         $stmt = $this->db->preparedStatement($sql);
         $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
@@ -124,7 +126,7 @@ class artworkRepository
      *
      * @param string $sortBy Das Sortierkriterium ('title', 'year' oder 'artist'). Standard ist 'title'
      * @param string $direction Die Sortierrichtung ('ASC' oder 'DESC'). Standard ist 'ASC'
-     * @return array Ein Array aus fertigen artwork-Objekten
+     * @return array Ein Array aus fertigen artwork-Objekten.
      */
     public function getAllSorted($sortBy = 'title', $direction = 'ASC')
     {
@@ -144,9 +146,9 @@ class artworkRepository
         }
 
         $sql = "SELECT a.*, art.FirstName, art.LastName 
-                FROM artworks a, artists art
-                WHERE a.ArtistID = art.ArtistID
-                ORDER BY $orderClause";
+            FROM artworks a
+            JOIN artists art ON a.ArtistID = art.ArtistID
+            ORDER BY $orderClause";
 
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute();
@@ -158,7 +160,6 @@ class artworkRepository
         {
             $artworks[] = new artwork($row);
         }
-
 
         return $artworks;
     }
@@ -195,39 +196,29 @@ class artworkRepository
      * Holt alle Kunstwerke, die einem bestimmten Genre zugeordnet sind
      *
      * @param int $genreId Die eindeutige ID des Genres
-     * @param string $sortBy Das Sortierkriterium ('title', 'year' oder 'artist')
-     * @param string $direction Die Sortierrichtung ('ASC' oder 'DESC')
      * @return array Ein Array aus fertigen artwork-Objekten
      */
-    public function getForGenre($genreId, $sortBy = 'title', $direction = 'ASC')
+    public function getForGenre($genreId)
     {
-        $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
-        $orderClause = "a.Title $dir";
-        if (strtolower($sortBy) === 'year')
-        {
-            $orderClause = "a.YearOfWork $dir";
-        }
-        if (strtolower($sortBy) === 'artist')
-        {
-            $orderClause = "art.LastName $dir, art.FirstName $dir";
-        }
-
         $sql = "SELECT a.*, art.FirstName, art.LastName 
-                FROM artworks a, ArtworkGenres ag, artists art
-                WHERE a.ArtWorkID = ag.ArtWorkID 
-                  AND a.ArtistID = art.ArtistID 
-                  AND ag.GenreID = :genreId
-                ORDER BY $orderClause";
+            FROM artworks a, ArtworkGenres ag, artists art
+            WHERE a.ArtWorkID = ag.ArtWorkID 
+              AND a.ArtistID = art.ArtistID 
+              AND ag.GenreID = :genreId
+            ORDER BY a.Title ASC";
 
         $stmt = $this->db->preparedStatement($sql);
-        $stmt->execute(['genreId' => $genreId]);
+        $stmt->bindValue(':genreId', (int)$genreId, PDO::PARAM_INT);
+        $stmt->execute();
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $artworks = [];
+
         foreach ($rows as $row)
         {
             $artworks[] = new artwork($row);
         }
+
         return $artworks;
     }
 
@@ -235,39 +226,29 @@ class artworkRepository
      * Holt alle Kunstwerke, die einem bestimmten Thema zugeordnet sind
      *
      * @param int $subjectId Die eindeutige ID des Themas
-     * @param string $sortBy Das Sortierkriterium ('title', 'year' oder 'artist')
-     * @param string $direction Die Sortierrichtung ('ASC' oder 'DESC')
      * @return array Ein Array aus fertigen artwork-Objekten
      */
-    public function getForSubject($subjectId, $sortBy = 'title', $direction = 'ASC')
+    public function getForSubject($subjectId)
     {
-        $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
-        $orderClause = "a.Title $dir";
-        if (strtolower($sortBy) === 'year')
-        {
-            $orderClause = "a.YearOfWork $dir";
-        }
-        if (strtolower($sortBy) === 'artist')
-        {
-            $orderClause = "art.LastName $dir, art.FirstName $dir";
-        }
-
         $sql = "SELECT a.*, art.FirstName, art.LastName 
-                FROM artworks a, ArtworkSubjects xas, artists art
-                WHERE a.ArtWorkID = xas.ArtWorkID 
-                  AND a.ArtistID = art.ArtistID 
-                  AND xas.SubjectID = :subjectId
-                ORDER BY $orderClause";
+            FROM artworks a, ArtworkSubjects xas, artists art
+            WHERE a.ArtWorkID = xas.ArtWorkID 
+              AND a.ArtistID = art.ArtistID 
+              AND xas.SubjectID = :subjectId
+            ORDER BY a.Title ASC";
 
         $stmt = $this->db->preparedStatement($sql);
-        $stmt->execute(['subjectId' => $subjectId]);
+        $stmt->bindValue(':subjectId', (int)$subjectId, PDO::PARAM_INT);
+        $stmt->execute();
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $artworks = [];
+
         foreach ($rows as $row)
         {
             $artworks[] = new artwork($row);
         }
+
         return $artworks;
     }
 
@@ -275,101 +256,28 @@ class artworkRepository
      * Sucht Kunstwerke, deren Titel mit einem bestimmten Suchwort beginnt
      *
      * @param string $keyword Das Suchwort
-     * @param string $sortBy Das Sortierkriterium ('title', 'year' oder 'artist'). Standard ist 'title'
-     * @param string $direction Die Sortierrichtung ('ASC' oder 'DESC'). Standard ist 'ASC'
      * @return array Ein Array aus fertigen artwork-Objekten
      */
-    public function searchByTitle($keyword, $sortBy = 'title', $direction = 'ASC')
+    public function searchByTitle($keyword)
     {
         $searchString = $keyword . '%';
-        $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
-
-        $orderClause = "a.Title $dir";
-        if (strtolower($sortBy) === 'year')
-        {
-            $orderClause = "a.YearOfWork $dir";
-        }
-        if (strtolower($sortBy) === 'artist')
-        {
-            $orderClause = "art.LastName $dir, art.FirstName $dir";
-        }
 
         $sql = "SELECT a.*, art.FirstName, art.LastName 
-                FROM artworks a, artists art 
-                WHERE a.ArtistID = art.ArtistID AND a.Title LIKE :keyword 
-                ORDER BY $orderClause";
+            FROM artworks a, artists art 
+            WHERE a.ArtistID = art.ArtistID AND a.Title LIKE :keyword 
+            ORDER BY a.Title ASC";
 
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute(['keyword' => $searchString]);
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $artworks = [];
+
         foreach ($rows as $row)
         {
             $artworks[] = new artwork($row);
         }
-        return $artworks;
-    }
 
-    /**
-     * Erweiterte Suche für Kunstwerke mit dynamischen Suche
-     *
-     * @param string $title Suchbegriff für den Titel
-     * @param int|null $yearMin Frühestes Entstehungsjahr
-     * @param int|null $yearMax Spätestes Entstehungsjahr
-     * @param int|null $genreId Die ID des gewählten Genres
-     * @param string $sortBy Sortierkriterium
-     * @param string $direction Sortierrichtung
-     * @return array Ein Array aus artwork-Objekten
-     */
-    public function advancedSearch($title = '', $yearMin = null, $yearMax = null, $genreId = null, $sortBy = 'title', $direction = 'ASC')
-    {
-        $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
-        $orderClause = "a.Title $dir";
-        if (strtolower($sortBy) === 'year') $orderClause = "a.YearOfWork $dir";
-        if (strtolower($sortBy) === 'artist') $orderClause = "art.LastName $dir, art.FirstName $dir";
-
-        $fromClause = "artworks a, artists art";
-        $whereClause = "a.ArtistID = art.ArtistID";
-        $params = [];
-
-        if (!empty($genreId))
-        {
-            $fromClause .= ", ArtworkGenres ag";
-            $whereClause .= " AND a.ArtWorkID = ag.ArtWorkID AND ag.GenreID = :genreId";
-            $params['genreId'] = (int)$genreId;
-        }
-
-        if (!empty($title))
-        {
-            $whereClause .= " AND a.Title LIKE :title";
-            $params['title'] = '%' . $title . '%';
-        }
-        if (!empty($yearMin))
-        {
-            $whereClause .= " AND a.YearOfWork >= :yearMin";
-            $params['yearMin'] = (int)$yearMin;
-        }
-        if (!empty($yearMax))
-        {
-            $whereClause .= " AND a.YearOfWork <= :yearMax";
-            $params['yearMax'] = (int)$yearMax;
-        }
-
-        $sql = "SELECT a.*, art.FirstName, art.LastName 
-                FROM $fromClause 
-                WHERE $whereClause 
-                ORDER BY $orderClause";
-
-        $stmt = $this->db->preparedStatement($sql);
-        $stmt->execute($params);
-
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $artworks = [];
-        foreach ($rows as $row)
-        {
-            $artworks[] = new artwork($row);
-        }
         return $artworks;
     }
 }
