@@ -10,6 +10,8 @@ class genre
     private $era;
     private $description;
     private $link;
+    private $imageFilename;
+
 
     /**
      * Erstellt ein neues Genre-Objekt anhand eines Datenbank-Datensatzes
@@ -23,6 +25,14 @@ class genre
         $this->era = $data['Era'];
         $this->description = $data['Description'];
         $this->link = $data['Link'];
+
+        $this->imageFilename =
+            $data['ImageFileName']
+            ?? $data['ImageFilename']
+            ?? $data['imageFilename']
+            ?? $data['imagefilename']
+            ?? $data['ArtistID']
+            ?? null;
     }
 
     // Getter
@@ -75,6 +85,21 @@ class genre
     public function getLink()
     {
         return $this->link;
+    }
+
+    public function getImagefilename()
+    {
+        $name = $this->imageFilename;
+
+        if ($name === null || $name === '') {
+            return null;
+        }
+
+        if (is_numeric($name) && strlen((string) $name) < 6) {
+            $name = str_pad((string) $name, 6, '0', STR_PAD_LEFT);
+        }
+
+        return $name;
     }
 }
 

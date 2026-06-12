@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/artistRepository.php';
+require_once __DIR__ . '/../repositories/artworkRepository.php';
 
 $artistId = (int) ($_GET['id'] ?? 0);
 
@@ -18,6 +19,8 @@ try {
     $db = new dbaccess();
     $db->connect();
 
+    $artistObj = (new artistRepository($db))->getById($artistId);
+
     // Raw SELECT * to capture all DB columns including Details, ArtistLink, BirthYear, DeathYear
     $stmt = $db->preparedStatement("SELECT * FROM artists WHERE ArtistID = :id");
     $stmt->execute(['id' => $artistId]);
@@ -32,7 +35,7 @@ try {
         exit;
     }
 
-    $artworks = (new artworkRepository($db))->getForArtist($artistId);
+    $artists = (new artistRepository($db))->findAll();
 
 } catch (Exception $e) {
     $pageTitle = 'Fehler';
@@ -82,7 +85,16 @@ if ($birthYear !== '' && $deathYear !== '') {
     $dateString = '';
 }
 
-$artistPhoto = artistImageUrl($artistId, 'medium');
+#$artistPhoto = artistImageUrl($artistId, 'medium');
+$width         = $artistObj->getWidth();
+$height        = $artistObj->getHeight();
+$imageFileName = $artistObj->getImagefilename();
+$mediumImage   = artistImageUrl($imageFileName, 'medium');
+$largeImage    = artistImageUrl($imageFileName, 'large');
+
+$dimensions = ($width && $height)
+        ? e((string)$width) . ' cm × ' . e((string)$height) . ' cm'
+        : '';
 
 $isFavorited = isset($_SESSION['favorites']['artists'])
         && in_array($artistId, array_map('intval', $_SESSION['favorites']['artists']), true);
@@ -91,11 +103,36 @@ $pageTitle = $fullName . ' · Künstler';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title text-white" id="imageModalLabel"><?= e($fullName); ?></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Schließen"></button>
+                </div>
+                <div class="modal-body text-center p-2">
+                    <img src="<?= e($largeImage); ?>" alt="<?= e($fullName); ?>" class="img-fluid">
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <section class="artist-detail-layout">
 
     <div class="artist-image-panel">
-        <img src="<?= e($artistPhoto); ?>" alt="<?= e($fullName); ?>" class="artist-photo img-fluid">
-    </div>
+        <img src="<?= e($mediumImage); ?>"
+             alt="<?= e($fullName); ?>"
+             class="artwork-main-image img-fluid"
+             role="button"
+             data-bs-toggle="modal"
+             data-bs-target="#imageModal"
+             title="Klicken für große Ansicht"
+             style="cursor:zoom-in;"
+        >
+        <small class="d-block text-muted mt-1">Klicken für große Version</small>    </div>
 
     <div class="artist-info-panel">
         <h1><?= e($fullName); ?></h1>

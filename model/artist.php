@@ -12,6 +12,8 @@ class artist
     private $gender;
     private $birthYear;
     private $imageFilename;
+    private $width;
+    private $height;
 
     /**
      * Erstellt ein Artist-Objekt anhand eines Datensatzes aus der Datenbank
@@ -111,5 +113,25 @@ class artist
         }
 
         return $name;
+    }
+
+    /**
+     * Gibt die Breite des Kunstwerks zurück
+     *
+     * @return int Die Breite
+     */
+    function getWidth ()
+    {
+        return $this->width;
+    }
+
+    /**
+     * Gibt die Höhe des Kunstwerks zurück
+     *
+     * @return int Die Höhe.
+     */
+    function getHeight ()
+    {
+        return $this->height;
     }
 }

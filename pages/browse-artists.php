@@ -9,23 +9,8 @@ require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/artistRepository.php';
 
-//$artistRepository = new artistRepository(db());
-//$artists = $artistRepository->findAll();
-
-
 $sort = safeParam((string) ($_GET['sort'] ?? 'firstName'), ['firstName', 'lastName'], 'firstName');
 $direction = safeParam(strtolower((string) ($_GET['direction'] ?? 'asc')), ['asc', 'desc'], 'asc');
-
-/*
-try {
-    $db = new dbaccess();
-    $db->connect();
-    $artistRepository = new artistRepository($db);
-    $artists = $artistRepository->getAllSorted($sort, $direction);
-} catch (Exception $e) {
-    $artists = [];
-}
-*/
 
 try {
     $db = new dbaccess();
@@ -44,7 +29,6 @@ $favoriteArtistIds = array_map('intval', $_SESSION["favorites"]["artists"]);
 require_once __DIR__.'/../includes/header.php';
 
 ?>
-
 
 <section class="page-heading">
     <h1>Künstler durchsuchen</h1>
@@ -111,6 +95,5 @@ require_once __DIR__.'/../includes/header.php';
         <?php endforeach; ?>
     </section>
 <?php endif; ?>
-
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
