@@ -11,6 +11,7 @@ class artist
     private $nationality;
     private $gender;
     private $birthYear;
+    private $imageFilename;
 
     /**
      * Erstellt ein Artist-Objekt anhand eines Datensatzes aus der Datenbank
@@ -87,5 +88,14 @@ class artist
     public function getId()
     {
         return $this->id;
+    }
+
+    function getImagefilename ()
+    {
+        $name = $this->imageFilename;
+        if (is_numeric($name) && strlen($name) < 6) {
+            $name = str_pad($name, 6, '0', STR_PAD_LEFT);
+        }
+        return $name;
     }
 }

@@ -5,8 +5,8 @@
  */
 class genre
 {
-    private $genreid;
-    private $genrename;
+    private $genreId;
+    private $genreName;
     private $era;
     private $description;
     private $link;
@@ -18,8 +18,8 @@ class genre
      */
     public function __construct($data)
     {
-        $this->genreid = $data['GenreID'];
-        $this->genrename = $data['GenreName'];
+        $this->genreId = $data['GenreID'];
+        $this->genreName = $data['GenreName'];
         $this->era = $data['Era'];
         $this->description = $data['Description'];
         $this->link = $data['Link'];
@@ -34,7 +34,7 @@ class genre
      */
     public function getGenreID()
     {
-        return $this->genreid;
+        return $this->genreId;
     }
 
     /**
@@ -44,7 +44,7 @@ class genre
      */
     public function getGenreName()
     {
-        return $this->genrename;
+        return $this->genreName;
     }
 
     /**

@@ -1,15 +1,15 @@
 <?php
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
-require_once __DIR__ . '/../repositories/artistRepository.php';
+require_once __DIR__ . '/../repositories/genreRepository.php';
 
-$artistId = (int) ($_GET['id'] ?? 0);
+$genreId = (int) ($_GET['id'] ?? 0);
 
-if ($artistId <= 0) {
-    $pageTitle = 'Künstler nicht gefunden';
+if ($genreId <= 0) {
+    $pageTitle = 'Genre nicht gefunden';
     require_once __DIR__ . '/../includes/header.php';
     echo '<section class="page-heading"><h1>Ungültige ID</h1>'
-            . '<a class="button-link" href="' . e(base_url('pages/browse-artists.php')) . '">Zurück zur Übersicht</a></section>';
+        . '<a class="button-link" href="' . e(base_url('pages/browse-genre.php')) . '">Zurück zur Übersicht</a></section>';
     require_once __DIR__ . '/../includes/footer.php';
     exit;
 }
@@ -19,101 +19,79 @@ try {
     $db->connect();
 
     // Raw SELECT * to capture all DB columns including Details, ArtistLink, BirthYear, DeathYear
-    $stmt = $db->preparedStatement("SELECT * FROM artists WHERE ArtistID = :id");
-    $stmt->execute(['id' => $artistId]);
-    $artistRow = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt = $db->preparedStatement("SELECT * FROM genres WHERE GenreID = :id");
+    $stmt->execute(['id' => $genreId]);
+    $genreRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$artistRow) {
-        $pageTitle = 'Künstler nicht gefunden';
+    if (!$genreRow) {
+        $pageTitle = 'Genre nicht gefunden';
         require_once __DIR__ . '/../includes/header.php';
-        echo '<section class="page-heading"><h1>Künstler nicht gefunden</h1>'
-                . '<a class="button-link" href="' . e(base_url('pages/browse-artists.php')) . '">Zurück zur Übersicht</a></section>';
+        echo '<section class="page-heading"><h1>Genre nicht gefunden</h1>'
+            . '<a class="button-link" href="' . e(base_url('pages/browse-genre.php')) . '">Zurück zur Übersicht</a></section>';
         require_once __DIR__ . '/../includes/footer.php';
         exit;
     }
 
-    $artworks = (new artworkRepository($db))->getForArtist($artistId);
+    $artworks = (new artworkRepository($db))->getForGenre($genreId);
 
 } catch (Exception $e) {
     $pageTitle = 'Fehler';
     require_once __DIR__ . '/../includes/header.php';
     echo '<section class="page-heading"><h1>Ladefehler</h1>'
-            . '<a class="button-link" href="' . e(base_url('pages/browse-artists.php')) . '">Zurück</a></section>';
+        . '<a class="button-link" href="' . e(base_url('pages/browse-genre.php')) . '">Zurück</a></section>';
     require_once __DIR__ . '/../includes/footer.php';
     exit;
 }
 
 // ── display values ─────────────────────────────────────────────────────────
-$firstName   = (string) ($artistRow['FirstName']   ?? '');
-$lastName    = (string) ($artistRow['LastName']     ?? '');
-$fullName    = trim($firstName . ' ' . $lastName);
-$nationality = (string) ($artistRow['Nationality'] ?? $artistRow['nationality'] ?? '');
+$genreName   = (string) ($genreRow['GenreName']   ?? '');
+$era    = (string) ($genreRow['Era']     ?? '');
+$description = (string) ($genreRow['Description']);
 // Details and ArtistLink — try multiple casing variants (DB column names vary)
 $details     = cleanHtml(
-        $artistRow['Details']     ??
-        $artistRow['details']     ??
-        $artistRow['Description'] ?? ''
+    $genreRow['Details']     ??
+    $genreRow['details']     ??
+    $genreRow['Description'] ?? ''
 );
-$artistLink  = (string) (
-        $artistRow['ArtistLink']  ??
-        $artistRow['artistlink']  ??
-        $artistRow['Artistlink']  ??
-        $artistRow['Link']        ?? ''
+$genreLink  = (string) (
+    $genreRow['GenreLink']  ??
+    $genreRow['genrelink']  ??
+    $genreRow['Genrelink']  ??
+    $genreRow['Link']        ?? ''
 );
 
-// Date — try BirthYear with multiple casing variants (DB column names vary)
-$birthYear   = (string) (
-        $artistRow['BirthYear']   ??
-        $artistRow['birthyear']   ??
-        $artistRow['Birthyear']   ??
-        $artistRow['birth_year']  ?? ''
-);
-$deathYear   = (string) (
-        $artistRow['DeathYear']   ??
-        $artistRow['deathyear']   ??
-        $artistRow['Deathyear']   ??
-        $artistRow['death_year']  ?? ''
-);
-if ($birthYear !== '' && $deathYear !== '') {
-    $dateString = $birthYear . ' – ' . $deathYear;
-} elseif ($birthYear !== '') {
-    $dateString = $birthYear;
-} else {
-    $dateString = '';
-}
+$genrePhoto = genreImageUrl($genreId);
 
-$artistPhoto = artistImageUrl($artistId, 'medium');
+$isFavorited = isset($_SESSION['favorites']['genre'])
+    && in_array($genreId, array_map('intval', $_SESSION['favorites']['genre']), true);
 
-$isFavorited = isset($_SESSION['favorites']['artists'])
-        && in_array($artistId, array_map('intval', $_SESSION['favorites']['artists']), true);
-
-$pageTitle = $fullName . ' · Künstler';
+$pageTitle = $genreName . ' · Genre';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<section class="artist-detail-layout">
+<section class="genre-detail-layout">
 
-    <div class="artist-image-panel">
-        <img src="<?= e($artistPhoto); ?>" alt="<?= e($fullName); ?>" class="artist-photo img-fluid">
+    <div class="genre-image-panel">
+        <img src="<?= e($genrePhoto); ?>" alt="<?= e($genreName); ?>" class="genre-photo img-fluid">
     </div>
 
-    <div class="artist-info-panel">
-        <h1><?= e($fullName); ?></h1>
+    <div class="genre-info-panel">
+        <h1><?= e($genreName); ?></h1>
 
         <?php if ($details !== ''): ?>
-            <p class="artist-bio"><?= e($details); ?></p>
+            <p class="genre-bio"><?= e($details); ?></p>
         <?php endif; ?>
 
         <!-- Favorite button -->
         <?php if (isLoggedIn()): ?>
             <?php if ($isFavorited): ?>
                 <a class="btn btn-warning btn-sm mb-3"
-                   href="<?= e(base_url('pages/remove-favorite.php') . '?type=artist&id=' . $artistId); ?>">
+                   href="<?= e(base_url('pages/remove-favorite.php') . '?type=genre&id=' . $genreId); ?>">
                     ★ Aus Favoriten entfernen
                 </a>
             <?php else: ?>
                 <a class="btn btn-outline-warning btn-sm mb-3"
-                   href="<?= e(base_url('pages/add-favorite.php') . '?type=artist&id=' . $artistId); ?>">
+                   href="<?= e(base_url('pages/add-favorite.php') . '?type=genre&id=' . $genreId); ?>">
                     ☆ Zu Favoriten hinzufügen
                 </a>
             <?php endif; ?>
@@ -125,26 +103,14 @@ require_once __DIR__ . '/../includes/header.php';
 
         <!-- Details table -->
         <table class="table table-bordered">
-            <caption class="fw-bold text-start pb-2 caption-top">Künstlerdetails</caption>
+            <caption class="fw-bold text-start pb-2 caption-top">Genredetails</caption>
             <tbody>
-            <?php if ($dateString !== ''): ?>
-                <tr>
-                    <th scope="row" style="width:35%">Datum</th>
-                    <td><?= e($dateString); ?></td>
-                </tr>
-            <?php endif; ?>
-            <?php if ($nationality !== ''): ?>
-                <tr>
-                    <th scope="row">Nationalität</th>
-                    <td><?= e($nationality); ?></td>
-                </tr>
-            <?php endif; ?>
-            <?php if ($artistLink !== ''): ?>
+            <?php if ($genreLink !== ''): ?>
                 <tr>
                     <th scope="row">Weitere Infos</th>
                     <td>
-                        <a href="<?= e($artistLink); ?>" target="_blank" rel="noopener">
-                            <?= e($artistLink); ?>
+                        <a href="<?= e($genreLink); ?>" target="_blank" rel="noopener">
+                            <?= e($genreLink); ?>
                         </a>
                     </td>
                 </tr>
@@ -156,10 +122,10 @@ require_once __DIR__ . '/../includes/header.php';
 
 <!-- ===== ARTWORKS GRID ===== -->
 <section class="mt-5">
-    <h2>Kunst von <?= e($fullName); ?></h2>
+    <h2>Genre <?= e($genreName); ?></h2>
 
     <?php if (empty($artworks)): ?>
-        <p class="text-muted">Keine Kunstwerke für diesen Künstler gefunden.</p>
+        <p class="text-muted">Keine Kunstwerke für dieses Genre gefunden.</p>
     <?php else: ?>
         <div class="row row-cols-2 row-cols-md-4 g-3">
             <?php foreach ($artworks as $artwork): ?>

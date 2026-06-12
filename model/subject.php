@@ -5,8 +5,8 @@
  */
 class subject
 {
-    private $subjectid;
-    private $subjectname;
+    private $subjectId;
+    private $subjectName;
 
     /**
      * Erstellt ein Subject-Objekt anhand eines Datenbank-Datensatzes
@@ -15,8 +15,8 @@ class subject
      */
     public function __construct($data)
     {
-        $this->subjectid = $data['SubjectId'];
-        $this->subjectname = $data['SubjectName'];
+        $this->subjectId = $data['SubjectId'];
+        $this->subjectName = $data['SubjectName'];
     }
 
     // Getter
@@ -28,7 +28,7 @@ class subject
      */
     public function getSubjectid()
     {
-        return $this->subjectid;
+        return $this->subjectId;
     }
 
     /**
@@ -38,6 +38,6 @@ class subject
      */
     public function getSubjectname()
     {
-        return $this->subjectname;
+        return $this->subjectName;
     }
 }
