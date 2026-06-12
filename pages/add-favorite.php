@@ -45,6 +45,11 @@ if ($redirectTarget === "single-artwork.php" && $type === "artwork")
     $redirectTarget = "single-artwork.php?id=" . urlencode((string) $id);
 }
 
+if ($redirectTarget === "single-artist.php" && $type === "artist")
+{
+    $redirectTarget = "single-artist.php?id=" . urlencode((string) $id);
+}
+
 $favoriteKey=$type==="artwork"?"artworks":"artists";
 
 if (!in_array($id, $_SESSION["favorites"][$favoriteKey], true))
