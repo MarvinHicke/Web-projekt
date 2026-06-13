@@ -23,8 +23,10 @@ class subject
             ?? $data['ImageFilename']
             ?? $data['imageFilename']
             ?? $data['imagefilename']
-            ?? $data['ArtistID']
-            ?? null;    }
+            ?? $data['SubjectId']
+            ?? $data['SubjectImage']
+            ?? null;
+    }
 
     // Getter
 

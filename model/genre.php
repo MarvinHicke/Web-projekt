@@ -31,7 +31,7 @@ class genre
             ?? $data['ImageFilename']
             ?? $data['imageFilename']
             ?? $data['imagefilename']
-            ?? $data['ArtistID']
+            ?? $data['GenreID']
             ?? null;
     }
 

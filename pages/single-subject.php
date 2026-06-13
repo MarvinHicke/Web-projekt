@@ -6,7 +6,7 @@ require_once __DIR__ . '/../repositories/subjectRepository.php';
 $subjectId = (int) ($_GET['id'] ?? 0);
 
 if ($subjectId <= 0) {
-    $pageTitle = 'Subject nicht gefunden';
+    $pageTitle = 'Thema nicht gefunden';
     require_once __DIR__ . '/../includes/header.php';
     echo '<section class="page-heading"><h1>Ungültige ID</h1>'
         . '<a class="button-link" href="' . e(base_url('pages/browse-subject.php')) . '">Zurück zur Übersicht</a></section>';
@@ -26,9 +26,9 @@ try {
     $subjectRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$subjectRow) {
-        $pageTitle = 'Subject nicht gefunden';
+        $pageTitle = 'Thema nicht gefunden';
         require_once __DIR__ . '/../includes/header.php';
-        echo '<section class="page-heading"><h1>Subject nicht gefunden</h1>'
+        echo '<section class="page-heading"><h1>Thema nicht gefunden</h1>'
             . '<a class="button-link" href="' . e(base_url('pages/browse-subject.php')) . '">Zurück zur Übersicht</a></section>';
         require_once __DIR__ . '/../includes/footer.php';
         exit;
@@ -57,7 +57,7 @@ $subjectLink  = (string) (
 
 $subjectPhoto = subjectImageUrl($subjectId);
 
-$pageTitle = $subjectName . ' · Subject';
+$pageTitle = $subjectName . ' · Thema: ';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -92,10 +92,10 @@ require_once __DIR__ . '/../includes/header.php';
 
 <!-- ===== ARTWORKS GRID ===== -->
 <section class="mt-5">
-    <h2>Subject <?= e($subjectName); ?></h2>
+    <h2>Thema: <?= e($subjectName); ?></h2>
 
     <?php if (empty($artworks)): ?>
-        <p class="text-muted">Keine Kunstwerke für dieses Subject gefunden.</p>
+        <p class="text-muted">Keine Kunstwerke für dieses Thema gefunden.</p>
     <?php else: ?>
         <div class="row row-cols-2 row-cols-md-4 g-3">
             <?php foreach ($artworks as $artwork): ?>

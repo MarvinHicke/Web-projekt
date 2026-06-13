@@ -75,7 +75,7 @@ require_once __DIR__.'/../includes/header.php';
 
             $imageUrl = $imageFileName
                     ? artistImageUrl($imageFileName, 'square-small')
-                    : base_url('images/artists/square-medium/');
+                    : base_url('images/placeholder.jpg');
             ?>
 
             <article class="artist-card-link-wrapper">

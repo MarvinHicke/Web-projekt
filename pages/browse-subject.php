@@ -51,10 +51,11 @@ require_once __DIR__.'/../includes/header.php';
             }
 
             $imageFileName = $subject->getImagefilename();
+            $imageFileName = $subject->getImagefilename();
 
             $imageUrl = $imageFileName
-                    ? subjectImageUrl($imageFileName, 'square-small')
-                    : base_url('images/subjects/square-medium/');
+                    ? subjectImageUrl($imageFileName, 'square-medium')
+                    : base_url('images/placeholder.jpg');
             ?>
 
             <article class="subject-card-link-wrapper">

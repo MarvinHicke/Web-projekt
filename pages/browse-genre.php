@@ -9,7 +9,7 @@ require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/genreRepository.php';
 
-$sort = safeParam((string) ($_GET['sort'] ?? 'era'), ['era', 'genreName'], 'eraName');
+$sort = safeParam((string) ($_GET['sort'] ?? 'era'), ['era', 'genreName'], 'era');
 
 try {
     $db = new dbaccess();
@@ -57,8 +57,8 @@ require_once __DIR__.'/../includes/header.php';
             $imageFileName = $genre->getImagefilename();
 
             $imageUrl = $imageFileName
-                    ? genreImageUrl($imageFileName, 'square-small')
-                    : base_url('images/genres/square-medium/');
+                    ? genreImageUrl($imageFileName, 'square-medium')
+                    : base_url('images/placeholder.jpg');
             ?>
 
             <article class="genre-card-link-wrapper">
@@ -71,6 +71,7 @@ require_once __DIR__.'/../includes/header.php';
 
                     <div class="genre-card-content">
                         <h2><?= e($genreName); ?></h2>
+                        <p><?= e($genreId); ?></p>
                         <p>Era: <?= e($era); ?></p>
                         <p><?= e($description); ?></p>
                         <span class="text-link">Einzelansicht öffnen</span>
