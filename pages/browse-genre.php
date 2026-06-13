@@ -20,65 +20,26 @@ try {
     die($e->getMessage());
 }
 
-$_SESSION["favorites"] ??= [];
-$_SESSION["favorites"]["genres"] ??= [];
-
-$favoriteGenresIds = array_map('intval', $_SESSION["favorites"]["genres"]);
-
 require_once __DIR__.'/../includes/header.php';
 
 ?>
     <section class="page-heading">
         <h1>Genres durchsuchen</h1>
-        <p>Entdecken sie Genre</p>
+        <p>Entdecken Sie Kunstrichtungen und Epochen.</p>
     </section>
 
 
 <?php if (empty($genres)): ?>
     <section class="message">
-        Es wurde kein Genre gefunden.
+        Es wurden keine Genres gefunden.
     </section>
 <?php else: ?>
-    <section class="genre-card-grid" aria-label="Liste der Genres">
-        <?php foreach ($genres as $genre): ?>
-            <?php
-            $genreId = $genre->getGenreID();
-
-            $genreName = $genre->getGenreName();
-
-            $era = $genre->getEra();
-
-            $description = $genre->getDescription();
-
-            if ($genreName === '') {
-                $genreName = 'Unbekanntes Genre';
-            }
-
-            $imageFileName = $genre->getImagefilename();
-
-            $imageUrl = $imageFileName
-                    ? genreImageUrl($imageFileName, 'square-medium')
-                    : base_url('images/placeholder.jpg');
-            ?>
-
-            <article class="genre-card-link-wrapper">
-                <a class="genre-card-link" href="<?= e(genreDetailUrl($genreId)); ?>">
-                    <img
-                            src="<?= e($imageUrl); ?>"
-                            alt="<?= e($genreName); ?>"
-                            class="genre-card-image"
-                    >
-
-                    <div class="genre-card-content">
-                        <h2><?= e($genreName); ?></h2>
-                        <p><?= e($genreId); ?></p>
-                        <p>Era: <?= e($era); ?></p>
-                        <p><?= e($description); ?></p>
-                        <span class="text-link">Einzelansicht öffnen</span>
-                    </div>
-                </a>
-            </article>
-        <?php endforeach; ?>
+    <section class="container my-4" aria-label="Liste der Genres">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <?php foreach ($genres as $genre): ?>
+                <?php include __DIR__ . '/../components/genre-card.php'; ?>
+            <?php endforeach; ?>
+        </div>
     </section>
 <?php endif; ?>
 
