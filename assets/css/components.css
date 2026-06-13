@@ -1,10 +1,5 @@
 /* ===== Components ===== */
 
-body
-{
-    font-family: 'Italic', sans-serif;
-}
-
 /* ===== Components: header ===== */
 .page-header {
     padding-bottom: 1rem;
@@ -32,6 +27,12 @@ body
 .artwork-card-img {
     height: 240px;
     object-fit: cover;
+}
+
+.entity-card-img {
+    height: 240px;
+    object-fit: cover;
+    background: #eee7dc;
 }
 
 /* ===== Components: suchen ===== */
@@ -86,4 +87,3 @@ body
     padding: 2rem;
     border-radius: 1rem;
 }
-
