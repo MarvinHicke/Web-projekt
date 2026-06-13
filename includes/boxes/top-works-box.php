@@ -31,11 +31,20 @@ function renderTopWorksBox(array $artworks): void
                         <a href="<?= e(artworkDetailUrl($id)); ?>">
                             <strong><?= e($title); ?></strong>
                             <span><?= e($artistName !== '' ? $artistName : 'Unbekannter Künstler'); ?></span>
-                            <small>
-                                Bewertung <?= $rating !== null
-                                    ? e(number_format((float) $rating, 1, ',', '.')) . '/5'
-                                    : 'noch nicht vorhanden'; ?>
-                            </small>
+                            <?php if ($rating !== null): ?>
+                                <?php $ratingPercent = max(0, min(100, ((float) $rating / 5) * 100)); ?>
+                                <span
+                                    class="rating-stars"
+                                    style="--rating-percent: <?= e(number_format($ratingPercent, 2, '.', '')); ?>%;"
+                                    aria-label="<?= e(number_format((float) $rating, 1, ',', '.')); ?> von 5 Sternen"
+                                >
+                                    <span class="rating-stars-empty" aria-hidden="true">★★★★★</span>
+                                    <span class="rating-stars-fill" aria-hidden="true">★★★★★</span>
+                                </span>
+                                <small><?= e(number_format((float) $rating, 1, ',', '.')); ?>/5</small>
+                            <?php else: ?>
+                                <small>Noch keine Bewertung</small>
+                            <?php endif; ?>
                         </a>
                     </li>
                 <?php endforeach; ?>
