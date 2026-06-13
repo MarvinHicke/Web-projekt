@@ -113,7 +113,7 @@ require_once __DIR__ . '/includes/header.php';
 
 <!-- ===== BOOTSTRAP CAROUSEL ===== -->
 <?php if (!empty($carouselArtworks)): ?>
-<section aria-label="Vorgestellte Kunstwerke" style="margin-bottom: 3rem;">
+<section class="carousel-section" aria-label="Vorgestellte Kunstwerke">
     <div id="artworkCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
 
         <div class="carousel-indicators">
@@ -140,9 +140,8 @@ require_once __DIR__ . '/includes/header.php';
                     <a href="<?= e(artworkDetailUrl($id)); ?>">
                         <img
                             src="<?= e(artworkImageUrl($imageFileName, 'large')); ?>"
-                            class="d-block w-100"
+                            class="d-block w-100 carousel-img"
                             alt="<?= e($title); ?>"
-                            style="max-height: 500px; object-fit: cover;"
                         >
                     </a>
                     <div class="carousel-caption d-none d-md-block"
