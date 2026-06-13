@@ -11,6 +11,9 @@ class artist
     private $nationality;
     private $gender;
     private $birthYear;
+    private $imageFilename;
+    private $width;
+    private $height;
 
     /**
      * Erstellt ein Artist-Objekt anhand eines Datensatzes aus der Datenbank
@@ -25,6 +28,14 @@ class artist
         $this->nationality = $data['Nationality'];
         $this->gender      = isset($data['Gender']) ? $data['Gender'] : (isset($data['gender']) ? $data['gender'] : 'unbekannt');
         $this->birthYear   = isset($data['BirthYear']) ? $data['BirthYear'] : (isset($data['birthyear']) ? $data['birthyear'] : null);
+
+        $this->imageFilename =
+            $data['ImageFileName']
+            ?? $data['ImageFilename']
+            ?? $data['imageFilename']
+            ?? $data['imagefilename']
+            ?? $data['ArtistID']
+            ?? null;
     }
 
     // Getter
@@ -87,5 +98,40 @@ class artist
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getImagefilename()
+    {
+        $name = $this->imageFilename;
+
+        if ($name === null || $name === '') {
+            return null;
+        }
+
+        if (is_numeric($name) && strlen((string) $name) < 6) {
+            $name = str_pad((string) $name, 6, '0', STR_PAD_LEFT);
+        }
+
+        return $name;
+    }
+
+    /**
+     * Gibt die Breite des Kunstwerks zurück
+     *
+     * @return int Die Breite
+     */
+    function getWidth ()
+    {
+        return $this->width;
+    }
+
+    /**
+     * Gibt die Höhe des Kunstwerks zurück
+     *
+     * @return int Die Höhe.
+     */
+    function getHeight ()
+    {
+        return $this->height;
     }
 }

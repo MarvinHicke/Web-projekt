@@ -26,12 +26,12 @@ class subjectRepository
      */
     public function findAll()
     {
-        $sql = "SELECT * FROM subjects";
+        $sql = "SELECT * FROM subjects ORDER BY SubjectName ASC";
 
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute();
 
-        $rows = $stmt->fetchAll();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $subjects = [];
 
         foreach ($rows as $row)

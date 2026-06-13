@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../repositories/artistRepository.php';
 require_once __DIR__ . '/../repositories/artworkRepository.php';
 
 $artistId = (int) ($_GET['id'] ?? 0);
@@ -9,7 +10,7 @@ if ($artistId <= 0) {
     $pageTitle = 'Künstler nicht gefunden';
     require_once __DIR__ . '/../includes/header.php';
     echo '<section class="page-heading"><h1>Ungültige ID</h1>'
-       . '<a class="button-link" href="' . e(base_url('pages/browse-artists.php')) . '">Zurück zur Übersicht</a></section>';
+            . '<a class="button-link" href="' . e(base_url('pages/browse-artists.php')) . '">Zurück zur Übersicht</a></section>';
     require_once __DIR__ . '/../includes/footer.php';
     exit;
 }
@@ -17,6 +18,8 @@ if ($artistId <= 0) {
 try {
     $db = new dbaccess();
     $db->connect();
+
+    $artistObj = (new artistRepository($db))->getById($artistId);
 
     // Raw SELECT * to capture all DB columns including Details, ArtistLink, BirthYear, DeathYear
     $stmt = $db->preparedStatement("SELECT * FROM artists WHERE ArtistID = :id");
@@ -27,18 +30,18 @@ try {
         $pageTitle = 'Künstler nicht gefunden';
         require_once __DIR__ . '/../includes/header.php';
         echo '<section class="page-heading"><h1>Künstler nicht gefunden</h1>'
-           . '<a class="button-link" href="' . e(base_url('pages/browse-artists.php')) . '">Zurück zur Übersicht</a></section>';
+                . '<a class="button-link" href="' . e(base_url('pages/browse-artists.php')) . '">Zurück zur Übersicht</a></section>';
         require_once __DIR__ . '/../includes/footer.php';
         exit;
     }
 
-    $artworks = (new artworkRepository($db))->getForArtist($artistId);
+    $artists = (new artistRepository($db))->findAll();
 
 } catch (Exception $e) {
     $pageTitle = 'Fehler';
     require_once __DIR__ . '/../includes/header.php';
     echo '<section class="page-heading"><h1>Ladefehler</h1>'
-       . '<a class="button-link" href="' . e(base_url('pages/browse-artists.php')) . '">Zurück</a></section>';
+            . '<a class="button-link" href="' . e(base_url('pages/browse-artists.php')) . '">Zurück</a></section>';
     require_once __DIR__ . '/../includes/footer.php';
     exit;
 }
@@ -50,29 +53,29 @@ $fullName    = trim($firstName . ' ' . $lastName);
 $nationality = (string) ($artistRow['Nationality'] ?? $artistRow['nationality'] ?? '');
 // Details and ArtistLink — try multiple casing variants (DB column names vary)
 $details     = cleanHtml(
-    $artistRow['Details']     ??
-    $artistRow['details']     ??
-    $artistRow['Description'] ?? ''
+        $artistRow['Details']     ??
+        $artistRow['details']     ??
+        $artistRow['Description'] ?? ''
 );
 $artistLink  = (string) (
-    $artistRow['ArtistLink']  ??
-    $artistRow['artistlink']  ??
-    $artistRow['Artistlink']  ??
-    $artistRow['Link']        ?? ''
+        $artistRow['ArtistLink']  ??
+        $artistRow['artistlink']  ??
+        $artistRow['Artistlink']  ??
+        $artistRow['Link']        ?? ''
 );
 
 // Date — try BirthYear with multiple casing variants (DB column names vary)
 $birthYear   = (string) (
-    $artistRow['BirthYear']   ??
-    $artistRow['birthyear']   ??
-    $artistRow['Birthyear']   ??
-    $artistRow['birth_year']  ?? ''
+        $artistRow['BirthYear']   ??
+        $artistRow['birthyear']   ??
+        $artistRow['Birthyear']   ??
+        $artistRow['birth_year']  ?? ''
 );
 $deathYear   = (string) (
-    $artistRow['DeathYear']   ??
-    $artistRow['deathyear']   ??
-    $artistRow['Deathyear']   ??
-    $artistRow['death_year']  ?? ''
+        $artistRow['DeathYear']   ??
+        $artistRow['deathyear']   ??
+        $artistRow['Deathyear']   ??
+        $artistRow['death_year']  ?? ''
 );
 if ($birthYear !== '' && $deathYear !== '') {
     $dateString = $birthYear . ' – ' . $deathYear;
@@ -82,20 +85,53 @@ if ($birthYear !== '' && $deathYear !== '') {
     $dateString = '';
 }
 
-$artistPhoto = artistImageUrl($artistId, 'medium');
+$width         = $artistObj->getWidth();
+$height        = $artistObj->getHeight();
+$imageFileName = $artistObj->getImagefilename();
+$mediumImage   = artistImageUrl($imageFileName, 'medium');
+$largeImage    = artistImageUrl($imageFileName, 'large');
+
+$dimensions = ($width && $height)
+        ? e((string)$width) . ' cm × ' . e((string)$height) . ' cm'
+        : '';
 
 $isFavorited = isset($_SESSION['favorites']['artists'])
-               && in_array($artistId, array_map('intval', $_SESSION['favorites']['artists']), true);
+        && in_array($artistId, array_map('intval', $_SESSION['favorites']['artists']), true);
 
 $pageTitle = $fullName . ' · Künstler';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title text-white" id="imageModalLabel"><?= e($fullName); ?></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Schließen"></button>
+                </div>
+                <div class="modal-body text-center p-2">
+                    <img src="<?= e($largeImage); ?>" alt="<?= e($fullName); ?>" class="img-fluid">
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <section class="artist-detail-layout">
 
     <div class="artist-image-panel">
-        <img src="<?= e($artistPhoto); ?>" alt="<?= e($fullName); ?>" class="artist-photo img-fluid">
-    </div>
+        <img src="<?= e($mediumImage); ?>"
+             alt="<?= e($fullName); ?>"
+             class="artwork-main-image img-fluid"
+             role="button"
+             data-bs-toggle="modal"
+             data-bs-target="#imageModal"
+             title="Klicken für große Ansicht"
+             style="cursor:zoom-in;"
+        >
+        <small class="d-block text-muted mt-1">Klicken für große Version</small>    </div>
 
     <div class="artist-info-panel">
         <h1><?= e($fullName); ?></h1>
@@ -105,35 +141,41 @@ require_once __DIR__ . '/../includes/header.php';
         <?php endif; ?>
 
         <!-- Favorite button -->
-        <?php if ($isFavorited): ?>
-            <a class="btn btn-primary btn-sm mb-3"
-               href="<?= e(base_url('pages/remove-favorite.php') . '?type=artist&id=' . urlencode((string) $artistId) . '&redirect=single-artist.php'); ?>">
-                ★ Aus Favoriten entfernen
-            </a>
+        <?php if (isLoggedIn()): ?>
+            <?php if ($isFavorited): ?>
+                <a class="btn btn-warning btn-sm mb-3"
+                   href="<?= e(base_url('pages/remove-favorite.php') . '?type=artist&id=' . $artistId); ?>">
+                    ★ Aus Favoriten entfernen
+                </a>
+            <?php else: ?>
+                <a class="btn btn-outline-warning btn-sm mb-3"
+                   href="<?= e(base_url('pages/add-favorite.php') . '?type=artist&id=' . $artistId); ?>">
+                    ☆ Zu Favoriten hinzufügen
+                </a>
+            <?php endif; ?>
         <?php else: ?>
-            <a class="btn btn-outline-primary btn-sm mb-3"
-               href="<?= e(base_url('pages/add-favorite.php') . '?type=artist&id=' . urlencode((string) $artistId) . '&redirect=single-artist.php'); ?>">
-                ☆ Zu Favoriten hinzufügen
-            </a>
+            <p class="mb-3 small">
+                <a href="<?= e(base_url('pages/login.php')); ?>">Anmelden</a>, um zu favorisieren.
+            </p>
         <?php endif; ?>
 
         <!-- Details table -->
         <table class="table table-bordered">
             <caption class="fw-bold text-start pb-2 caption-top">Künstlerdetails</caption>
             <tbody>
-                <?php if ($dateString !== ''): ?>
+            <?php if ($dateString !== ''): ?>
                 <tr>
                     <th scope="row" style="width:35%">Datum</th>
                     <td><?= e($dateString); ?></td>
                 </tr>
-                <?php endif; ?>
-                <?php if ($nationality !== ''): ?>
+            <?php endif; ?>
+            <?php if ($nationality !== ''): ?>
                 <tr>
                     <th scope="row">Nationalität</th>
                     <td><?= e($nationality); ?></td>
                 </tr>
-                <?php endif; ?>
-                <?php if ($artistLink !== ''): ?>
+            <?php endif; ?>
+            <?php if ($artistLink !== ''): ?>
                 <tr>
                     <th scope="row">Weitere Infos</th>
                     <td>
@@ -142,7 +184,7 @@ require_once __DIR__ . '/../includes/header.php';
                         </a>
                     </td>
                 </tr>
-                <?php endif; ?>
+            <?php endif; ?>
             </tbody>
         </table>
     </div>
