@@ -1,15 +1,23 @@
 <article class="col">
     <div class="card h-100 shadow-sm ui-card">
+        <a href="<?= e(artistDetailUrl((int) $artist->getId())); ?>">
+            <?php // Der zentrale Helper liefert bei fehlendem Künstlerbild den Placeholder. ?>
+            <img
+                src="<?= e(artistImageUrl((int) $artist->getId(), 'square-medium')); ?>"
+                class="card-img-top entity-card-img"
+                alt="<?= e($artist->getFirstName() . ' ' . $artist->getLastName()); ?>"
+            >
+        </a>
         <div class="card-body">
 
             <h2 class="h5 card-title">
-                <?= htmlspecialchars(
+                <?= e(
                     $artist->getFirstName() . ' ' . $artist->getLastName()
-                ) ?>
+                ); ?>
             </h2>
 
             <p class="card-text text-muted">
-                Artist ID: <?= htmlspecialchars($artist->getId()) ?>
+                Künstler-ID: <?= e((string) $artist->getId()); ?>
             </p>
 
             <?php

@@ -1,3 +1,6 @@
+<?php
+// $sortOptions liefert Wert-Label-Paare; $currentSort markiert die aktive Auswahl.
+?>
 <form method="get" class="sort-bar d-flex gap-2 align-items-center mb-4">
 
     <label for="sort" class="form-label mb-0">Sortieren nach</label>

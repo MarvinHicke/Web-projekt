@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/artworkRepository.php';
 
@@ -68,13 +69,13 @@ require_once __DIR__ . '/../includes/header.php';
                         class="artwork-card-image"
                     >
 
-                    <div class="artwork-card-content">
-                        <h2><?= e($title); ?></h2>
-                        <p><strong>Künstler:</strong> <?= e($artistName !== '' ? $artistName : 'Unbekannt'); ?></p>
-                        <p><strong>Jahr:</strong> <?= e($year !== '' ? $year : 'Unbekannt'); ?></p>
-                        <span class="text-link">Einzelansicht öffnen</span>
-                    </div>
                 </a>
+                <div class="artwork-card-content">
+                    <h2><a href="<?= e(artworkDetailUrl($artworkId)); ?>"><?= e($title); ?></a></h2>
+                    <p><strong>Künstler:</strong> <?= e($artistName !== '' ? $artistName : 'Unbekannt'); ?></p>
+                    <p><strong>Jahr:</strong> <?= e($year !== '' ? $year : 'Unbekannt'); ?></p>
+                    <a class="btn btn-sm btn-primary" href="<?= e(artworkDetailUrl($artworkId)); ?>">Ansehen</a>
+                </div>
             </article>
         <?php endforeach; ?>
     </section>

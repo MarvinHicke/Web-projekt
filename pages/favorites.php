@@ -64,12 +64,13 @@ if (!empty($favoriteArtworkIds) || !empty($favoriteArtistIds))
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-    <section class="page-heading">
-        <h1>Favoriten</h1>
-        <p>Hier sehen Sie Ihre favorisierten Künstler und Kunstwerke.</p>
-    </section>
+<section class="page-heading">
+    <p class="eyebrow">Ihre persönliche Auswahl</p>
+    <h1>Favoriten</h1>
+    <p class="mb-0">Hier sehen Sie Ihre favorisierten Künstler und Kunstwerke.</p>
+</section>
 
-    <section class="result-grid" aria-label="Favoritenlisten">
+<section class="result-grid" aria-label="Favoritenlisten">
         <div class="result-column">
             <h2>Favorisierte Künstler</h2>
 
@@ -158,6 +159,6 @@ require_once __DIR__ . '/../includes/header.php';
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
-    </section>
+</section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

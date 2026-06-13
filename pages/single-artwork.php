@@ -188,12 +188,12 @@ require_once __DIR__ . '/../includes/header.php';
 
         <!-- Favorite -->
         <?php if ($isFavorited): ?>
-            <a class="btn btn-warning btn-sm mb-3"
+            <a class="btn btn-primary btn-sm mb-3"
                href="<?= e(base_url('pages/remove-favorite.php') . '?type=artwork&id=' . urlencode((string) $artworkId) . '&redirect=single-artwork.php'); ?>">
                 ★ Aus Favoriten entfernen
             </a>
         <?php else: ?>
-            <a class="btn btn-outline-warning btn-sm mb-3"
+            <a class="btn btn-outline-primary btn-sm mb-3"
                href="<?= e(base_url('pages/add-favorite.php') . '?type=artwork&id=' . urlencode((string) $artworkId) . '&redirect=single-artwork.php'); ?>">
                 ☆ Zu Favoriten hinzufügen
             </a>
@@ -228,19 +228,68 @@ require_once __DIR__ . '/../includes/header.php';
                                     </h2>
                                     <div id="gallInfo" class="accordion-collapse collapse">
                                         <div class="accordion-body ps-0 small">
+
                                             <?php if ($galleryObj->getGalleryNativeName()): ?>
-                                                <p class="mb-1"><strong>Einheimischer Name:</strong> <?= e($galleryObj->getGalleryNativeName()); ?></p>
+                                                <p class="mb-1"><strong>Einheimischer Name:</strong> <?php echo e($galleryObj->getGalleryNativeName()); ?></p>
                                             <?php endif; ?>
                                             <?php if ($galleryObj->getGalleryCountry()): ?>
-                                                <p class="mb-1"><strong>Land:</strong> <?= e($galleryObj->getGalleryCountry()); ?></p>
+                                                <p class="mb-1"><strong>Land:</strong> <?php echo e($galleryObj->getGalleryCountry()); ?></p>
                                             <?php endif; ?>
                                             <?php if ($galleryObj->getGalleryWebsite()): ?>
                                                 <p class="mb-0"><strong>Website:</strong>
-                                                    <a href="<?= e($galleryObj->getGalleryWebsite()); ?>" target="_blank" rel="noopener">
-                                                        <?= e($galleryObj->getGalleryWebsite()); ?>
+                                                    <a href="<?php echo e($galleryObj->getGalleryWebsite()); ?>" target="_blank">
+                                                        <?php echo e($galleryObj->getGalleryWebsite()); ?>
                                                     </a>
                                                 </p>
                                             <?php endif; ?>
+
+                                            <?php
+                                            // Nur anzeigen wenn Koordinaten vorhanden sind, falls nicht dann wird die Karte hoffentlich ignoriert :p
+                                            if ($galleryObj->getLatitude() != '' && $galleryObj->getLongitude() != '')
+                                            {
+                                             ?>
+                                                <br>
+                                                <p><b>Wo ist das?</b></p>
+
+                                                <div id="map" style="height: 250px; width: 100%;"></div>
+
+                                                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                                                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+                                                <script>
+                                                    // PHP Variablen in JS speichern
+                                                    var lat = <?php echo $galleryObj->getLatitude(); ?>;
+                                                    var lon = <?php echo $galleryObj->getLongitude(); ?>;
+
+                                                    var mapSchonDa = false;
+
+                                                    // Notiz an mich - Karte lädt im unsichtbaren Accordion falsch
+                                                    // Maybe StackOverflow: Warten bis das Accordion ganz offen ist...
+                                                    // https://stackoverflow.com/questions/42604005/leaflet-map-not-showing-properly-in-bootstrap-4-collapse <-- Notiz zum Nachlesen, bitte net löschen :>
+                                                    document.getElementById('gallInfo').addEventListener('shown.bs.collapse', function ()
+                                                    {
+
+                                                        if (mapSchonDa == false) {
+                                                            // Karte laden (Zoom-Level 13)
+                                                            var map = L.map('map').setView([lat, lon], 13);
+
+                                                            // Bilder für die Karte :p
+                                                            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                                {
+                                                                attribution: '© OpenStreetMap'
+                                                            }).addTo(map);
+
+                                                            // Diesen roten Marker setzen auf der Karte
+                                                            L.marker([lat, lon]).addTo(map)
+                                                                .bindPopup("Galerie ist hier!")
+                                                                .openPopup();
+
+                                                            mapSchonDa = true; // Damit de la Card (die Karte) beim zweiten Aufklappen nicht nochmal lädt...
+                                                        }
+                                                    });
+                                                </script>
+
+                                            <?php } ?>
                                         </div>
                                     </div>
                                 </div>
@@ -280,7 +329,16 @@ require_once __DIR__ . '/../includes/header.php';
                     <th scope="row">Durchschnittsbewertung</th>
                     <td>
                         <?php if ($averageRating !== null): ?>
-                            <strong><?= e(number_format($averageRating, 1, ',', '.')); ?>/5</strong>
+                            <?php $ratingPercent = max(0, min(100, ($averageRating / 5) * 100)); ?>
+                            <span
+                                class="rating-stars"
+                                style="--rating-percent: <?= e(number_format($ratingPercent, 2, '.', '')); ?>%;"
+                                aria-label="<?= e(number_format($averageRating, 1, ',', '.')); ?> von 5 Sternen"
+                            >
+                                <span class="rating-stars-empty" aria-hidden="true">★★★★★</span>
+                                <span class="rating-stars-fill" aria-hidden="true">★★★★★</span>
+                            </span>
+                            <strong class="ms-2"><?= e(number_format($averageRating, 1, ',', '.')); ?>/5</strong>
                             <span class="text-muted small">(<?= $totalReviews; ?> Bewertungen)</span>
                         <?php else: ?>
                             <span class="text-muted"></span>
@@ -349,7 +407,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <strong class="ms-2"><?= e($reviewerName); ?></strong>
                             <span class="text-muted ms-2 small"><?= e($reviewerLocation); ?></span>
                             <?php if ($isOwn): ?>
-                                <span class="badge text-bg-info ms-1">Deine Bewertung</span>
+                                <span class="review-own-badge ms-1">Deine Bewertung</span>
                             <?php endif; ?>
                         </div>
                         <small class="text-muted"><?= e($formatted); ?></small>

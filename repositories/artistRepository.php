@@ -72,9 +72,9 @@ class artistRepository
     public function getMostReviewedArtists($limit = 3)
     {
         $sql =
-            "SELECT a.*, 
-               (SELECT COUNT(r.ReviewId) 
-                FROM reviews r, artworks aw 
+            "SELECT a.*,
+               (SELECT COUNT(r.ReviewId)
+                FROM reviews r, artworks aw
                 WHERE r.ArtWorkId = aw.ArtWorkID AND aw.ArtistID = a.ArtistID) as ReviewCount
             FROM artists a
             ORDER BY ReviewCount DESC
@@ -94,19 +94,62 @@ class artistRepository
     }
 
     /**
-     * Holt alle Künstler sortiert nach Nachname und Vorname
+     * Holt alle Kunstwerke und sortiert sie nach einem bestimmten Kriterium
      *
-     * @param string $direction Die Sortierreihenfolge (ASC oder DESC). Standard ist ASC
-     * @return array Ein Array aus der Datenbankzeilen
+     * @param string $sortBy Das Sortierkriterium ('title', 'year' oder 'artist'). Standard ist 'title'
+     * @param string $direction Die Sortierrichtung ('ASC' oder 'DESC'). Standard ist 'ASC'
+     * @return array Ein Array aus fertigen artwork-Objekten.
      */
-    public function getAllSorted($direction = 'ASC')
+    public function getAllSorted($sortBy = 'firstName', $direction = 'ASC')
     {
         $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
 
-        $sql = "SELECT * FROM artists ORDER BY LastName " . $dir . ", FirstName " . $dir;
+        switch (strtolower($sortBy)) {
+            case 'lastname':
+                $orderClause = "art.LastName $dir, art.FirstName $dir";
+                break;
+
+            case 'firstname':
+            default:
+                $orderClause = "art.FirstName $dir, art.LastName $dir";
+                break;
+        }
+
+        $sql = "SELECT art.*
+            FROM artists art
+            ORDER BY $orderClause";
 
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute();
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $artists = [];
+
+        foreach ($rows as $row) {
+            $artists[] = new artist($row);
+        }
+
+        return $artists;
+    }
+
+    /**
+     * Sucht künstler deren Nachname mit einem bestimmten Suchwort beginnt
+     *
+     * @param string $keyword Das Suchwort
+     * @param string $direction Die Sortierreihenfolge ('ASC' oder 'DESC'). Standard ist 'ASC'
+     * @return array Ein Array aus dem Treffer des Suchbegriffs
+     */
+    public function searchByLastName($keyword, $direction = 'ASC')
+    {
+        $searchString = $keyword . '%';
+        $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
+
+        $sql = "SELECT * FROM artists
+                WHERE LastName LIKE :keyword
+                ORDER BY LastName " . $dir;
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute(['keyword' => $searchString]);
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $artists = [];
@@ -120,28 +163,77 @@ class artistRepository
     }
 
     /**
-     * Sucht künstler deren Nachname mit einem bestimmten Suchwort beginnt
+     * Holt eine Liste aller eindeutigen Nationalitäten für das Dropdown-Menü der erweiterten Suche.
      *
-     * @param string $keyword Das Suchwort
-     * @return array Ein Array aus dem Treffer des Suchbegriffs
+     * @return array Ein Array von Strings mit den Nationalitäten.
      */
-    public function searchByLastName($keyword)
+    public function getNationalities()
     {
-        $searchString = $keyword . '%';
-
-        $sql = "SELECT * FROM artists WHERE LastName LIKE :keyword ORDER BY LastName ASC";
+        $sql = "SELECT DISTINCT Nationality FROM artists 
+                WHERE Nationality IS NOT NULL AND Nationality != '' 
+                ORDER BY Nationality ASC";
 
         $stmt = $this->db->preparedStatement($sql);
-        $stmt->execute(['keyword' => $searchString]);
+        $stmt->execute();
+
+        $nationalities = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC))
+        {
+            $nationalities[] = $row['Nationality'];
+        }
+        return $nationalities;
+    }
+
+    /**
+     * Erweiterte Suche für Künstler mit dynamischen Suche
+     *
+     * @param string $name Suchbegriff für Vor- oder Nachname
+     * @param int $yearMin Frühestes Lebensjahr
+     * @param int $yearMax Spätestes Lebensjahr
+     * @param string $nationality Die Nationalität
+     * @param string $direction Sortierrichtung
+     * @return array Ein Array aus artist-Objekten, die den Kriterien entsprechen
+     */
+    public function advancedSearch($name = '', $yearMin = null, $yearMax = null, $nationality = '', $direction = 'ASC')
+    {
+        $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
+        $sql = "SELECT * FROM artists WHERE 1=1";
+        $params = [];
+
+        if (!empty($name))
+        {
+            $sql .= " AND (FirstName LIKE :name1 OR LastName LIKE :name2)";
+            $params['name1'] = '%' . $name . '%';
+            $params['name2'] = '%' . $name . '%';
+        }
+        if (!empty($nationality))
+        {
+            $sql .= " AND Nationality = :nationality";
+            $params['nationality'] = $nationality;
+        }
+
+        if (!empty($yearMin))
+        {
+            $sql .= " AND (YearOfDeath >= :yearMin OR YearOfDeath IS NULL)";
+            $params['yearMin'] = (int)$yearMin;
+        }
+        if (!empty($yearMax))
+        {
+            $sql .= " AND YearOfBirth <= :yearMax";
+            $params['yearMax'] = (int)$yearMax;
+        }
+
+        $sql .= " ORDER BY LastName $dir, FirstName $dir";
+
+        $stmt = $this->db->preparedStatement($sql);
+        $stmt->execute($params);
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $artists = [];
-
         foreach ($rows as $row)
         {
             $artists[] = new artist($row);
         }
-
         return $artists;
     }
 }

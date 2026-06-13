@@ -1,4 +1,5 @@
 <?php
+// Englische und ältere deutsche Variablennamen bleiben für bestehende Includes kompatibel.
 $seitenTitel = $title ?? $titel ?? 'Seitentitel';
 $seitenUntertitel = $subtitle ?? $untertitel ?? '';
 ?>

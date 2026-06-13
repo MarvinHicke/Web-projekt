@@ -1,4 +1,5 @@
 <?php
+// Nur freigegebene Bootstrap-Varianten werden als CSS-Klasse ausgegeben.
 $allowedVariants = ['primary', 'secondary', 'danger', 'outline-primary'];
 $variant = in_array($buttonVariant ?? 'primary', $allowedVariants, true)
     ? $buttonVariant

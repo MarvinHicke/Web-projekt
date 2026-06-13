@@ -1,13 +1,19 @@
 <article class="col">
     <div class="card h-100 shadow-sm ui-card">
+        <?php // Subject-Bilder werden über den gemeinsamen Fallback-Helper aufgelöst. ?>
+        <img
+            src="<?= e(subjectImageUrl((int) $subject->getSubjectid())); ?>"
+            class="card-img-top entity-card-img"
+            alt="<?= e($subject->getSubjectname()); ?>"
+        >
         <div class="card-body">
 
             <h2 class="h5 card-title">
-                <?= htmlspecialchars($subject->getSubjectname()) ?>
+                <?= e($subject->getSubjectname()); ?>
             </h2>
 
             <p class="card-text text-muted">
-                Subject ID: <?= htmlspecialchars($subject->getSubjectid()) ?>
+                Themen-ID: <?= e((string) $subject->getSubjectid()); ?>
             </p>
 
             <?php

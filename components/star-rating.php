@@ -1,4 +1,5 @@
 <?php
+// Ungültige Werte werden vor der Ausgabe auf die sichtbare Skala von 0 bis 5 begrenzt.
 $rating = max(0, min(5, (int) ($rating ?? 0)));
 ?>
 

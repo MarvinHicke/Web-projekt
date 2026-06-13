@@ -5,11 +5,13 @@
  */
 class genre
 {
-    private $genreid;
-    private $genrename;
+    private $genreId;
+    private $genreName;
     private $era;
     private $description;
     private $link;
+    private $imageFilename;
+
 
     /**
      * Erstellt ein neues Genre-Objekt anhand eines Datenbank-Datensatzes
@@ -18,11 +20,19 @@ class genre
      */
     public function __construct($data)
     {
-        $this->genreid = $data['GenreID'];
-        $this->genrename = $data['GenreName'];
-        $this->era = $data['Era'];
-        $this->description = $data['Description'];
-        $this->link = $data['Link'];
+        $this->genreId = $data['GenreID'];
+        $this->genreName = $data['GenreName'] ?? '';
+        $this->era = $data['Era'] ?? '';
+        $this->description = $data['Description'] ?? '';
+        $this->link = $data['Link'] ?? '';
+
+        $this->imageFilename =
+            $data['ImageFileName']
+            ?? $data['ImageFilename']
+            ?? $data['imageFilename']
+            ?? $data['imagefilename']
+            ?? $data['GenreID']
+            ?? null;
     }
 
     // Getter
@@ -34,7 +44,7 @@ class genre
      */
     public function getGenreID()
     {
-        return $this->genreid;
+        return $this->genreId;
     }
 
     /**
@@ -44,7 +54,7 @@ class genre
      */
     public function getGenreName()
     {
-        return $this->genrename;
+        return $this->genreName;
     }
 
     /**
@@ -76,5 +86,19 @@ class genre
     {
         return $this->link;
     }
-}
 
+    public function getImagefilename()
+    {
+        $name = $this->imageFilename;
+
+        if ($name === null || $name === '') {
+            return null;
+        }
+
+        if (is_numeric($name) && strlen((string) $name) < 6) {
+            $name = str_pad((string) $name, 6, '0', STR_PAD_LEFT);
+        }
+
+        return $name;
+    }
+}
