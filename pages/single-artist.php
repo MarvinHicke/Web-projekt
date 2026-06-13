@@ -85,7 +85,6 @@ if ($birthYear !== '' && $deathYear !== '') {
     $dateString = '';
 }
 
-#$artistPhoto = artistImageUrl($artistId, 'medium');
 $width         = $artistObj->getWidth();
 $height        = $artistObj->getHeight();
 $imageFileName = $artistObj->getImagefilename();

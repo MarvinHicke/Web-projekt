@@ -3,31 +3,77 @@ ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-$pageTitle = 'Themen durchsuchen';
+$pageTitle = 'Subject durchsuchen';
 
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/subjectRepository.php';
 
-$subjectRepository = new subjectRepository(db());
-$subjects = $subjectRepository->findAll();
+$sort = safeParam((string) ($_GET['sort'] ?? 'subjectName'), ['subjectName'], 'subjectName');
+
+try {
+    $db = new dbaccess();
+    $db->connect();
+    $subjectRepository = new subjectRepository($db);
+    $subjects = $subjectRepository->findAll();
+} catch (Throwable $e) {
+    die($e->getMessage());
+}
+
+$_SESSION["favorites"] ??= [];
+$_SESSION["favorites"]["subjects"] ??= [];
+
+$favoriteSubjectsIds = array_map('intval', $_SESSION["favorites"]["subjects"]);
 
 require_once __DIR__.'/../includes/header.php';
 
 ?>
+    <section class="page-heading">
+        <h1>Subjects durchsuchen</h1>
+        <p>Entdecken sie Subjects</p>
+    </section>
 
-<section class="page-heading">
-    <h1>Themen durchsuchen</h1>
-    <p>Entdecken Sie die Themen der Kunstwerke.</p>
-</section>
 
-<section class="container my-4">
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+<?php if (empty($subjects)): ?>
+    <section class="message">
+        Es wurde kein Subject gefunden.
+    </section>
+<?php else: ?>
+    <section class="subject-card-grid" aria-label="Liste der Subjects">
         <?php foreach ($subjects as $subject): ?>
-            <?php include __DIR__ . '/../components/subject-card.php'; ?>
+            <?php
+            $subjectId = $subject->getSubjectId();
+
+            $subjectName = $subject->getSubjectName();
+
+            if ($subjectName === '') {
+                $subjectName = 'Unbekanntes Subject';
+            }
+
+            $imageFileName = $subject->getImagefilename();
+
+            $imageUrl = $imageFileName
+                    ? subjectImageUrl($imageFileName, 'square-small')
+                    : base_url('images/subjects/square-medium/');
+            ?>
+
+            <article class="subject-card-link-wrapper">
+                <a class="subject-card-link" href="<?= e(subjectDetailUrl($subjectId)); ?>">
+                    <img
+                            src="<?= e($imageUrl); ?>"
+                            alt="<?= e($subjectName); ?>"
+                            class="subject-card-image"
+                    >
+
+                    <div class="subject-card-content">
+                        <h2><?= e($subjectName); ?></h2>
+                        <span class="text-link">Einzelansicht öffnen</span>
+                    </div>
+                </a>
+            </article>
         <?php endforeach; ?>
-    </div>
-</section>
+    </section>
+<?php endif; ?>
 
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

@@ -18,12 +18,14 @@ try {
     $db = new dbaccess();
     $db->connect();
 
+    $subjectObj = (new subjectRepository($db))->getById($subjectId);
+
     // Raw SELECT * to capture all DB columns including Details, ArtistLink, BirthYear, DeathYear
     $stmt = $db->preparedStatement("SELECT * FROM subjects WHERE SubjectID = :id");
     $stmt->execute(['id' => $subjectId]);
-    $genreRow = $stmt->fetch(PDO::FETCH_ASSOC);
+    $subjectRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$genreRow) {
+    if (!$subjectRow) {
         $pageTitle = 'Subject nicht gefunden';
         require_once __DIR__ . '/../includes/header.php';
         echo '<section class="page-heading"><h1>Subject nicht gefunden</h1>'
@@ -32,7 +34,7 @@ try {
         exit;
     }
 
-    $artworks = (new artworkRepository($db))->getForSubject($subjectId);
+    $subjects = (new subjectRepository($db))->findAll();
 
 } catch (Exception $e) {
     $pageTitle = 'Fehler';
@@ -55,9 +57,6 @@ $subjectLink  = (string) (
 
 $subjectPhoto = subjectImageUrl($subjectId);
 
-$isFavorited = isset($_SESSION['favorites']['subject'])
-    && in_array($subjectId, array_map('intval', $_SESSION['favorites']['subject']), true);
-
 $pageTitle = $subjectName . ' · Subject';
 require_once __DIR__ . '/../includes/header.php';
 ?>
@@ -65,34 +64,16 @@ require_once __DIR__ . '/../includes/header.php';
 <section class="subject-detail-layout">
 
     <div class="subject-image-panel">
-        <img src="<?= e($subjectPhoto); ?>" alt="<?= e($subjectName); ?>" class="subject-photo img-fluid">
+        <img src="<?= e($subjectPhoto); ?>" alt="<?= e($subjectName); ?>">
+
     </div>
 
     <div class="subject-info-panel">
         <h1><?= e($subjectName); ?></h1>
 
-        <!-- Favorite button -->
-        <?php if (isLoggedIn()): ?>
-            <?php if ($isFavorited): ?>
-                <a class="btn btn-warning btn-sm mb-3"
-                   href="<?= e(base_url('pages/remove-favorite.php') . '?type=subject&id=' . $subjectId); ?>">
-                    ★ Aus Favoriten entfernen
-                </a>
-            <?php else: ?>
-                <a class="btn btn-outline-warning btn-sm mb-3"
-                   href="<?= e(base_url('pages/add-favorite.php') . '?type=subject&id=' . $subjectId); ?>">
-                    ☆ Zu Favoriten hinzufügen
-                </a>
-            <?php endif; ?>
-        <?php else: ?>
-            <p class="mb-3 small">
-                <a href="<?= e(base_url('pages/login.php')); ?>">Anmelden</a>, um zu favorisieren.
-            </p>
-        <?php endif; ?>
-
         <!-- Details table -->
         <table class="table table-bordered">
-            <caption class="fw-bold text-start pb-2 caption-top">Subjectdetails</caption>
+            <caption class="fw-bold text-start pb-2 caption-top"></caption>
             <tbody>
             <?php if ($subjectLink !== ''): ?>
                 <tr>
