@@ -20,24 +20,24 @@ function escapeHtml(string $value): string
 /** @var array<int, array{title: string, message: string}> $errors */
 $errors = [
     400 => [
-        'title' => 'Bad Request',
-        'message' => 'The request could not be understood. Please check it and try again.',
+        'title' => 'Ungültige Anfrage',
+        'message' => 'Die Anfrage konnte nicht verarbeitet werden. Bitte prüfen Sie Ihre Eingabe und versuchen Sie es erneut.',
     ],
     401 => [
-        'title' => 'Unauthorized',
-        'message' => 'You need to sign in or provide valid credentials to view this page.',
+        'title' => 'Anmeldung erforderlich',
+        'message' => 'Sie müssen angemeldet sein, um diese Seite aufzurufen.',
     ],
     403 => [
-        'title' => 'Forbidden',
-        'message' => 'You do not have permission to access this page or resource.',
+        'title' => 'Zugriff verweigert',
+        'message' => 'Sie haben keine Berechtigung, diese Seite oder Ressource aufzurufen.',
     ],
     404 => [
-        'title' => 'Page Not Found',
-        'message' => 'The page you requested could not be found.',
+        'title' => 'Seite nicht gefunden',
+        'message' => 'Die angeforderte Seite konnte nicht gefunden werden.',
     ],
     500 => [
-        'title' => 'Internal Server Error',
-        'message' => 'Something went wrong on our side. Please try again later.',
+        'title' => 'Interner Serverfehler',
+        'message' => 'Bei der Verarbeitung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.',
     ],
 ];
 
@@ -56,7 +56,7 @@ $bootstrapUrl = $projectBasePath . 'assets/css/bootstrap.min.css';
 $homeUrl = $projectBasePath . 'index.php';
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -142,7 +142,7 @@ $homeUrl = $projectBasePath . 'index.php';
             <h1 class="error-title" id="error-title"><?= escapeHtml($error['title']); ?></h1>
             <p class="error-message"><?= escapeHtml($error['message']); ?></p>
             <a class="home-link btn btn-primary" href="<?= escapeHtml($homeUrl); ?>">
-                Back to homepage
+                Zurück zur Startseite
             </a>
         </section>
     </main>
