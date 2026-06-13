@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/genreRepository.php';
+require_once __DIR__ . '/../repositories/artworkRepository.php';
 
 $genreId = (int) ($_GET['id'] ?? 0);
 
@@ -34,7 +35,7 @@ try {
         exit;
     }
 
-    $genres = (new genreRepository($db))->findAll();
+    $artworks = (new artworkRepository($db))->getForGenre($genreId);
 
 } catch (Exception $e) {
     $pageTitle = 'Fehler';
@@ -54,6 +55,7 @@ $genreLink  = (string) (
         $genreRow['genrelink']  ??
         $genreRow['Link']        ?? ''
 );
+$description = (string) ($genreRow['Description'] ?? '');
 
 $genrePhoto = genreImageUrl($genreId);
 
@@ -70,6 +72,8 @@ require_once __DIR__ . '/../includes/header.php';
 
         <div class="genre-info-panel">
             <h1><?= e($genreName); ?></h1>
+            <p><strong>Beschreibung:</strong> <?= e($description); ?></p>
+
 
             <!-- Details table -->
             <table class="table table-bordered">
@@ -92,7 +96,7 @@ require_once __DIR__ . '/../includes/header.php';
 
     <!-- ===== ARTWORKS GRID ===== -->
     <section class="mt-5">
-        <h2>Genre <?= e($genreName); ?></h2>
+        <h2>Kunstwerke des Genre '<?= e($genreName); ?>'</h2>
 
         <?php if (empty($artworks)): ?>
             <p class="text-muted">Keine Kunstwerke für dieses Genre gefunden.</p>
@@ -108,7 +112,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="col">
                         <div class="card h-100 text-center">
                             <a href="<?= e(artworkDetailUrl($awId)); ?>">
-                                <img src="<?= e(artworkImageUrl($awFileName, 'square-small')); ?>"
+                                <img src="<?= e(artworkImageUrl($awFileName, 'square-medium')); ?>"
                                      alt="<?= e($awTitle); ?>"
                                      class="card-img-top"
                                      style="height:160px; object-fit:cover;">

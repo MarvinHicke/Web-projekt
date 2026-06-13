@@ -70,12 +70,13 @@ require_once __DIR__.'/../includes/header.php';
                     >
 
                     <div class="genre-card-content">
-                        <h2><?= e($genreName); ?></h2>
-                        <p><?= e($genreId); ?></p>
-                        <p>Era: <?= e($era); ?></p>
-                        <p><?= e($description); ?></p>
-                        <span class="text-link">Einzelansicht öffnen</span>
-                    </div>
+
+                        <h2><a href="<?= e(genreDetailUrl($genreId)); ?>"><?= e($genreName); ?></a></h2>
+                        <p><strong>Era:</strong> <?= e($era !== '' ? $era : 'Unbekannt'); ?></p>
+
+                        <div class="result-actions">
+                            <a class="btn btn-sm btn-primary" href="<?= e(genreDetailUrl($genreId)); ?>">Ansehen</a>
+                        </div>
                 </a>
             </article>
         <?php endforeach; ?>
