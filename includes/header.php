@@ -56,7 +56,7 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
                     <li><a href="<?= e(base_url('pages/browse-artworks.php')); ?>">Kunstwerke</a></li>
                     <li><a href="<?= e(base_url('pages/browse-artists.php')); ?>">Künstler</a></li>
                     <li><a href="<?= e(base_url('pages/browse-genre.php')); ?>">Genres</a></li>
-                    <li><a href="<?= e(base_url('pages/browse-subject.php')); ?>">Subjects</a></li>
+                    <li><a href="<?= e(base_url('pages/browse-subject.php')); ?>">Themen</a></li>
                 </ul>
             </li>
         </ul>
