@@ -15,7 +15,7 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
     <link rel="stylesheet" href="<?= e(base_url('assets/css/bootstrap.min.css')); ?>">
     <link rel="stylesheet" href="<?= e(base_url('assets/css/theme_bootswatch.css')); ?>">
     <link rel="stylesheet" href="<?= e(base_url('assets/css/components.css')); ?>">
-    <link rel="stylesheet" href="<?= e(base_url('assets/css/styles.css')); ?>?v=4">
+    <link rel="stylesheet" href="<?= e(base_url('assets/css/styles.css')); ?>?v=5">
 </head>
 <body>
 
