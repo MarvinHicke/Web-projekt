@@ -49,27 +49,27 @@ require_once __DIR__ . '/../includes/header.php';
     <h2>Team und Arbeitsverteilung</h2>
     <div class="team-grid">
         <article class="team-card">
-            <span class="team-role">Person A · Daten &amp; Architektur</span>
+            <span class="team-role">Daten &amp; Architektur</span>
             <h3>Marvin Hicke</h3>
             <p>DB-Anbindung, Repository-Grundlagen, Datenzugriff, Tests und technische Integration.</p>
         </article>
         <article class="team-card">
-            <span class="team-role">Person B · Layout &amp; System</span>
+            <span class="team-role">Layout &amp; System</span>
             <h3>Sehyang Na</h3>
             <p>Bootstrap-Theme, lokale Fonts, Navigation, About Us, Bild-Fallbacks, UI-Unterstützung und Dokumentationsgrafiken.</p>
         </article>
         <article class="team-card">
-            <span class="team-role">Person C · Öffentliche Inhalte</span>
+            <span class="team-role">Öffentliche Inhalte</span>
             <h3>Lisanne Godlinski</h3>
             <p>Browse-Seiten und öffentliche Detailseiten für Künstler, Genres und Subjects.</p>
         </article>
         <article class="team-card">
-            <span class="team-role">Person D · Home, Artwork &amp; Suche</span>
+            <span class="team-role">Home, Artwork &amp; Suche</span>
             <h3>Fatemeh Nezamolmaleki</h3>
             <p>Startseite, Suchergebnisse, Artwork-Detailseite, Widgets und Inhaltsverknüpfungen.</p>
         </article>
         <article class="team-card">
-            <span class="team-role">Person E · Benutzerfunktionen</span>
+            <span class="team-role">Benutzerfunktionen</span>
             <h3>Linus Meyer</h3>
             <p>Registrierung, Login/Logout, Konto, Favoriten, Reviews, Rollen und Benutzerverwaltung.</p>
         </article>
