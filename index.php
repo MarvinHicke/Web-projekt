@@ -25,6 +25,8 @@ try {
 
     $topArtworkCandidates = $artworkRepo->getTopArtworks(20);
     $topArtworks          = array_slice($topArtworkCandidates, 0, 3);
+
+    // Im Carousel werden nur Kunstwerke mit einem tatsächlich vorhandenen Bild gezeigt.
     $carouselArtworks     = array_values(array_filter(
         $topArtworkCandidates,
         static function (array $work): bool {

@@ -1,4 +1,5 @@
 <?php
+// Unbekannte Alert-Typen fallen auf die neutrale Info-Darstellung zurück.
 $allowedTypes = ['success', 'danger', 'warning', 'info'];
 $type = in_array($alertType ?? 'info', $allowedTypes, true)
     ? $alertType

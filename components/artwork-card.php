@@ -1,6 +1,7 @@
 <article class="col">
     <div class="card h-100 shadow-sm ui-card">
 
+        <?php // Der zentrale Helper sucht alternative Bildgrößen und nutzt sonst den Placeholder. ?>
         <img
             src="<?= e(artworkImageUrl($artwork->getImagefilename(), 'square-small')); ?>"
             class="card-img-top artwork-card-img entity-card-img"

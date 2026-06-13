@@ -67,6 +67,7 @@ function artistImageUrl(int $artistId, string $size = 'medium'): string
 /** Returns URL for a genre image by ID */
 function genreImageUrl(int $genreId, string $size = 'square-medium'): string
 {
+    // Erst die gewünschte Größe prüfen, danach die vorhandenen Genre-Formate.
     $sizesToTry = array_unique([$size, 'square-medium', 'square-thumbs']);
 
     foreach ($sizesToTry as $trySize) {
@@ -83,6 +84,7 @@ function genreImageUrl(int $genreId, string $size = 'square-medium'): string
 /** Returns URL for a subject image by ID */
 function subjectImageUrl(int $subjectId, string $size = 'square-medium'): string
 {
+    // Erst die gewünschte Größe prüfen, danach die vorhandenen Subject-Formate.
     $sizesToTry = array_unique([$size, 'square-medium', 'square-thumbs']);
 
     foreach ($sizesToTry as $trySize) {
@@ -99,6 +101,7 @@ function subjectImageUrl(int $subjectId, string $size = 'square-medium'): string
 /** Checks whether an image URL points to the shared placeholder image. */
 function isPlaceholderImageUrl(string $imageUrl): bool
 {
+    // Nur den URL-Pfad vergleichen, damit Query-Parameter das Ergebnis nicht verändern.
     $path = parse_url($imageUrl, PHP_URL_PATH);
     return str_ends_with(is_string($path) ? $path : '', '/images/placeholder.jpg');
 }
