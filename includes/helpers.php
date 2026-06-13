@@ -65,9 +65,9 @@ function artistImageUrl(int $artistId, string $size = 'medium'): string
 }
 
 /** Returns URL for a genre image by ID */
-function genreImageUrl(int $genreId): string
+function genreImageUrl(int $genreId, string $size = 'square-medium'): string
 {
-    $sizesToTry = ['square-medium', 'square-thumbs'];
+    $sizesToTry = array_unique([$size, 'square-medium', 'square-thumbs']);
 
     foreach ($sizesToTry as $trySize) {
         $relativePath = 'images/genres/' . $trySize . '/' . $genreId . '.jpg';
@@ -81,9 +81,9 @@ function genreImageUrl(int $genreId): string
 }
 
 /** Returns URL for a subject image by ID */
-function subjectImageUrl(int $subjectId): string
+function subjectImageUrl(int $subjectId, string $size = 'square-medium'): string
 {
-    $sizesToTry = ['square-medium', 'square-thumbs'];
+    $sizesToTry = array_unique([$size, 'square-medium', 'square-thumbs']);
 
     foreach ($sizesToTry as $trySize) {
         $relativePath = 'images/subjects/' . $trySize . '/' . $subjectId . '.jpg';
@@ -94,6 +94,13 @@ function subjectImageUrl(int $subjectId): string
     }
 
     return base_url('images/placeholder.jpg');
+}
+
+/** Checks whether an image URL points to the shared placeholder image. */
+function isPlaceholderImageUrl(string $imageUrl): bool
+{
+    $path = parse_url($imageUrl, PHP_URL_PATH);
+    return str_ends_with(is_string($path) ? $path : '', '/images/placeholder.jpg');
 }
 
 function artworkDetailUrl(int $artworkId): string

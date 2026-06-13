@@ -2,19 +2,19 @@
     <div class="card h-100 shadow-sm ui-card">
 
         <img
-            src="<?= htmlspecialchars(artworkImageUrl($artwork->getImagefilename(), 'square-small')) ?>"
-            class="card-img-top artwork-card-img"
-            alt="<?= htmlspecialchars($artwork->getTitle()) ?>"
+            src="<?= e(artworkImageUrl($artwork->getImagefilename(), 'square-small')); ?>"
+            class="card-img-top artwork-card-img entity-card-img"
+            alt="<?= e($artwork->getTitle()); ?>"
         >
 
         <div class="card-body">
 
             <h2 class="h5 card-title">
-                <?= htmlspecialchars($artwork->getTitle()) ?>
+                <?= e($artwork->getTitle()); ?>
             </h2>
 
             <p class="card-text text-muted">
-                <?= htmlspecialchars($artwork->getYearofwork()) ?>
+                <?= e((string) $artwork->getYearofwork()); ?>
             </p>
 
             <?php

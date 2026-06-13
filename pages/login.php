@@ -60,50 +60,67 @@ if(($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST")
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<section class="page-heading">
-    <h1>Anmelden</h1>
-    <p>Melden Sie sich mit Ihrer E-Mail und Ihrem Passwort an.</p>
-</section>
+<section class="auth-layout">
+    <div class="auth-intro">
+        <p class="eyebrow">Willkommen zurück</p>
+        <h1>Anmelden</h1>
+        <p>Melden Sie sich mit Ihrer E-Mail-Adresse und Ihrem Passwort an.</p>
+        <p class="small mb-0">
+            Noch kein Konto?
+            <a href="<?= e(base_url('pages/register.php')); ?>">Jetzt registrieren</a>
+        </p>
+    </div>
 
-<section class="data-box auth-panel">
-    <?php foreach ($errors as $error): ?>
-        <?php
-        $alertType = "danger";
-        $alertMessage = $error;
-        include __DIR__ . "/../components/alert-box.php";
-        ?>
-    <?php endforeach; ?>
+    <div class="card border-0 shadow-sm auth-card">
+        <div class="card-body p-4 p-md-5">
+            <?php foreach ($errors as $error): ?>
+                <?php
+                $alertType = "danger";
+                $alertMessage = $error;
+                include __DIR__ . "/../components/alert-box.php";
+                ?>
+            <?php endforeach; ?>
 
-    <form method="POST" class="auth-form">
-        <div class="mb-3">
-            <label for="email" class="form-label">E-Mail</label>
-            <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    class="form-control"
-                    required
-                    maxlength="100"
-                    value="<?= e($email) ?>"
-            >
+            <?php if ($successMessage !== ""): ?>
+                <?php
+                $alertType = "success";
+                $alertMessage = $successMessage;
+                include __DIR__ . "/../components/alert-box.php";
+                ?>
+            <?php endif; ?>
+
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="email">E-Mail</label>
+                    <input
+                        class="form-control form-control-lg"
+                        type="email"
+                        id="email"
+                        name="email"
+                        autocomplete="email"
+                        required
+                        maxlength="100"
+                        value="<?= e($email); ?>"
+                    >
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold" for="password">Passwort</label>
+                    <input
+                        class="form-control form-control-lg"
+                        type="password"
+                        id="password"
+                        name="password"
+                        autocomplete="current-password"
+                        required
+                        minlength="8"
+                    >
+                </div>
+
+                <button class="btn btn-primary btn-lg w-100" type="submit">Anmelden</button>
+            </form>
         </div>
-
-        <div class="mb-3">
-            <label for="password" class="form-label">Passwort</label>
-            <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    class="form-control"
-                    required
-                    minlength="8"
-            >
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Anmelden
-        </button>
-    </form>
+    </div>
 </section>
 
 <?php

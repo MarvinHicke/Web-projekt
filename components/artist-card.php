@@ -1,15 +1,22 @@
 <article class="col">
     <div class="card h-100 shadow-sm ui-card">
+        <a href="<?= e(artistDetailUrl((int) $artist->getId())); ?>">
+            <img
+                src="<?= e(artistImageUrl((int) $artist->getId(), 'square-medium')); ?>"
+                class="card-img-top entity-card-img"
+                alt="<?= e($artist->getFirstName() . ' ' . $artist->getLastName()); ?>"
+            >
+        </a>
         <div class="card-body">
 
             <h2 class="h5 card-title">
-                <?= htmlspecialchars(
+                <?= e(
                     $artist->getFirstName() . ' ' . $artist->getLastName()
-                ) ?>
+                ); ?>
             </h2>
 
             <p class="card-text text-muted">
-                Artist ID: <?= htmlspecialchars($artist->getId()) ?>
+                Künstler-ID: <?= e((string) $artist->getId()); ?>
             </p>
 
             <?php
@@ -27,6 +34,8 @@
                 $buttonVariant = 'outline-primary';
                 include __DIR__ . '/button.php';
                 ?>
+            <?php elseif (($showFavoriteStatus ?? false) === true): ?>
+                <a class="btn btn-warning" href="<?= e(base_url('pages/favorites.php')); ?>">In Favoriten</a>
             <?php endif; ?>
 
             <?php if (($showRemoveFavoriteButton ?? false) === true): ?>

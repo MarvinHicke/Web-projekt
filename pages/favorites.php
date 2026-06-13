@@ -64,10 +64,57 @@ if (!empty($favoriteArtworkIds) || !empty($favoriteArtistIds))
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-    <section class="page-heading">
-        <h1>Favoriten</h1>
-        <p>Hier sehen Sie Ihre favorisierten Künstler und Kunstwerke.</p>
-    </section>
+<section class="page-heading">
+    <p class="eyebrow">Ihre persönliche Auswahl</p>
+    <h1>Favoriten</h1>
+    <p class="mb-0">Hier sehen Sie Ihre favorisierten Künstler und Kunstwerke.</p>
+</section>
+
+<section class="favorites-section">
+<div class="section-heading">
+    <h2>Favorisierte Kunstwerke</h2>
+    <span class="badge rounded-pill text-bg-light"><?= count($favoriteArtworks); ?></span>
+</div>
+<?php if(empty($favoriteArtworks)) : ?>
+    <?php
+    $alertType="info";
+    $alertMessage="Du hast noch keine Kunstwerke favorisiert.";
+    include __DIR__ . '/../components/alert-box.php';
+    ?>
+<?php else: ?>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <?php foreach ($favoriteArtworks as $artwork): ?>
+            <?php
+            $showRemoveFavoriteButton = true;
+            include __DIR__ . '/../components/artwork-card.php';
+            ?>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+</section>
+
+<section class="favorites-section">
+<div class="section-heading">
+    <h2>Favorisierte Künstler</h2>
+    <span class="badge rounded-pill text-bg-light"><?= count($favoriteArtists); ?></span>
+</div>
+<?php if(empty($favoriteArtists)) : ?>
+    <?php
+    $alertType="info";
+    $alertMessage="Du hast noch keine Künstler favorisiert.";
+    include __DIR__ . '/../components/alert-box.php';
+    ?>
+<?php else: ?>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <?php foreach ($favoriteArtists as $artist): ?>
+            <?php
+            $showRemoveFavoriteButton = true;
+            include __DIR__ . '/../components/artist-card.php';
+            ?>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+</section>
 
     <section class="result-grid" aria-label="Favoritenlisten">
         <div class="result-column">

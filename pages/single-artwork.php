@@ -329,7 +329,16 @@ require_once __DIR__ . '/../includes/header.php';
                     <th scope="row">Durchschnittsbewertung</th>
                     <td>
                         <?php if ($averageRating !== null): ?>
-                            <strong><?= e(number_format($averageRating, 1, ',', '.')); ?>/5</strong>
+                            <?php $ratingPercent = max(0, min(100, ($averageRating / 5) * 100)); ?>
+                            <span
+                                class="rating-stars"
+                                style="--rating-percent: <?= e(number_format($ratingPercent, 2, '.', '')); ?>%;"
+                                aria-label="<?= e(number_format($averageRating, 1, ',', '.')); ?> von 5 Sternen"
+                            >
+                                <span class="rating-stars-empty" aria-hidden="true">★★★★★</span>
+                                <span class="rating-stars-fill" aria-hidden="true">★★★★★</span>
+                            </span>
+                            <strong class="ms-2"><?= e(number_format($averageRating, 1, ',', '.')); ?>/5</strong>
                             <span class="text-muted small">(<?= $totalReviews; ?> Bewertungen)</span>
                         <?php else: ?>
                             <span class="text-muted"></span>

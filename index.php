@@ -11,6 +11,7 @@ require_once __DIR__ . '/includes/boxes/most-reviewed-artists-box.php';
 require_once __DIR__ . '/includes/boxes/most-recent-reviews-box.php';
 
 $topArtworks         = [];
+$carouselArtworks    = [];
 $mostReviewedArtists = [];
 $latestReviews       = [];
 
@@ -22,8 +23,16 @@ try {
     $artistRepo  = new artistRepository($db);
     $reviewRepo  = new reviewRepository($db);
 
-    // Fetch more so we have enough after filtering out those without real image files
-    $topArtworks         = $artworkRepo->getTopArtworks(15);
+    $topArtworkCandidates = $artworkRepo->getTopArtworks(20);
+    $topArtworks          = array_slice($topArtworkCandidates, 0, 3);
+    $carouselArtworks     = array_values(array_filter(
+        $topArtworkCandidates,
+        static function (array $work): bool {
+            $imageFileName = (string) ($work['ImageFileName'] ?? '');
+            return !isPlaceholderImageUrl(artworkImageUrl($imageFileName, 'large'));
+        }
+    ));
+    $carouselArtworks = array_slice($carouselArtworks, 0, 5);
     $mostReviewedArtists = $artistRepo->getMostReviewedArtists(3);
     $latestReviews       = $reviewRepo->getLatestReviewsWithDetails(3);
 } catch (Exception $e) {
@@ -64,6 +73,43 @@ require_once __DIR__ . '/includes/header.php';
         <a class="button-link" href="<?= e(base_url('pages/browse-artworks.php')); ?>">Kunstwerke durchsuchen</a>
     </div>
 </section>
+
+<?php if (!isLoggedIn()): ?>
+<section class="home-login-panel" aria-labelledby="home-login-title">
+    <div>
+        <p class="eyebrow">Persönlicher Bereich</p>
+        <h2 id="home-login-title">Anmelden</h2>
+        <p class="mb-0">Melden Sie sich an, um Favoriten und Bewertungen zu verwalten.</p>
+    </div>
+    <form method="post" action="<?= e(base_url('pages/login.php')); ?>" class="home-login-form">
+        <div>
+            <label class="form-label" for="home-login-email">E-Mail</label>
+            <input
+                class="form-control"
+                type="email"
+                id="home-login-email"
+                name="email"
+                autocomplete="email"
+                required
+                maxlength="100"
+            >
+        </div>
+        <div>
+            <label class="form-label" for="home-login-password">Passwort</label>
+            <input
+                class="form-control"
+                type="password"
+                id="home-login-password"
+                name="password"
+                autocomplete="current-password"
+                required
+                minlength="8"
+            >
+        </div>
+        <button class="btn btn-primary" type="submit">Anmelden</button>
+    </form>
+</section>
+<?php endif; ?>
 
 <!-- ===== BOOTSTRAP CAROUSEL ===== -->
 <?php if (!empty($carouselArtworks)): ?>
@@ -122,6 +168,10 @@ require_once __DIR__ . '/includes/header.php';
             <span class="visually-hidden">Weiter</span>
         </button>
     </div>
+</section>
+<?php elseif (!empty($carouselArtworks)): ?>
+<section class="message">
+    Für das Carousel sind momentan weniger als drei Kunstwerke mit vorhandenen Bildern verfügbar.
 </section>
 <?php endif; ?>
 

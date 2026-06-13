@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../model/helper.php';
@@ -6,95 +7,125 @@ require_once __DIR__ . '/../repositories/artworkRepository.php';
 require_once __DIR__ . '/../repositories/artistRepository.php';
 
 $pageTitle = 'Suchergebnisse';
-
-$query = isset($_GET['q']) ? trim($_GET['q']) : '';
-$sort = isset($_GET['sort']) ? $_GET['sort'] : 'title';
-$direction = isset($_GET['dir']) ? $_GET['dir'] : 'ASC';
-$searchType = isset($_GET['search_type']) ? $_GET['search_type'] : '';
-
-if ($query !== '')
-{
-    $searchType = '';
-}
-
-$artistResults = [];
+ 
+$query            = trim((string) ($_GET['q'] ?? ''));
+$artistDirection  = safeParam(strtolower((string) ($_GET['artist_direction'] ?? 'asc')), ['asc', 'desc'], 'asc');
+$artworkSort      = safeParam((string) ($_GET['artwork_sort'] ?? 'title'), ['title', 'artist', 'year'], 'title');
+$artworkDirection = safeParam(strtolower((string) ($_GET['artwork_direction'] ?? 'asc')), ['asc', 'desc'], 'asc');
+ 
+$artistResults  = [];
 $artworkResults = [];
 
-try
-{
-    $db = new dbaccess();
-    $db->connect();
+$_SESSION['favorites'] ??= [];
+$_SESSION['favorites']['artists'] ??= [];
+$_SESSION['favorites']['artworks'] ??= [];
 
-    $artworkRepo = new artworkRepository($db);
-    $artistRepo  = new artistRepository($db);
-
-    if ($searchType === 'artist') {
-        $name = isset($_GET['artist_name']) ? trim($_GET['artist_name']) : '';
-        $nationality = isset($_GET['nationality']) ? $_GET['nationality'] : '';
-        $yearMin = !empty($_GET['year_min']) ? (int)$_GET['year_min'] : null;
-        $yearMax = !empty($_GET['year_max']) ? (int)$_GET['year_max'] : null;
-
-        $artistResults = $artistRepo->advancedSearch($name, $yearMin, $yearMax, $nationality, $direction);
+$favoriteArtistIds  = array_map('intval', $_SESSION['favorites']['artists']);
+$favoriteArtworkIds = array_map('intval', $_SESSION['favorites']['artworks']);
+ 
+if (mb_strlen($query) >= 3) {
+    try {
+        $db = new dbaccess();
+        $db->connect();
+ 
+        $artworkRepo = new artworkRepository($db);
+        $artistRepo  = new artistRepository($db);
+ 
+        // Search artists by last name
+        $artistObjs = $artistRepo->searchByLastName($query);
+        foreach ($artistObjs as $artist) {
+            $artistResults[] = [
+                'ArtistID'  => $artist->getId(),
+                'FirstName' => $artist->getFirstName(),
+                'LastName'  => $artist->getLastName(),
+            ];
+        }
+ 
+        // Search artworks by title
+        $artworkObjs = $artworkRepo->searchByTitle($query);
+        foreach ($artworkObjs as $artwork) {
+            $artworkResults[] = [
+                'ArtWorkID'     => $artwork->getArtworkid(),
+                'Title'         => $artwork->getTitle(),
+                'FirstName'     => $artwork->getFirstName(),
+                'LastName'      => $artwork->getLastName(),
+                'YearOfWork'    => $artwork->getYearofwork(),
+                'ImageFileName' => $artwork->getImagefilename(),
+            ];
+        }
+ 
+    } catch (Exception $e) {
+        // DB not available — results stay empty
     }
-    elseif ($searchType === 'artwork')
-    {
-        $title = isset($_GET['artwork_title']) ? trim($_GET['artwork_title']) : '';
-        $genreId = !empty($_GET['genre']) ? (int)$_GET['genre'] : null;
-        $yearMin = !empty($_GET['year_min']) ? (int)$_GET['year_min'] : null;
-        $yearMax = !empty($_GET['year_max']) ? (int)$_GET['year_max'] : null;
+ 
+    usort($artistResults, static function (array $a, array $b) use ($artistDirection): int {
+        $comparison = strcasecmp(
+            (string) ($a['LastName'] ?? '') . (string) ($a['FirstName'] ?? ''),
+            (string) ($b['LastName'] ?? '') . (string) ($b['FirstName'] ?? '')
+        );
+        return $artistDirection === 'desc' ? -$comparison : $comparison;
+    });
 
-        $artworkResults = $artworkRepo->advancedSearch($title, $yearMin, $yearMax, $genreId, $sort, $direction);
+    usort($artworkResults, static function (array $a, array $b) use ($artworkSort, $artworkDirection): int {
+        if ($artworkSort === 'year') {
+            $comparison = (int) ($a['YearOfWork'] ?? 0) <=> (int) ($b['YearOfWork'] ?? 0);
+        } elseif ($artworkSort === 'artist') {
+            $comparison = strcasecmp(
+                (string) ($a['LastName'] ?? '') . (string) ($a['FirstName'] ?? ''),
+                (string) ($b['LastName'] ?? '') . (string) ($b['FirstName'] ?? '')
+            );
+        } else {
+            $comparison = strcasecmp((string) ($a['Title'] ?? ''), (string) ($b['Title'] ?? ''));
+        }
 
-    }
-    elseif (mb_strlen($query) >= 3)
-    {
-        $artistResults  = $artistRepo->searchByLastName($query, $direction);
-        $artworkResults = $artworkRepo->searchByTitle($query, $sort, $direction);
-    }
-
-} catch (Exception $e)
-{}
-
+        return $artworkDirection === 'desc' ? -$comparison : $comparison;
+    });
+}
+ 
 require_once __DIR__ . '/../includes/header.php';
 ?>
+ 
+<section class="page-heading">
+    <h1>Suchergebnisse</h1>
+    <p>Die Suche ist global erreichbar und sucht ab mindestens drei Zeichen nach Künstlernachnamen oder Kunstwerktiteln.</p>
+</section>
+ 
+<section class="sort-panel" aria-label="Suchformular">
+    <form method="get" action="<?= e(base_url('pages/search-results.php')); ?>">
+        <label for="search-page-input">Suchbegriff</label>
+ 
+        <input
+            id="search-page-input"
+            type="search"
+            name="q"
+            minlength="3"
+            value="<?= e($query); ?>"
+            placeholder="z. B. Gogh oder Mona"
+        >
+ 
+        <label for="artist-direction">Künstler</label>
+        <select id="artist-direction" name="artist_direction">
+            <option value="asc" <?= $artistDirection === 'asc' ? 'selected' : ''; ?>>Name aufsteigend</option>
+            <option value="desc" <?= $artistDirection === 'desc' ? 'selected' : ''; ?>>Name absteigend</option>
+        </select>
 
-    <section class="page-heading">
-        <h1>Suchergebnisse</h1>
-        <p>Die Suche ist global erreichbar und sucht ab mindestens drei Zeichen nach Künstlernachnamen oder Kunstwerktiteln.</p>
-    </section>
+        <label for="artwork-sort">Kunstwerke nach</label>
+        <select id="artwork-sort" name="artwork_sort">
+            <option value="title" <?= $artworkSort === 'title' ? 'selected' : ''; ?>>Titel</option>
+            <option value="artist" <?= $artworkSort === 'artist' ? 'selected' : ''; ?>>Künstler</option>
+            <option value="year" <?= $artworkSort === 'year' ? 'selected' : ''; ?>>Jahr</option>
+        </select>
 
-    <section class="sort-panel" aria-label="Suchformular">
-        <form method="get" action="search-results.php">
-
-            <?php
-            if ($searchType !== '')
-            {
-                foreach ($_GET as $key => $value)
-                {
-                    if ($key !== 'q' && $key !== 'sort' && $value !== '')
-                    {
-                        echo '<input type="hidden" name="' . htmlspecialchars($key) . '" value="' . htmlspecialchars($value) . '">';
-                    }
-                }
-            }
-            ?>
-
-            <label for="search-page-input">Suchbegriff</label>
-            <input id="search-page-input" type="search" name="q" value="<?php echo htmlspecialchars($query); ?>" placeholder="z. B. Gogh oder Mona">
-
-            <label for="sort">Sortierung</label>
-            <select id="sort" name="sort">
-                <option value="title"  <?php if($sort === 'title') echo 'selected'; ?>>Titel</option>
-                <option value="artist" <?php if($sort === 'artist') echo 'selected'; ?>>Künstler</option>
-                <option value="year"   <?php if($sort === 'year') echo 'selected'; ?>>Jahr</option>
-            </select>
-
-            <button type="submit">Suchen</button>
-        </form>
-    </section>
-
-    <hr>
-
+        <label for="artwork-direction">Richtung</label>
+        <select id="artwork-direction" name="artwork_direction">
+            <option value="asc" <?= $artworkDirection === 'asc' ? 'selected' : ''; ?>>Aufsteigend</option>
+            <option value="desc" <?= $artworkDirection === 'desc' ? 'selected' : ''; ?>>Absteigend</option>
+        </select>
+ 
+        <button type="submit">Suchen</button>
+    </form>
+</section>
+ 
 <?php if ($query !== '' && mb_strlen($query) < 3): ?>
     <div class="message">Bitte geben Sie mindestens drei Zeichen ein.</div>
 <?php endif; ?>
@@ -119,8 +150,22 @@ require_once __DIR__ . '/../includes/header.php';
                         ?>
                         <img src="../<?php echo htmlspecialchars($bildPfad); ?>" alt="Portrait des Künstlers">
                         <div>
-                            <h3><?php echo htmlspecialchars($artist->getFirstName() . ' ' . $artist->getLastName()); ?></h3>
-                            <a href="single-artist.php?id=<?php echo $artist->getId(); ?>">Künstler öffnen</a>
+                            <h3>
+                                <a href="<?= e(artistDetailUrl($artistId)); ?>">
+                                    <?= e($artistName !== '' ? $artistName : 'Unbekannter Künstler'); ?>
+                                </a>
+                            </h3>
+                            <div class="result-actions">
+                                <a class="btn btn-sm btn-primary" href="<?= e(artistDetailUrl($artistId)); ?>">Ansehen</a>
+                                <?php if (in_array($artistId, $favoriteArtistIds, true)): ?>
+                                    <a class="btn btn-sm btn-warning" href="<?= e(base_url('pages/favorites.php')); ?>">In Favoriten</a>
+                                <?php else: ?>
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       href="<?= e(base_url('pages/add-favorite.php') . '?type=artist&id=' . $artistId); ?>">
+                                        Zu Favoriten
+                                    </a>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </article>
                 <?php endforeach; ?>
@@ -141,10 +186,20 @@ require_once __DIR__ . '/../includes/header.php';
                         ?>
                         <img src="../<?php echo htmlspecialchars($bildPfad); ?>" alt="Bild des Kunstwerks">
                         <div>
-                            <h3><?php echo htmlspecialchars($artwork->getTitle()); ?></h3>
-                            <p><?php echo htmlspecialchars($kuenstlerName); ?></p>
-                            <p><?php echo htmlspecialchars($artwork->getYearofwork()); ?></p>
-                            <a href="single-artwork.php?id=<?php echo $artwork->getArtworkid(); ?>">Kunstwerk öffnen</a>
+                            <h3><a href="<?= e(artworkDetailUrl($artworkId)); ?>"><?= e($title); ?></a></h3>
+                            <p><?= e($artistName !== '' ? $artistName : 'Unbekannter Künstler'); ?></p>
+                            <p><?= e($year !== '' ? $year : 'Jahr unbekannt'); ?></p>
+                            <div class="result-actions">
+                                <a class="btn btn-sm btn-primary" href="<?= e(artworkDetailUrl($artworkId)); ?>">Ansehen</a>
+                                <?php if (in_array($artworkId, $favoriteArtworkIds, true)): ?>
+                                    <a class="btn btn-sm btn-warning" href="<?= e(base_url('pages/favorites.php')); ?>">In Favoriten</a>
+                                <?php else: ?>
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       href="<?= e(base_url('pages/add-favorite.php') . '?type=artwork&id=' . $artworkId); ?>">
+                                        Zu Favoriten
+                                    </a>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </article>
                 <?php endforeach; ?>
