@@ -24,14 +24,8 @@ require_once __DIR__.'/../includes/header.php';
 <section class="container my-4">
     <div class="row row-cols-1 row-cols-md-3 g-4">
         <?php foreach ($artists as $artist): ?>
-            <?php
-            $showFavoriteStatus = in_array((int) $artist->getId(), $favoriteArtistIds, true);
-            $showAddFavoriteButton = !$showFavoriteStatus;
-            include __DIR__ . '/../components/artist-card.php';
-            ?>
+            <?php include __DIR__ . '/../components/artist-card.php'; ?>
         <?php endforeach; ?>
-
-        <?php unset($showAddFavoriteButton, $showFavoriteStatus); ?>
     </div>
 </section>
 
