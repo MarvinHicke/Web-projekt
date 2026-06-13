@@ -1,13 +1,18 @@
 <article class="col">
     <div class="card h-100 shadow-sm ui-card">
+        <img
+            src="<?= e(subjectImageUrl((int) $subject->getSubjectid())); ?>"
+            class="card-img-top entity-card-img"
+            alt="<?= e($subject->getSubjectname()); ?>"
+        >
         <div class="card-body">
 
             <h2 class="h5 card-title">
-                <?= htmlspecialchars($subject->getSubjectname()) ?>
+                <?= e($subject->getSubjectname()); ?>
             </h2>
 
             <p class="card-text text-muted">
-                Subject ID: <?= htmlspecialchars($subject->getSubjectid()) ?>
+                Subject-ID: <?= e((string) $subject->getSubjectid()); ?>
             </p>
 
             <?php
