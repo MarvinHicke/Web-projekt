@@ -41,27 +41,29 @@ try {
     // DB not available — widgets show empty state
 }
 
-// Filter carousel: only artworks whose image file actually exists on disk
-$carouselArtworks = [];
-foreach ($topArtworks as $work) {
-    $fileName = trim((string) ($work['ImageFileName'] ?? ''));
-    if ($fileName === '') continue;
-    if (!str_ends_with(strtolower($fileName), '.jpg')) $fileName .= '.jpg';
-    $hasImage = false;
-    foreach (['large', 'medium', 'small', 'square-small'] as $size) {
-        if (file_exists(__DIR__ . '/images/works/' . $size . '/' . $fileName)) {
-            $hasImage = true;
-            break;
+    // Boxes show top 3
+    $topArtworks = array_slice($topArtworkCandidates, 0, 3);
+
+    // Carousel: filter from all candidates, only artworks with a real image file on disk
+    $carouselArtworks = [];
+    foreach ($topArtworkCandidates as $work) {
+        $fileName = trim((string) ($work['ImageFileName'] ?? ''));
+        if ($fileName === '') continue;
+        if (!str_ends_with(strtolower($fileName), '.jpg')) $fileName .= '.jpg';
+        foreach (['large', 'medium', 'small', 'square-small'] as $size) {
+            if (file_exists(__DIR__ . '/images/works/' . $size . '/' . $fileName)) {
+                $carouselArtworks[] = $work;
+                break;
+            }
         }
-    }
-    if ($hasImage) {
-        $carouselArtworks[] = $work;
         if (count($carouselArtworks) >= 5) break;
     }
-}
 
-// Boxes only need top 5
-$boxArtworks = array_slice($topArtworks, 0, 5);
+    $mostReviewedArtists = $artistRepo->getMostReviewedArtists(3);
+    $latestReviews       = $reviewRepo->getLatestReviewsWithDetails(3);
+} catch (Exception $e) {
+    // DB not available — widgets show empty state
+}
 
 require_once __DIR__ . '/includes/header.php';
 ?>
@@ -133,9 +135,9 @@ require_once __DIR__ . '/includes/header.php';
         <div class="carousel-inner" style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.15);">
             <?php foreach ($carouselArtworks as $i => $work): ?>
                 <?php
-                $id            = (int)    ($work['ArtWorkID']     ?? 0);
-                $title         = (string) ($work['Title']          ?? 'Unbekanntes Kunstwerk');
-                $imageFileName = (string) ($work['ImageFileName']  ?? '');
+                $id            = (int)    ($work['ArtWorkID']    ?? 0);
+                $title         = (string) ($work['Title']        ?? 'Unbekanntes Kunstwerk');
+                $imageFileName = (string) ($work['ImageFileName'] ?? '');
                 $rating        = $work['AvgRating'] ?? null;
                 ?>
                 <div class="carousel-item <?= $i === 0 ? 'active' : ''; ?>">
@@ -179,7 +181,7 @@ require_once __DIR__ . '/includes/header.php';
 <!-- ===== THREE DATA BOXES ===== -->
 <section class="three-box-grid" aria-label="Datenboxen auf der Startseite"
          style="margin-top: 1rem; padding-top: 1rem;">
-    <?php renderTopWorksBox($boxArtworks); ?>
+    <?php renderTopWorksBox($topArtworks); ?>
     <?php renderMostReviewedArtistsBox($mostReviewedArtists); ?>
     <?php renderMostRecentReviewsBox($latestReviews); ?>
 </section>
