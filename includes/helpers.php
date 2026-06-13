@@ -96,6 +96,13 @@ function subjectImageUrl(int $subjectId, string $size = 'square-medium'): string
     return base_url('images/placeholder.jpg');
 }
 
+/** Checks whether an image URL points to the shared placeholder image. */
+function isPlaceholderImageUrl(string $imageUrl): bool
+{
+    $path = parse_url($imageUrl, PHP_URL_PATH);
+    return str_ends_with(is_string($path) ? $path : '', '/images/placeholder.jpg');
+}
+
 function artworkDetailUrl(int $artworkId): string
 {
     return base_url('pages/single-artwork.php') . '?id=' . urlencode((string) $artworkId);
