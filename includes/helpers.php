@@ -65,9 +65,9 @@ function artistImageUrl(int $artistId, string $size = 'medium'): string
 }
 
 /** Returns URL for a genre image by ID */
-function genreImageUrl(int $genreId): string
+function genreImageUrl(int $genreId, string $size = 'square-medium'): string
 {
-    $sizesToTry = ['square-medium', 'square-thumbs'];
+    $sizesToTry = array_unique([$size, 'square-medium', 'square-thumbs']);
 
     foreach ($sizesToTry as $trySize) {
         $relativePath = 'images/genres/' . $trySize . '/' . $genreId . '.jpg';
@@ -81,9 +81,9 @@ function genreImageUrl(int $genreId): string
 }
 
 /** Returns URL for a subject image by ID */
-function subjectImageUrl(int $subjectId): string
+function subjectImageUrl(int $subjectId, string $size = 'square-medium'): string
 {
-    $sizesToTry = ['square-medium', 'square-thumbs'];
+    $sizesToTry = array_unique([$size, 'square-medium', 'square-thumbs']);
 
     foreach ($sizesToTry as $trySize) {
         $relativePath = 'images/subjects/' . $trySize . '/' . $subjectId . '.jpg';
