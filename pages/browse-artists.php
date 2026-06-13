@@ -21,11 +21,6 @@ try {
     die($e->getMessage());
 }
 
-$_SESSION["favorites"] ??= [];
-$_SESSION["favorites"]["artists"] ??= [];
-
-$favoriteArtistIds = array_map('intval', $_SESSION["favorites"]["artists"]);
-
 require_once __DIR__.'/../includes/header.php';
 
 ?>
@@ -58,52 +53,13 @@ require_once __DIR__.'/../includes/header.php';
         Es wurden keine Künstler gefunden.
     </section>
 <?php else: ?>
-    <section class="artist-card-grid" aria-label="Liste der Artists">
-        <?php foreach ($artists as $artist): ?>
-<<<<<<< HEAD
-            <?php include __DIR__ . '/../components/artist-card.php'; ?>
-        <?php endforeach; ?>
-    </div>
-</section>
-
-
-<?php require_once __DIR__ . '/../includes/footer.php'; ?>
-=======
-            <?php
-            $artistId = $artist->getId();
-
-            $artistName = trim(
-                    ($artist->getFirstName() ?? '') . ' ' . ($artist->getLastName() ?? '')
-            );
-
-            if ($artistName === '') {
-                $artistName = 'Unbekannter Künstler';
-            }
-
-            $imageFileName = $artist->getImagefilename();
-
-            $imageUrl = $imageFileName
-                    ? artistImageUrl($imageFileName, 'square-small')
-                    : base_url('images/placeholder.jpg');
-            ?>
-
-            <article class="artist-card-link-wrapper">
-                <a class="artist-card-link" href="<?= e(artistDetailUrl($artistId)); ?>">
-                    <img
-                            src="<?= e($imageUrl); ?>"
-                            alt="<?= e($artistName); ?>"
-                            class="artist-card-image"
-                    >
-
-                    <div class="artist-card-content">
-                        <h2><?= e($artistName); ?></h2>
-                        <span class="text-link">Einzelansicht öffnen</span>
-                    </div>
-                </a>
-            </article>
-        <?php endforeach; ?>
+    <section class="container my-4" aria-label="Liste der Künstler">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <?php foreach ($artists as $artist): ?>
+                <?php include __DIR__ . '/../components/artist-card.php'; ?>
+            <?php endforeach; ?>
+        </div>
     </section>
 <?php endif; ?>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
->>>>>>> 13af276fcdc5d40822246e5c8d150d90f6846e16
