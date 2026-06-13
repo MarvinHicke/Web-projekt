@@ -3,7 +3,7 @@ ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-$pageTitle = 'Browse Subject';
+$pageTitle = 'Themen durchsuchen';
 
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
@@ -17,8 +17,8 @@ require_once __DIR__.'/../includes/header.php';
 ?>
 
 <section class="page-heading">
-    <h1>Subjects durchsuchen</h1>
-    <p>Entdecken sie Subjects</p>
+    <h1>Themen durchsuchen</h1>
+    <p>Entdecken Sie die Themen der Kunstwerke.</p>
 </section>
 
 <section class="container my-4">
