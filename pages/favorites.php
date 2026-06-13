@@ -53,10 +53,17 @@ $pageTitle = "Favoriten";
 require_once __DIR__ . "/../includes/header.php";
 ?>
 
-<h1>Favoriten</h1>
-<p>Hier sehen Sie ihre favorisierten Künstler und Kunstwerke.</p>
+<section class="page-heading">
+    <p class="eyebrow">Ihre persönliche Auswahl</p>
+    <h1>Favoriten</h1>
+    <p class="mb-0">Hier sehen Sie Ihre favorisierten Künstler und Kunstwerke.</p>
+</section>
 
-<h2>Favorisierte Kunstwerke</h2>
+<section class="favorites-section">
+<div class="section-heading">
+    <h2>Favorisierte Kunstwerke</h2>
+    <span class="badge rounded-pill text-bg-light"><?= count($favoriteArtworks); ?></span>
+</div>
 <?php if(empty($favoriteArtworks)) : ?>
     <?php
     $alertType="info";
@@ -73,8 +80,13 @@ require_once __DIR__ . "/../includes/header.php";
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
+</section>
 
-<h2>Favorisierte Künstler</h2>
+<section class="favorites-section">
+<div class="section-heading">
+    <h2>Favorisierte Künstler</h2>
+    <span class="badge rounded-pill text-bg-light"><?= count($favoriteArtists); ?></span>
+</div>
 <?php if(empty($favoriteArtists)) : ?>
     <?php
     $alertType="info";
@@ -91,6 +103,7 @@ require_once __DIR__ . "/../includes/header.php";
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
+</section>
 
 <?php
 require_once __DIR__ . "/../includes/footer.php";
