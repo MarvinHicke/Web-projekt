@@ -20,7 +20,7 @@ require_once __DIR__ . '/../includes/header.php';
         <h2>Das Projekt</h2>
         <p>
             Die Anwendung macht Reproduktionen bekannter Kunstwerke zugänglich.
-            Besucher können Kunstwerke, Künstler, Genres und Subjects durchsuchen,
+            Besucher können Kunstwerke, Künstler, Genres und Themen durchsuchen,
             Detailinformationen ansehen und die globale Suche verwenden.
         </p>
         <p class="mb-0">
@@ -61,17 +61,17 @@ require_once __DIR__ . '/../includes/header.php';
         <article class="team-card">
             <span class="team-role">Öffentliche Inhalte</span>
             <h3>Lisanne Godlinski</h3>
-            <p>Browse-Seiten und öffentliche Detailseiten für Künstler, Genres und Subjects.</p>
+            <p>Übersichts- und Detailseiten für Künstler, Genres und Themen.</p>
         </article>
         <article class="team-card">
-            <span class="team-role">Home, Artwork &amp; Suche</span>
+            <span class="team-role">Startseite, Kunstwerke &amp; Suche</span>
             <h3>Fatemeh Nezamolmaleki</h3>
             <p>Startseite, Suchergebnisse, Artwork-Detailseite, Widgets und Inhaltsverknüpfungen.</p>
         </article>
         <article class="team-card">
             <span class="team-role">Benutzerfunktionen</span>
             <h3>Linus Meyer</h3>
-            <p>Registrierung, Login/Logout, Konto, Favoriten, Reviews, Rollen und Benutzerverwaltung.</p>
+            <p>Registrierung, Anmeldung/Abmeldung, Konto, Favoriten, Bewertungen, Rollen und Benutzerverwaltung.</p>
         </article>
     </div>
 </section>
