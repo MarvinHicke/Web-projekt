@@ -609,6 +609,21 @@ small {
     margin: 0;
 }
 
+/* Advanced Search placeholder */
+
+.advanced-search-fallback {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.browse-link-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
 .sr-only {
     position: absolute;
     width: 1px;
@@ -652,6 +667,11 @@ small {
     }
 
     .home-login-form {
+        grid-template-columns: 1fr;
+    }
+
+    .advanced-search-fallback,
+    .browse-link-grid {
         grid-template-columns: 1fr;
     }
 
