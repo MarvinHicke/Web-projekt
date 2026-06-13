@@ -21,10 +21,10 @@ class genre
     public function __construct($data)
     {
         $this->genreId = $data['GenreID'];
-        $this->genreName = $data['GenreName'];
-        $this->era = $data['Era'];
-        $this->description = $data['Description'];
-        $this->link = $data['Link'];
+        $this->genreName = $data['GenreName'] ?? '';
+        $this->era = $data['Era'] ?? '';
+        $this->description = $data['Description'] ?? '';
+        $this->link = $data['Link'] ?? '';
 
         $this->imageFilename =
             $data['ImageFileName']
@@ -102,4 +102,3 @@ class genre
         return $name;
     }
 }
-
