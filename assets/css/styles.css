@@ -209,10 +209,19 @@ button:hover,
 }
 
 .hero {
-    min-height: 280px;
+    min-height: 170px;
     display: flex;
     align-items: center;
+    padding: 20px 24px;
     background: linear-gradient(135deg, #fffaf2, #ead8bd);
+}
+
+.hero p:not(.eyebrow) {
+    margin-bottom: 12px;
+}
+
+.hero h1 {
+    font-size: clamp(2.25rem, 5vw, 3.25rem);
 }
 
 .home-login-panel {
@@ -271,6 +280,16 @@ button:hover,
     height: 180px;
     object-fit: cover;
     border-radius: 12px;
+}
+
+.carousel-section {
+    margin-bottom: 24px;
+}
+
+.carousel-img {
+    height: clamp(440px, 64vh, 680px);
+    object-fit: contain !important;
+    background: #211b17;
 }
 
 .clean-list {
@@ -678,6 +697,10 @@ small {
     .auth-layout {
         gap: 20px;
         min-height: auto;
+    }
+
+    .carousel-img {
+        height: clamp(300px, 55vh, 500px);
     }
 
     .artwork-row img,
