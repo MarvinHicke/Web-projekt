@@ -12,7 +12,7 @@
             </h2>
 
             <p class="card-text text-muted">
-                Subject-ID: <?= e((string) $subject->getSubjectid()); ?>
+                Themen-ID: <?= e((string) $subject->getSubjectid()); ?>
             </p>
 
             <?php
