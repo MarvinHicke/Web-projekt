@@ -1,13 +1,18 @@
 <article class="col">
     <div class="card h-100 shadow-sm ui-card">
+        <img
+            src="<?= e(genreImageUrl((int) $genre->getGenreID())); ?>"
+            class="card-img-top entity-card-img"
+            alt="<?= e($genre->getGenreName()); ?>"
+        >
         <div class="card-body">
 
             <h2 class="h5 card-title">
-                <?= htmlspecialchars($genre->getGenreName()) ?>
+                <?= e($genre->getGenreName()); ?>
             </h2>
 
             <p class="card-text text-muted">
-                Epoche: <?= htmlspecialchars($genre->getEra()) ?>
+                Epoche: <?= e((string) $genre->getEra()); ?>
             </p>
 
             <?php
