@@ -215,6 +215,25 @@ button:hover,
     background: linear-gradient(135deg, #fffaf2, #ead8bd);
 }
 
+.home-login-panel {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.4fr);
+    gap: 28px;
+    align-items: end;
+    padding: 24px;
+    margin-bottom: 24px;
+    background: #fffaf2;
+    border: 1px solid #e3d8c8;
+    border-radius: 18px;
+}
+
+.home-login-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+}
+
 .hero h1,
 .page-heading h1,
 .artwork-info-panel h1 {
@@ -273,6 +292,26 @@ button:hover,
 .box-note,
 small {
     color: #6b6258;
+}
+
+.rating-stars {
+    position: relative;
+    display: inline-block;
+    width: 5.55em;
+    color: #c5b9aa;
+    font-family: Arial, sans-serif;
+    font-size: 1.1rem;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+}
+
+.rating-stars-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--rating-percent);
+    overflow: hidden;
+    color: #a86413;
 }
 
 .sort-panel form {
@@ -393,6 +432,17 @@ small {
     height: 140px;
     object-fit: cover;
     border-radius: 12px;
+}
+
+.mini-card h3 a {
+    color: inherit;
+}
+
+.result-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
 }
 
 /* D-Bereich: Single Artwork */
@@ -595,8 +645,13 @@ small {
     .artwork-detail-layout,
     .about-grid,
     .auth-layout,
+    .home-login-panel,
     .artwork-row,
     .mini-card {
+        grid-template-columns: 1fr;
+    }
+
+    .home-login-form {
         grid-template-columns: 1fr;
     }
 
