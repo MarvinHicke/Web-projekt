@@ -478,7 +478,7 @@ require_once __DIR__ . "/../includes/header.php";
     </button>
 </form>
 
-<h2>Meine Reviews</h2>
+<h2>Meine Bewertungen</h2>
 <p>Hier werden später deine eigenen Bewertungen angezeigt.</p>
 
 <h2>Meine Favoriten</h2>
