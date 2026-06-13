@@ -44,18 +44,7 @@ try {
     $reviewRepo      = new reviewRepository($db);
     $ratingData      = $reviewRepo->getAverageRatingArtwork($artworkId);
 
-    // Reviews with customer city + country via JOIN
-    $reviewStmt = $db->preparedStatement(
-        "SELECT r.ReviewId, r.Rating, r.Comment, r.ReviewDate, r.CustomerId,
-                c.City, c.Country, cl.UserName
-         FROM reviews r
-         LEFT JOIN customers c         ON r.CustomerId = c.CustomerID
-         LEFT JOIN customerlogon cl    ON r.CustomerId = cl.CustomerID
-         WHERE r.ArtWorkId = :id
-         ORDER BY r.ReviewDate DESC"
-    );
-    $reviewStmt->execute(['id' => $artworkId]);
-    $reviewRows = $reviewStmt->fetchAll(PDO::FETCH_ASSOC);
+    $reviewRows = $reviewRepo->getForArtworkWithCustomerData($artworkId);
 
 } catch (Exception $e) {
     $pageTitle = 'Fehler';
@@ -69,24 +58,50 @@ try {
 // ── handle add-review POST (PRG pattern) ─────────────────────────────────────
 $reviewErrors = [];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_review'])) {
-    if (!isLoggedIn()) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_review']))
+{
+    if (!isLoggedIn())
+    {
         $reviewErrors[] = 'Nur angemeldete Nutzer können Bewertungen abgeben.';
-    } else {
+    }
+    else
+    {
         $loggedInId = (int) ($_SESSION['user']['CustomerID'] ?? 0);
-        $rating     = (int) ($_POST['rating']  ?? 0);
-        $comment    = trim((string) ($_POST['comment'] ?? ''));
+        $rating = filter_var($_POST['rating'] ?? null, FILTER_VALIDATE_INT);
+        $comment = trim(strip_tags((string) ($_POST['comment'] ?? '')));
 
-        if ($rating < 1 || $rating > 5)  $reviewErrors[] = 'Bewertung muss zwischen 1 und 5 liegen.';
-        if ($comment === '')              $reviewErrors[] = 'Kommentar darf nicht leer sein.';
+        if ($loggedInId <= 0)
+        {
+            $reviewErrors[] = 'Der angemeldete Benutzer konnte nicht erkannt werden.';
+        }
 
-        if (empty($reviewErrors)) {
-            if ($reviewRepo->hasUserReviewedArtwork($artworkId, $loggedInId)) {
+        if ($rating === false || $rating < 1 || $rating > 5)
+        {
+            $reviewErrors[] = 'Bewertung muss zwischen 1 und 5 liegen.';
+        }
+
+        if ($comment === '')
+        {
+            $reviewErrors[] = 'Kommentar darf nicht leer sein.';
+        }
+
+        if (empty($reviewErrors))
+        {
+            if ($reviewRepo->hasUserReviewedArtwork($artworkId, $loggedInId))
+            {
                 $reviewErrors[] = 'Sie haben dieses Kunstwerk bereits bewertet.';
-            } else {
-                $reviewRepo->addReview($artworkId, $loggedInId, $rating, $comment);
-                header('Location: ' . base_url('pages/single-artwork.php') . '?id=' . $artworkId . '&reviewed=1');
-                exit;
+            }
+            else
+            {
+                $reviewAdded = $reviewRepo->addReview($artworkId, $loggedInId, (int) $rating, $comment);
+
+                if ($reviewAdded)
+                {
+                    header('Location: ' . base_url('pages/single-artwork.php') . '?id=' . $artworkId . '&review=added#reviews');
+                    exit;
+                }
+
+                $reviewErrors[] = 'Die Bewertung konnte nicht gespeichert werden.';
             }
         }
     }
@@ -172,22 +187,16 @@ require_once __DIR__ . '/../includes/header.php';
         <?php endif; ?>
 
         <!-- Favorite -->
-        <?php if (isLoggedIn()): ?>
-            <?php if ($isFavorited): ?>
-                <a class="btn btn-warning btn-sm mb-3"
-                   href="<?= e(base_url('pages/remove-favorite.php') . '?type=artwork&id=' . $artworkId); ?>">
-                    ★ Aus Favoriten entfernen
-                </a>
-            <?php else: ?>
-                <a class="btn btn-outline-warning btn-sm mb-3"
-                   href="<?= e(base_url('pages/add-favorite.php') . '?type=artwork&id=' . $artworkId); ?>">
-                    ☆ Zu Favoriten hinzufügen
-                </a>
-            <?php endif; ?>
+        <?php if ($isFavorited): ?>
+            <a class="btn btn-primary btn-sm mb-3"
+               href="<?= e(base_url('pages/remove-favorite.php') . '?type=artwork&id=' . urlencode((string) $artworkId) . '&redirect=single-artwork.php'); ?>">
+                ★ Aus Favoriten entfernen
+            </a>
         <?php else: ?>
-            <p class="mb-3 small">
-                <a href="<?= e(base_url('pages/login.php')); ?>">Anmelden</a>, um zu favorisieren.
-            </p>
+            <a class="btn btn-outline-primary btn-sm mb-3"
+               href="<?= e(base_url('pages/add-favorite.php') . '?type=artwork&id=' . urlencode((string) $artworkId) . '&redirect=single-artwork.php'); ?>">
+                ☆ Zu Favoriten hinzufügen
+            </a>
         <?php endif; ?>
 
         <!-- Details table -->
@@ -219,19 +228,68 @@ require_once __DIR__ . '/../includes/header.php';
                                     </h2>
                                     <div id="gallInfo" class="accordion-collapse collapse">
                                         <div class="accordion-body ps-0 small">
+
                                             <?php if ($galleryObj->getGalleryNativeName()): ?>
-                                                <p class="mb-1"><strong>Einheimischer Name:</strong> <?= e($galleryObj->getGalleryNativeName()); ?></p>
+                                                <p class="mb-1"><strong>Einheimischer Name:</strong> <?php echo e($galleryObj->getGalleryNativeName()); ?></p>
                                             <?php endif; ?>
                                             <?php if ($galleryObj->getGalleryCountry()): ?>
-                                                <p class="mb-1"><strong>Land:</strong> <?= e($galleryObj->getGalleryCountry()); ?></p>
+                                                <p class="mb-1"><strong>Land:</strong> <?php echo e($galleryObj->getGalleryCountry()); ?></p>
                                             <?php endif; ?>
                                             <?php if ($galleryObj->getGalleryWebsite()): ?>
                                                 <p class="mb-0"><strong>Website:</strong>
-                                                    <a href="<?= e($galleryObj->getGalleryWebsite()); ?>" target="_blank" rel="noopener">
-                                                        <?= e($galleryObj->getGalleryWebsite()); ?>
+                                                    <a href="<?php echo e($galleryObj->getGalleryWebsite()); ?>" target="_blank">
+                                                        <?php echo e($galleryObj->getGalleryWebsite()); ?>
                                                     </a>
                                                 </p>
                                             <?php endif; ?>
+
+                                            <?php
+                                            // Nur anzeigen wenn Koordinaten vorhanden sind, falls nicht dann wird die Karte hoffentlich ignoriert :p
+                                            if ($galleryObj->getLatitude() != '' && $galleryObj->getLongitude() != '')
+                                            {
+                                             ?>
+                                                <br>
+                                                <p><b>Wo ist das?</b></p>
+
+                                                <div id="map" style="height: 250px; width: 100%;"></div>
+
+                                                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                                                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+                                                <script>
+                                                    // PHP Variablen in JS speichern
+                                                    var lat = <?php echo $galleryObj->getLatitude(); ?>;
+                                                    var lon = <?php echo $galleryObj->getLongitude(); ?>;
+
+                                                    var mapSchonDa = false;
+
+                                                    // Notiz an mich - Karte lädt im unsichtbaren Accordion falsch
+                                                    // Maybe StackOverflow: Warten bis das Accordion ganz offen ist...
+                                                    // https://stackoverflow.com/questions/42604005/leaflet-map-not-showing-properly-in-bootstrap-4-collapse <-- Notiz zum Nachlesen, bitte net löschen :>
+                                                    document.getElementById('gallInfo').addEventListener('shown.bs.collapse', function ()
+                                                    {
+
+                                                        if (mapSchonDa == false) {
+                                                            // Karte laden (Zoom-Level 13)
+                                                            var map = L.map('map').setView([lat, lon], 13);
+
+                                                            // Bilder für die Karte :p
+                                                            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                                {
+                                                                attribution: '© OpenStreetMap'
+                                                            }).addTo(map);
+
+                                                            // Diesen roten Marker setzen auf der Karte
+                                                            L.marker([lat, lon]).addTo(map)
+                                                                .bindPopup("Galerie ist hier!")
+                                                                .openPopup();
+
+                                                            mapSchonDa = true; // Damit de la Card (die Karte) beim zweiten Aufklappen nicht nochmal lädt...
+                                                        }
+                                                    });
+                                                </script>
+
+                                            <?php } ?>
                                         </div>
                                     </div>
                                 </div>
@@ -283,7 +341,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <strong class="ms-2"><?= e(number_format($averageRating, 1, ',', '.')); ?>/5</strong>
                             <span class="text-muted small">(<?= $totalReviews; ?> Bewertungen)</span>
                         <?php else: ?>
-                            <span class="text-muted">Noch keine Bewertung</span>
+                            <span class="text-muted"></span>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -293,11 +351,19 @@ require_once __DIR__ . '/../includes/header.php';
 </article>
 
 <!-- ===== REVIEWS ===== -->
-<section class="reviews-section mt-5">
+<section id="reviews" class="reviews-section mt-5">
     <h2>Bewertungen</h2>
 
-    <?php if (isset($_GET['reviewed'])): ?>
+    <?php if ((string) ($_GET['review'] ?? '') === 'added'): ?>
         <div class="alert alert-success">Ihre Bewertung wurde gespeichert.</div>
+    <?php endif; ?>
+
+    <?php if ((string) ($_GET['review'] ?? '') === 'deleted'): ?>
+        <div class="alert alert-success">Die Bewertung wurde gelöscht.</div>
+    <?php endif; ?>
+
+    <?php if ((string) ($_GET['review'] ?? '') === 'delete-error'): ?>
+        <div class="alert alert-danger">Die Bewertung konnte nicht gelöscht werden.</div>
     <?php endif; ?>
 
     <?php if (empty($reviewRows)): ?>
@@ -305,25 +371,43 @@ require_once __DIR__ . '/../includes/header.php';
     <?php else: ?>
         <?php foreach ($reviewRows as $row): ?>
             <?php
-            $stars     = max(0, min(5, (int) ($row['Rating'] ?? 0)));
+            $stars = max(0, min(5, (int) ($row['Rating'] ?? 0)));
             $formatted = !empty($row['ReviewDate']) ? date('d.m.Y', strtotime($row['ReviewDate'])) : '';
-            $username  = (string) ($row['UserName'] ?? 'Unbekannt');
-            $city      = (string) ($row['City']     ?? '');
-            $country   = (string) ($row['Country']  ?? '');
-            $location  = implode(', ', array_filter([$city, $country]));
-            $isOwn     = $loggedInId > 0 && (int)($row['CustomerId'] ?? -1) === $loggedInId;
+            $city = trim((string) ($row['City'] ?? ''));
+            $country = trim((string) ($row['Country'] ?? ''));
+            $reviewerName = trim((string) ($row['ReviewerFirstName'] ?? '') . ' ' . (string) ($row['ReviewerLastName'] ?? ''));
+
+            if ($reviewerName === '')
+            {
+                $reviewerName = 'Unbekannter Reviewer';
+            }
+
+            $reviewerLocation = 'Ort unbekannt';
+
+            if ($city !== '' && $country !== '')
+            {
+                $reviewerLocation = $city . ' (' . $country . ')';
+            }
+            elseif ($city !== '')
+            {
+                $reviewerLocation = $city;
+            }
+            elseif ($country !== '')
+            {
+                $reviewerLocation = $country;
+            }
+
+            $isOwn = $loggedInId > 0 && (int) ($row['CustomerId'] ?? -1) === $loggedInId;
             ?>
             <article class="card mb-3">
                 <div class="card-body">
                     <div class="d-flex justify-content-between flex-wrap gap-2">
                         <div>
                             <span class="text-warning fs-5"><?= str_repeat('★', $stars) . str_repeat('☆', 5 - $stars); ?></span>
-                            <strong class="ms-2"><?= e($username); ?></strong>
+                            <strong class="ms-2"><?= e($reviewerName); ?></strong>
+                            <span class="text-muted ms-2 small"><?= e($reviewerLocation); ?></span>
                             <?php if ($isOwn): ?>
-                                <span class="badge text-bg-info ms-1">Deine Bewertung</span>
-                            <?php endif; ?>
-                            <?php if ($location !== ''): ?>
-                                <span class="text-muted ms-2 small"><?= e($location); ?></span>
+                                <span class="review-own-badge ms-1">Deine Bewertung</span>
                             <?php endif; ?>
                         </div>
                         <small class="text-muted"><?= e($formatted); ?></small>
@@ -359,7 +443,13 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
                     <div class="mb-3">
                         <label for="comment" class="form-label fw-bold">Kommentar</label>
-                        <textarea id="comment" name="comment" class="form-control" rows="4" required><?= e((string)($_POST['comment'] ?? '')); ?></textarea>
+                        <textarea
+                                id="comment"
+                                name="comment"
+                                class="form-control"
+                                rows="4"
+                                required
+                        ><?= e((string) ($_POST['comment'] ?? '')); ?></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Bewertung speichern</button>
                 </form>

@@ -148,7 +148,7 @@ if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
                 $user = $customerRepository->GetByUsername($email);
                 $_SESSION['user'] = [
                     'CustomerID' => (int)$user['CustomerID'],
-                    'UserName' => (string)$user['UserName'],
+                    'UserName' => (string)($user['UserName'] ?? $user['Email'] ?? $email),
                     'Type' => (int)$user['Type'],
                     'FirstName' => (string)($user['FirstName'] ?? ''),
                     'LastName' => (string)($user['LastName'] ?? ''),
@@ -165,155 +165,172 @@ if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
 require_once __DIR__ . "/../includes/header.php";
 ?>
 
-<h1>Registrieren</h1>
-<p>Erstellen Sie ein neues Konto</p>
+<section class="page-heading">
+    <h1>Registrieren</h1>
+    <p>Erstellen Sie ein neues Konto.</p>
+</section>
 
-<?php foreach ($errors as $error): ?>
-    <?php
-    $alertType = "danger";
-    $alertMessage = $error;
-    include __DIR__ . "/../components/alert-box.php";
-    ?>
-<?php endforeach; ?>
+<section class="data-box auth-panel">
+    <?php foreach ($errors as $error): ?>
+        <?php
+        $alertType = "danger";
+        $alertMessage = $error;
+        include __DIR__ . "/../components/alert-box.php";
+        ?>
+    <?php endforeach; ?>
 
-<?php if ($successMessage !== ""): ?>
-    <?php
-    $alertType = "success";
-    $alertMessage = $successMessage;
-    include __DIR__ . "/../components/alert-box.php";
-    ?>
-<?php endif; ?>
+    <form method="POST" class="auth-form">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="firstName" class="form-label">Vorname</label>
+                <input
+                        type="text"
+                        id="firstName"
+                        name="firstName"
+                        class="form-control"
+                        required
+                        maxlength="<?= $nameMaxLength ?>"
+                        value="<?= e($firstName) ?>"
+                >
+            </div>
 
-<form method="POST">
-    <div>
-        <label for="firstName">Vorname</label>
-        <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            required
-            maxlength="<?= $nameMaxLength ?>"
-            value="<?= e($firstName) ?>"
-        >
-    </div>
+            <div class="col-md-6 mb-3">
+                <label for="lastName" class="form-label">Nachname</label>
+                <input
+                        type="text"
+                        id="lastName"
+                        name="lastName"
+                        class="form-control"
+                        required
+                        maxlength="<?= $nameMaxLength ?>"
+                        value="<?= e($lastName) ?>"
+                >
+            </div>
+        </div>
 
-    <div>
-        <label for="lastName">Nachname</label>
-        <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            required
-            maxlength="<?= $nameMaxLength ?>"
-            value="<?= e($lastName) ?>"
-        >
-    </div>
+        <div class="mb-3">
+            <label for="address" class="form-label">Adresse</label>
+            <input
+                    type="text"
+                    id="address"
+                    name="address"
+                    class="form-control"
+                    required
+                    maxlength="<?= $textMaxLength ?>"
+                    value="<?= e($address) ?>"
+            >
+        </div>
 
-    <div>
-        <label for="address">Adresse</label>
-        <input
-                type="text"
-                id="address"
-                name="address"
-                required
-                maxlength="<?= $textMaxLength ?>"
-                value="<?= e($address) ?>"
-        >
-    </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="city" class="form-label">Stadt</label>
+                <input
+                        type="text"
+                        id="city"
+                        name="city"
+                        class="form-control"
+                        required
+                        maxlength="<?= $textMaxLength ?>"
+                        value="<?= e($city) ?>"
+                >
+            </div>
 
-    <div>
-        <label for="city">Stadt</label>
-        <input
-                type="text"
-                id="city"
-                name="city"
-                required
-                maxlength="<?= $textMaxLength ?>"
-                value="<?= e($city) ?>"
-        >
-    </div>
+            <div class="col-md-6 mb-3">
+                <label for="region" class="form-label">Region</label>
+                <input
+                        type="text"
+                        id="region"
+                        name="region"
+                        class="form-control"
+                        maxlength="<?= $textMaxLength ?>"
+                        value="<?= e($region) ?>"
+                >
+            </div>
+        </div>
 
-    <div>
-        <label for="region">Region</label>
-        <input
-                type="text"
-                id="region"
-                name="region"
-                maxlength="<?= $textMaxLength ?>"
-                value="<?= e($region) ?>"
-        >
-    </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="country" class="form-label">Land</label>
+                <input
+                        type="text"
+                        id="country"
+                        name="country"
+                        class="form-control"
+                        required
+                        maxlength="<?= $textMaxLength ?>"
+                        value="<?= e($country) ?>"
+                >
+            </div>
 
-    <div>
-        <label for="country">Land</label>
-        <input
-                type="text"
-                id="country"
-                name="country"
-                required
-                maxlength="<?= $textMaxLength ?>"
-                value="<?= e($country) ?>"
-        >
-    </div>
+            <div class="col-md-6 mb-3">
+                <label for="postal" class="form-label">Postleitzahl</label>
+                <input
+                        type="text"
+                        id="postal"
+                        name="postal"
+                        class="form-control"
+                        maxlength="<?= $textMaxLength ?>"
+                        value="<?= e($postal) ?>"
+                >
+            </div>
+        </div>
 
-    <div>
-        <label for="postal">Postleitzahl</label>
-        <input
-                type="text"
-                id="postal"
-                name="postal"
-                maxlength="<?= $textMaxLength ?>"
-                value="<?= e($postal) ?>"
-        >
-    </div>
+        <div class="mb-3">
+            <label for="phone" class="form-label">Telefon</label>
+            <input
+                    type="text"
+                    id="phone"
+                    name="phone"
+                    class="form-control"
+                    maxlength="<?= $textMaxLength ?>"
+                    value="<?= e($phone) ?>"
+            >
+        </div>
 
-    <div>
-        <label for="phone">Telefon</label>
-        <input
-                type="tel"
-                id="phone"
-                name="phone"
-                maxlength="<?= $textMaxLength ?>"
-                value="<?= e($phone) ?>"
-        >
-    </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">E-Mail</label>
+            <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-control"
+                    required
+                    maxlength="<?= $emailMaxLength ?>"
+                    value="<?= e($email) ?>"
+            >
+        </div>
 
-    <div>
-        <label for="email">E-Mail</label>
-        <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            maxlength="<?= $emailMaxLength ?>"
-            value="<?= e($email) ?>"
-        >
-    </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="password" class="form-label">Passwort</label>
+                <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-control"
+                        required
+                        minlength="<?= $passwordMinLength ?>"
+                >
+            </div>
 
-    <div>
-        <label for="password">Passwort</label>
-        <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            minlength="<?= $passwordMinLength ?>"
-        >
-    </div>
+            <div class="col-md-6 mb-3">
+                <label for="confirmPassword" class="form-label">Passwort bestätigen</label>
+                <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        class="form-control"
+                        required
+                        minlength="<?= $passwordMinLength ?>"
+                >
+            </div>
+        </div>
 
-    <div>
-        <label for="confirmPassword">Passwort bestätigen</label>
-        <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            required
-            minlength="<?= $passwordMinLength ?>"
-        >
-    </div>
-
-    <button type="submit">Registrieren</button>
-</form>
+        <button type="submit" class="btn btn-primary">
+            Registrieren
+        </button>
+    </form>
+</section>
 
 <?php
 require_once __DIR__ . "/../includes/footer.php";

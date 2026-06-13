@@ -34,11 +34,32 @@ try {
     ));
     $carouselArtworks = array_slice($carouselArtworks, 0, 5);
     $mostReviewedArtists = $artistRepo->getMostReviewedArtists(3);
-    // Use the new method that returns raw arrays with ArtworkTitle
     $latestReviews       = $reviewRepo->getLatestReviewsWithDetails(3);
 } catch (Exception $e) {
     // DB not available — widgets show empty state
 }
+
+// Filter carousel: only artworks whose image file actually exists on disk
+$carouselArtworks = [];
+foreach ($topArtworks as $work) {
+    $fileName = trim((string) ($work['ImageFileName'] ?? ''));
+    if ($fileName === '') continue;
+    if (!str_ends_with(strtolower($fileName), '.jpg')) $fileName .= '.jpg';
+    $hasImage = false;
+    foreach (['large', 'medium', 'small', 'square-small'] as $size) {
+        if (file_exists(__DIR__ . '/images/works/' . $size . '/' . $fileName)) {
+            $hasImage = true;
+            break;
+        }
+    }
+    if ($hasImage) {
+        $carouselArtworks[] = $work;
+        if (count($carouselArtworks) >= 5) break;
+    }
+}
+
+// Boxes only need top 5
+$boxArtworks = array_slice($topArtworks, 0, 5);
 
 require_once __DIR__ . '/includes/header.php';
 ?>
@@ -91,8 +112,8 @@ require_once __DIR__ . '/includes/header.php';
 <?php endif; ?>
 
 <!-- ===== BOOTSTRAP CAROUSEL ===== -->
-<?php if (count($carouselArtworks) >= 3): ?>
-<section class="carousel-section" aria-label="Vorgestellte Kunstwerke">
+<?php if (!empty($carouselArtworks)): ?>
+<section aria-label="Vorgestellte Kunstwerke" style="margin-bottom: 3rem;">
     <div id="artworkCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
 
         <div class="carousel-indicators">
@@ -107,29 +128,32 @@ require_once __DIR__ . '/includes/header.php';
             <?php endforeach; ?>
         </div>
 
-        <div class="carousel-inner">
+        <div class="carousel-inner" style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.15);">
             <?php foreach ($carouselArtworks as $i => $work): ?>
                 <?php
-                $id            = (int)    ($work['ArtWorkID']    ?? 0);
-                $title         = (string) ($work['Title']        ?? 'Unbekanntes Kunstwerk');
-                $imageFileName = (string) ($work['ImageFileName'] ?? '');
+                $id            = (int)    ($work['ArtWorkID']     ?? 0);
+                $title         = (string) ($work['Title']          ?? 'Unbekanntes Kunstwerk');
+                $imageFileName = (string) ($work['ImageFileName']  ?? '');
                 $rating        = $work['AvgRating'] ?? null;
                 ?>
                 <div class="carousel-item <?= $i === 0 ? 'active' : ''; ?>">
                     <a href="<?= e(artworkDetailUrl($id)); ?>">
                         <img
                             src="<?= e(artworkImageUrl($imageFileName, 'large')); ?>"
-                            class="d-block w-100 carousel-img"
+                            class="d-block w-100"
                             alt="<?= e($title); ?>"
-                            style="max-height:520px; object-fit:cover;"
+                            style="max-height: 500px; object-fit: cover;"
                         >
                     </a>
-                    <div class="carousel-caption d-none d-md-block">
-                        <h5><?= e($title); ?></h5>
+                    <div class="carousel-caption d-none d-md-block"
+                         style="background: rgba(0,0,0,0.45); border-radius: 8px; padding: 0.75rem 1.25rem; bottom: 2rem;">
+                        <h5 style="margin-bottom: 0.25rem;"><?= e($title); ?></h5>
                         <?php if ($rating !== null): ?>
-                            <p>Bewertung: <?= e(number_format((float)$rating, 1, ',', '.')); ?>/5</p>
+                            <p style="margin-bottom: 0.5rem; opacity: 0.9;">
+                                Bewertung: <?= e(number_format((float)$rating, 1, ',', '.')); ?>/5
+                            </p>
                         <?php endif; ?>
-                        <a class="btn btn-sm btn-light mt-1" href="<?= e(artworkDetailUrl($id)); ?>">Ansehen</a>
+                        <a class="btn btn-sm btn-light" href="<?= e(artworkDetailUrl($id)); ?>">Ansehen</a>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -152,8 +176,9 @@ require_once __DIR__ . '/includes/header.php';
 <?php endif; ?>
 
 <!-- ===== THREE DATA BOXES ===== -->
-<section class="three-box-grid" aria-label="Datenboxen auf der Startseite">
-    <?php renderTopWorksBox($topArtworks); ?>
+<section class="three-box-grid" aria-label="Datenboxen auf der Startseite"
+         style="margin-top: 1rem; padding-top: 1rem;">
+    <?php renderTopWorksBox($boxArtworks); ?>
     <?php renderMostReviewedArtistsBox($mostReviewedArtists); ?>
     <?php renderMostRecentReviewsBox($latestReviews); ?>
 </section>

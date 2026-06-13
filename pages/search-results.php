@@ -1,9 +1,11 @@
 <?php
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
+require_once __DIR__ . '/../includes/init.php';
+require_once __DIR__ . '/../model/helper.php';
 require_once __DIR__ . '/../repositories/artworkRepository.php';
 require_once __DIR__ . '/../repositories/artistRepository.php';
- 
+
 $pageTitle = 'Suchergebnisse';
  
 $query            = trim((string) ($_GET['q'] ?? ''));
@@ -125,32 +127,28 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
  
 <?php if ($query !== '' && mb_strlen($query) < 3): ?>
-    <section class="message">Bitte geben Sie mindestens drei Zeichen ein.</section>
+    <div class="message">Bitte geben Sie mindestens drei Zeichen ein.</div>
 <?php endif; ?>
- 
-<?php if ($query === ''): ?>
-    <section class="message">Bitte geben Sie einen Suchbegriff ein.</section>
+
+<?php if ($query === '' && $searchType === ''): ?>
+    <div class="message">Bitte geben Sie einen Suchbegriff ein.</div>
 <?php endif; ?>
- 
-<?php if (mb_strlen($query) >= 3): ?>
-    <section class="result-grid" aria-label="Suchergebnisse">
- 
-        <div class="result-column">
+
+<?php if ($searchType !== '' || mb_strlen($query) >= 3): ?>
+
+    <?php if (empty($artistResults) && empty($artworkResults)): ?>
+        <div class="message">Keine Künstler oder Kunstwerke für diese Suche gefunden.</div>
+    <?php else: ?>
+
+        <?php if (!empty($artistResults)): ?>
             <h2>Künstler</h2>
- 
-            <?php if (empty($artistResults)): ?>
-                <p>Keine Künstler gefunden.</p>
-            <?php else: ?>
+            <div style="margin-bottom: 2rem;">
                 <?php foreach ($artistResults as $artist): ?>
-                    <?php
-                    $artistId   = (int) ($artist['ArtistID'] ?? 0);
-                    $artistName = trim((string) ($artist['FirstName'] ?? '') . ' ' . (string) ($artist['LastName'] ?? ''));
-                    ?>
-                    <article class="mini-card">
-                        <img
-                            src="<?= e(artistImageUrl($artistId, 'medium')); ?>"
-                            alt="<?= e($artistName); ?>"
-                        >
+                    <article class="mini-card" style="margin-bottom: 1rem;">
+                        <?php
+                        $bildPfad = Helper::getImagePath($artist->getId(), 'artists', 'square-medium');
+                        ?>
+                        <img src="../<?php echo htmlspecialchars($bildPfad); ?>" alt="Portrait des Künstlers">
                         <div>
                             <h3>
                                 <a href="<?= e(artistDetailUrl($artistId)); ?>">
@@ -171,28 +169,22 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                     </article>
                 <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
- 
-        <div class="result-column">
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($artworkResults)): ?>
             <h2>Kunstwerke</h2>
- 
-            <?php if (empty($artworkResults)): ?>
-                <p>Keine Kunstwerke gefunden.</p>
-            <?php else: ?>
+            <div>
                 <?php foreach ($artworkResults as $artwork): ?>
-                    <?php
-                    $artworkId   = (int) ($artwork['ArtWorkID'] ?? 0);
-                    $title       = (string) ($artwork['Title'] ?? 'Unbekanntes Kunstwerk');
-                    $artistName  = trim((string) ($artwork['FirstName'] ?? '') . ' ' . (string) ($artwork['LastName'] ?? ''));
-                    $year        = (string) ($artwork['YearOfWork'] ?? '');
-                    $imgFileName = (string) ($artwork['ImageFileName'] ?? '');
-                    ?>
-                    <article class="mini-card">
-                        <img
-                            src="<?= e(artworkImageUrl($imgFileName, 'square-small')); ?>"
-                            alt="<?= e($title); ?>"
-                        >
+                    <article class="mini-card" style="margin-bottom: 1rem;">
+                        <?php
+                        $dateinameOhneEndung = str_replace('.jpg', '', $artwork->getImagefilename());
+                        $bildPfad = Helper::getImagePath($dateinameOhneEndung, 'works', 'square-small');
+
+                        $kuenstler = isset($artistRepo) ? $artistRepo->getById($artwork->getArtistId()) : null;
+                        $kuenstlerName = $kuenstler ? $kuenstler->getFirstName() . ' ' . $kuenstler->getLastName() : 'Unbekannter Künstler';
+                        ?>
+                        <img src="../<?php echo htmlspecialchars($bildPfad); ?>" alt="Bild des Kunstwerks">
                         <div>
                             <h3><a href="<?= e(artworkDetailUrl($artworkId)); ?>"><?= e($title); ?></a></h3>
                             <p><?= e($artistName !== '' ? $artistName : 'Unbekannter Künstler'); ?></p>
@@ -211,10 +203,16 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                     </article>
                 <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
- 
-    </section>
+            </div>
+        <?php endif; ?>
+
+    <?php endif; ?>
 <?php endif; ?>
- 
-<?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+<?php
+if (isset($db))
+{
+    $db->close();
+}
+require_once __DIR__ . '/../includes/footer.php';
+?>

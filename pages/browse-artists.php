@@ -12,11 +12,6 @@ require_once __DIR__ . '/../repositories/artistRepository.php';
 $artistRepository = new artistRepository(db());
 $artists = $artistRepository->findAll();
 
-$_SESSION["favorites"] ??= [];
-$_SESSION["favorites"]["artists"] ??= [];
-
-$favoriteArtistIds = array_map('intval', $_SESSION["favorites"]["artists"]);
-
 require_once __DIR__.'/../includes/header.php';
 
 ?>
