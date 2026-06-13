@@ -34,6 +34,8 @@
                 $buttonVariant = 'outline-primary';
                 include __DIR__ . '/button.php';
                 ?>
+            <?php elseif (($showFavoriteStatus ?? false) === true): ?>
+                <a class="btn btn-warning" href="<?= e(base_url('pages/favorites.php')); ?>">In Favoriten</a>
             <?php endif; ?>
 
             <?php if (($showRemoveFavoriteButton ?? false) === true): ?>
