@@ -1,42 +1,53 @@
 <?php
+// Gemeinsame Basisfunktionen, Initialisierung, Datenbankzugriff und Repositories laden.
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/dbaccess.php';
 require_once __DIR__ . '/../repositories/artistRepository.php';
 require_once __DIR__ . '/../repositories/genreRepository.php';
 
+// Seitentitel für die erweiterte Suche setzen.
 $pageTitle = 'Erweiterte Suche';
 
 try
 {
+    // Datenbankverbindung öffnen.
     $db = new dbaccess();
     $db->connect();
 
+    // Repositories für Künstler- und Genre-Daten initialisieren.
     $artistRepo = new artistRepository($db);
     $genreRepo  = new genreRepository($db);
 
+    // Filterwerte für die Suchformulare aus der Datenbank laden.
     $nationalities = $artistRepo->getNationalities();
     $genres = $genreRepo->getAllForBrowse();
 
+    // Datenbankverbindung nach dem Laden der Filterwerte schließen.
     $db->close();
 } catch (Exception $e)
 {
+    // Bei Ladefehlern leere Filterlisten verwenden, damit die Seite weiterhin angezeigt werden kann.
     $nationalities = [];
     $genres = [];
 }
 
+// Gemeinsamen Header einbinden.
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+    <!-- Hauptbereich der erweiterten Suche. -->
     <div class="container mt-3">
         <h1>Erweiterte Suche</h1>
         <p>Hier kannst du genauer nach Künstlern oder Kunstwerken filtern.</p>
 
         <hr>
 
+        <!-- Suchformular für Künstler. -->
         <h3>Künstler suchen</h3>
         <form method="get" action="search-results.php">
 
+            <!-- Versteckte Felder steuern Suchtyp, Standardsortierung und Sortierrichtung. -->
             <input type="hidden" name="search_type" value="artist">
             <input type="hidden" name="sort" value="artist">
             <input type="hidden" name="dir" value="ASC">
@@ -72,9 +83,11 @@ require_once __DIR__ . '/../includes/header.php';
 
         <hr class="my-5">
 
+        <!-- Suchformular für Kunstwerke. -->
         <h3>Kunstwerke suchen</h3>
         <form method="get" action="search-results.php">
 
+            <!-- Versteckte Felder steuern Suchtyp, Standardsortierung und Sortierrichtung. -->
             <input type="hidden" name="search_type" value="artwork">
             <input type="hidden" name="sort" value="title">
             <input type="hidden" name="dir" value="ASC">
@@ -109,4 +122,7 @@ require_once __DIR__ . '/../includes/header.php';
         </form>
     </div>
 
-<?php require_once __DIR__ . '/../includes/footer.php'; ?>
+<?php
+// Gemeinsamen Footer einbinden.
+require_once __DIR__ . '/../includes/footer.php';
+?>
