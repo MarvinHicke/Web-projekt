@@ -1,59 +1,59 @@
 <?php
-// Enable detailed error output during development.
+// Detaillierte Fehlerausgabe während der Entwicklung aktivieren.
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-// Set the page title before loading the shared header.
+// Seitentitel vor dem Laden des Headers setzen.
 $pageTitle = 'Subject durchsuchen';
 
-// Load application initialization, shared helpers, and the subject repository.
+// Initialisierung, gemeinsame Hilfsfunktionen und Repository laden.
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/subjectRepository.php';
 
 try {
-    // Open the database connection and load all subjects.
+    // Datenbankverbindung öffnen und Subjects laden.
     $db = new dbaccess();
     $db->connect();
 
     $subjectRepository = new subjectRepository($db);
     $subjects = $subjectRepository->findAll();
 } catch (Throwable $e) {
-    // Stop execution and show the error message during development.
+    // Fehler während der Entwicklung direkt ausgeben.
     die($e->getMessage());
 }
 
-// Render the shared header after all page data has been prepared.
+// Gemeinsamen Header einbinden, nachdem die Seitendaten vorbereitet wurden.
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-    <!-- Page heading for the subject browse page. -->
+    <!-- Seitenüberschrift für die Subjectübersicht. -->
     <section class="page-heading">
-        <h1>Subjects durchsuchen</h1>
-        <p>Entdecken Sie Subjects.</p>
+        <h1>Themen durchsuchen</h1>
+        <p>Entdecken Sie die Themen zu den Kunstwerken.</p>
     </section>
 
 <?php if (empty($subjects)): ?>
-    <!-- Empty-state message shown when no subjects are available. -->
+    <!-- Hinweis, falls keine Subjects vorhanden sind. -->
     <section class="message">
-        Es wurde kein Subject gefunden.
+        Es wurde kein Thema gefunden.
     </section>
 <?php else: ?>
-    <!-- Responsive grid containing all subject cards. -->
+    <!-- Kartenraster mit allen Subjects. -->
     <section class="subject-card-grid" aria-label="Liste der Subjects">
         <?php foreach ($subjects as $subject): ?>
             <?php
-            // Prepare display values for the current subject card.
+            // Anzeigewerte für die aktuelle Subjectkarte vorbereiten.
             $subjectId = $subject->getSubjectId();
             $subjectName = $subject->getSubjectName();
 
-            // Use a fallback label if the subject name is missing.
+            // Fallback verwenden, falls kein Subjectname vorhanden ist.
             if ($subjectName === '') {
                 $subjectName = 'Unbekanntes Subject';
             }
 
-            // Build the subject image URL or use a placeholder image as fallback.
+            // Subjectbild laden oder Platzhalter verwenden.
             $imageFileName = $subject->getImagefilename();
 
             $imageUrl = $imageFileName
@@ -61,7 +61,7 @@ require_once __DIR__ . '/../includes/header.php';
                     : base_url('images/placeholder.jpg');
             ?>
 
-            <!-- Single subject card. -->
+            <!-- Einzelne Subjectkarte. -->
             <article class="subject-card-link-wrapper">
                 <a href="<?= e(subjectDetailUrl($subjectId)); ?>">
                     <img
@@ -90,6 +90,6 @@ require_once __DIR__ . '/../includes/header.php';
 <?php endif; ?>
 
 <?php
-// Render the shared footer.
+// Gemeinsamen Footer einbinden.
 require_once __DIR__ . '/../includes/footer.php';
 ?>

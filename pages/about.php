@@ -1,15 +1,15 @@
 <?php
-// Load shared application helpers, configuration, session handling, and utility functions.
+// Gemeinsame Konfiguration, Hilfsfunktionen und Basisfunktionen laden.
 require_once __DIR__ . '/../includes/bootstrap.php';
 
-// Set the page title before loading the shared header.
+// Seitentitel vor dem Laden des Headers setzen.
 $pageTitle = 'Über uns';
 
-// Render the shared page header and navigation.
+// Gemeinsamen Header mit Navigation einbinden.
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-    <!-- Page introduction section with project context. -->
+    <!-- Einleitungsbereich mit Projektkontext. -->
     <section class="page-heading">
         <p class="eyebrow">Web-Technologien · Sommersemester 2026</p>
         <h1>Über Art Gallery</h1>
@@ -19,23 +19,23 @@ require_once __DIR__ . '/../includes/header.php';
         </p>
     </section>
 
-    <!-- Main project information area. -->
+    <!-- Bereich mit allgemeinen Projektinformationen. -->
     <section class="about-grid" aria-label="Projektinformationen">
         <!-- General project description. -->
         <article class="content-card">
             <h2>Das Projekt</h2>
             <p>
-                Die Anwendung macht Reproduktionen bekannter Kunstwerke zugänglich.
+                Die Anwendung macht bekannte Kunstwerke digital zugänglich.
                 Besucher können Kunstwerke, Künstler, Genres und Themen durchsuchen,
-                Detailinformationen ansehen und die globale Suche verwenden.
+                Detailinformationen ansehen und eine detaillierte globale Suche nutzen.
             </p>
             <p class="mb-0">
-                Zusätzlich bietet das Projekt sitzungsbasierte Favoriten sowie geschützte
+                Zusätzlich bietet das Projekt die Möglichkeit Favoritenlisten zu erstellen sowie weitere
                 Funktionen für registrierte Benutzer und Administratoren.
             </p>
         </article>
 
-        <!-- Key project facts and technologies. -->
+        <!-- Rahmendaten des Semesterprojekts. -->
         <article class="content-card">
             <h2>Rahmendaten</h2>
             <dl class="about-facts mb-0">
@@ -51,12 +51,12 @@ require_once __DIR__ . '/../includes/header.php';
         </article>
     </section>
 
-    <!-- Team overview and responsibility distribution. -->
+    <!-- Teamübersicht mit Arbeitsverteilung. -->
     <section class="content-card mt-4">
         <p class="eyebrow">Gruppe 1</p>
         <h2>Team und Arbeitsverteilung</h2>
 
-        <!-- Responsive team card layout. -->
+        <!-- Kartenlayout für die Teammitglieder. -->
         <div class="team-grid">
             <!-- Team member: data access and architecture. -->
             <article class="team-card">
@@ -65,28 +65,28 @@ require_once __DIR__ . '/../includes/header.php';
                 <p>DB-Anbindung, Repository-Grundlagen, Datenzugriff, Tests und technische Integration.</p>
             </article>
 
-            <!-- Team member: layout and UI system. -->
+            <!-- Teammitglied mit Schwerpunkt Layout und UI-System. -->
             <article class="team-card">
                 <span class="team-role">Layout &amp; System</span>
                 <h3>Sehyang Na</h3>
                 <p>Bootstrap-Theme, lokale Fonts, Navigation, About Us, Bild-Fallbacks, UI-Unterstützung und Dokumentationsgrafiken.</p>
             </article>
 
-            <!-- Team member: public browsing content. -->
+            <!-- Teammitglied mit Schwerpunkt öffentliche Inhaltsseiten. -->
             <article class="team-card">
                 <span class="team-role">Öffentliche Inhalte</span>
                 <h3>Lisanne Godlinski</h3>
                 <p>Übersichts- und Detailseiten für Künstler, Genres und Themen.</p>
             </article>
 
-            <!-- Team member: homepage, artworks, and search. -->
+            <!-- Teammitglied mit Schwerpunkt Startseite, Kunstwerke und Suche. -->
             <article class="team-card">
                 <span class="team-role">Startseite, Kunstwerke &amp; Suche</span>
                 <h3>Fatemeh Nezamolmaleki</h3>
                 <p>Startseite, Suchergebnisse, Artwork-Detailseite, Widgets und Inhaltsverknüpfungen.</p>
             </article>
 
-            <!-- Team member: authentication, favorites, reviews, and administration. -->
+            <!-- Teammitglied mit Schwerpunkt Benutzerfunktionen. -->
             <article class="team-card">
                 <span class="team-role">Benutzerfunktionen</span>
                 <h3>Linus Meyer</h3>
@@ -96,6 +96,6 @@ require_once __DIR__ . '/../includes/header.php';
     </section>
 
 <?php
-// Render the shared page footer.
+// Gemeinsamen Footer einbinden.
 require_once __DIR__ . '/../includes/footer.php';
 ?>

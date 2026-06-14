@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Checks whether a user is currently logged in.
+ * Prüft, ob aktuell ein Benutzer angemeldet ist.
  *
  * @return bool
  */
@@ -11,7 +11,7 @@ function isLoggedIn(): bool
 }
 
 /**
- * Checks whether the current user is an administrator.
+ * Prüft, ob der aktuell angemeldete Benutzer Administratorrechte besitzt.
  *
  * @return bool
  */
@@ -21,7 +21,7 @@ function isAdmin(): bool
 }
 
 /**
- * Returns the current username.
+ * Gibt den Benutzernamen des aktuell angemeldeten Benutzers zurück.
  *
  * @return string
  */

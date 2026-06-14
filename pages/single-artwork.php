@@ -443,7 +443,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <form method="post" action="<?= e(base_url('pages/single-artwork.php') . '?id=' . $artworkId); ?>">
                     <input type="hidden" name="add_review" value="1">
                     <div class="mb-3">
-                        <label for="rating" class="form-label fw-bold">Bewertung (1–5)</label>
+                        <label for="rating" class="form-label fw-bold">Bewertung (1–5 ★) </label>
                         <input type="number" id="rating" name="rating" class="form-control"
                                min="1" max="5" required value="<?= (int)($_POST['rating'] ?? 3); ?>">
                     </div>

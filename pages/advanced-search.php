@@ -105,7 +105,7 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
             <br>
 
-            <button type="submit" class="btn btn-success">Kunstwerke filtern</button>
+            <button type="submit" class="btn btn-primary">Kunstwerke filtern</button>
         </form>
     </div>
 

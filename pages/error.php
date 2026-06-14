@@ -1,6 +1,9 @@
 <?php
+// Initialisierung und Hilfsfunktionen laden.
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../model/Helper.php';
+
+// Fehlermeldung aus der URL lesen oder eine Standardmeldung verwenden.
 $msg = $_GET['msg'] ?? "Ein unbekannter Fehler ist aufgetreten.";
 ?>
 <!DOCTYPE html>
@@ -8,7 +11,9 @@ $msg = $_GET['msg'] ?? "Ein unbekannter Fehler ist aufgetreten.";
 <head>
     <meta charset="UTF-8">
     <title>Fehler aufgetreten</title>
+
     <style>
+        /* Zentriert den Fehlerbereich horizontal und vertikal auf der Seite. */
         .error-container
         {
             display: flex;
@@ -19,6 +24,8 @@ $msg = $_GET['msg'] ?? "Ein unbekannter Fehler ist aufgetreten.";
             text-align: center;
             font-family: sans-serif;
         }
+
+        /* Begrenzte Darstellung des Fehlerbildes mit abgerundeten Ecken. */
         .error-image
         {
             max-width: 400px;
@@ -30,15 +37,20 @@ $msg = $_GET['msg'] ?? "Ein unbekannter Fehler ist aufgetreten.";
 </head>
 <body>
 
-    <div class="error-container">
-        <img src="../images/sad_cat.jpg" alt="Fehler Bild" class="error-image">
+<!-- Fehleranzeige mit Bild, Meldung und Rücklink. -->
+<div class="error-container">
+    <img src="../images/sad_cat.jpg" alt="Fehler Bild" class="error-image">
 
-        <h1> Nur auserwählte Menschen kommen auf diese Fehler-Seite... </h1>
-        <p><?= htmlspecialchars($msg) ?></p>
+    <h1> Nur auserwählte Menschen kommen auf diese Fehler-Seite ... </h1>
 
-        <br>
-        <a href="index.php">Zurück zur Startseite</a>
-    </div>
+    <!-- Sichere Ausgabe der Fehlermeldung. -->
+    <p><?= htmlspecialchars($msg) ?></p>
+
+    <br>
+
+    <!-- Link zurück zur Startseite. -->
+    <a href="/index.php">Zurück zur Startseite</a>
+</div>
 
 </body>
 </html>

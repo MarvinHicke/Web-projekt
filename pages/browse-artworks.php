@@ -92,7 +92,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <h2><a href="<?= e(artworkDetailUrl($artworkId)); ?>"><?= e($title); ?></a></h2>
                     <p><strong>Künstler:</strong> <?= e($artistName !== '' ? $artistName : 'Unbekannt'); ?></p>
                     <p><strong>Jahr:</strong> <?= e($year !== '' ? (string)$year : 'Unbekannt'); ?></p>
-                    <a class="btn btn-sm btn-primary" href="<?= e(artworkDetailUrl($artworkId)); ?>">Einzelansicht öffnen</a>
+                    <a class="btn btn-sm btn-primary" href="<?= e(artworkDetailUrl($artworkId)); ?>">Ansehen</a>
                 </div>
             </article>
         <?php endforeach; ?>
