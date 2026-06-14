@@ -26,7 +26,7 @@ class genreRepository
      */
     public function findAll()
     {
-        $sql = "SELECT * FROM genres";
+        $sql = "SELECT * FROM genres ORDER BY Era ASC, GenreName ASC";
 
         $stmt = $this->db->preparedStatement($sql);
         $stmt->execute();
