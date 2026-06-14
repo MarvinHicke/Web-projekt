@@ -1,4 +1,19 @@
 <?php
+/**
+ * Suchergebnisseite (UC09, UC10).
+ *
+ * Wird aufgerufen, wenn ein Benutzer im globalen Suchfeld (UC09) einen
+ * Begriff eingibt. Die Suche startet erst ab mindestens 3 Zeichen.
+ * Es wird nach Künstlernachnamen (LIKE 'wert%') und Kunstwerktiteln gesucht.
+ *
+ * Die Ergebnisse werden in zwei getrennten Bereichen angezeigt:
+ * - Künstler (mit Bild, Link zur Einzelansicht, Favoritenlink)
+ * - Kunstwerke (mit Bild, Künstler, Jahr, Link, Favoritenlink)
+ *
+ * Sortierung: Künstler nach Name (auf-/absteigend),
+ *             Kunstwerke nach Titel, Künstler oder Jahr (auf-/absteigend).
+ */
+
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/artworkRepository.php';
@@ -6,14 +21,17 @@ require_once __DIR__ . '/../repositories/artistRepository.php';
 
 $pageTitle = 'Suchergebnisse';
 
+// Suchbegriff und Sortierparameter aus der URL lesen und absichern
 $query            = trim((string) ($_GET['q'] ?? ''));
-$artistDirection  = safeParam(strtolower((string) ($_GET['artist_direction'] ?? 'asc')), ['asc', 'desc'], 'asc');
-$artworkSort      = safeParam((string) ($_GET['artwork_sort'] ?? 'title'), ['title', 'artist', 'year'], 'title');
+$artistDirection  = safeParam(strtolower((string) ($_GET['artist_direction']  ?? 'asc')), ['asc', 'desc'], 'asc');
+$artworkSort      = safeParam((string) ($_GET['artwork_sort']      ?? 'title'), ['title', 'artist', 'year'], 'title');
 $artworkDirection = safeParam(strtolower((string) ($_GET['artwork_direction'] ?? 'asc')), ['asc', 'desc'], 'asc');
 
+// Ergebnislisten; bleiben leer, wenn keine Suche durchgeführt wird
 $artistResults  = [];
 $artworkResults = [];
 
+// Favoritenstatus aus der Session lesen (für Favoritenlinks in den Ergebnissen)
 $_SESSION['favorites'] ??= [];
 $_SESSION['favorites']['artists']  ??= [];
 $_SESSION['favorites']['artworks'] ??= [];
@@ -21,6 +39,7 @@ $_SESSION['favorites']['artworks'] ??= [];
 $favoriteArtistIds  = array_map('intval', $_SESSION['favorites']['artists']);
 $favoriteArtworkIds = array_map('intval', $_SESSION['favorites']['artworks']);
 
+// Suche nur ausführen, wenn mindestens 3 Zeichen eingegeben wurden (UC09)
 if (mb_strlen($query) >= 3) {
     try {
         $db = new dbaccess();
@@ -29,7 +48,7 @@ if (mb_strlen($query) >= 3) {
         $artworkRepo = new artworkRepository($db);
         $artistRepo  = new artistRepository($db);
 
-        // Search artists by last name
+        // Künstler nach Nachname suchen (LIKE 'wert%') → Objekte in Arrays umwandeln
         foreach ($artistRepo->searchByLastName($query) as $artist) {
             $artistResults[] = [
                 'ArtistID'  => $artist->getId(),
@@ -38,7 +57,7 @@ if (mb_strlen($query) >= 3) {
             ];
         }
 
-        // Search artworks by title
+        // Kunstwerke nach Titel suchen (LIKE 'wert%') → Objekte in Arrays umwandeln
         foreach ($artworkRepo->searchByTitle($query) as $artwork) {
             $artworkResults[] = [
                 'ArtWorkID'     => $artwork->getArtworkid(),
@@ -51,10 +70,10 @@ if (mb_strlen($query) >= 3) {
         }
 
     } catch (Exception $e) {
-        // DB not available — results stay empty
+        // Datenbankfehler: leere Ergebnislisten, kein Absturz
     }
 
-    // Sort artists
+    // Künstler nach Nachname + Vorname sortieren (UC10)
     usort($artistResults, static function (array $a, array $b) use ($artistDirection): int {
         $cmp = strcasecmp(
             ($a['LastName'] ?? '') . ($a['FirstName'] ?? ''),
@@ -63,7 +82,7 @@ if (mb_strlen($query) >= 3) {
         return $artistDirection === 'desc' ? -$cmp : $cmp;
     });
 
-    // Sort artworks
+    // Kunstwerke nach dem gewählten Kriterium sortieren (UC10)
     usort($artworkResults, static function (array $a, array $b) use ($artworkSort, $artworkDirection): int {
         if ($artworkSort === 'year') {
             $cmp = (int)($a['YearOfWork'] ?? 0) <=> (int)($b['YearOfWork'] ?? 0);
@@ -73,6 +92,7 @@ if (mb_strlen($query) >= 3) {
                 ($b['LastName'] ?? '') . ($b['FirstName'] ?? '')
             );
         } else {
+            // Standardsortierung: nach Titel
             $cmp = strcasecmp((string)($a['Title'] ?? ''), (string)($b['Title'] ?? ''));
         }
         return $artworkDirection === 'desc' ? -$cmp : $cmp;
@@ -88,7 +108,7 @@ require_once __DIR__ . '/../includes/header.php';
        nach Künstlernachnamen oder Kunstwerktiteln.</p>
 </section>
 
-<!-- Search form with sorting controls -->
+<!-- Suchformular mit Sortieroptionen (UC09, UC10) -->
 <section class="sort-panel" aria-label="Suchformular">
     <form method="get" action="<?= e(base_url('pages/search-results.php')); ?>">
 
@@ -125,43 +145,48 @@ require_once __DIR__ . '/../includes/header.php';
     </form>
 </section>
 
-<!-- Validation messages -->
+<!-- Validierungsmeldungen (UC09: mindestens 3 Zeichen erforderlich) -->
 <?php if ($query !== '' && mb_strlen($query) < 3): ?>
     <div class="message">Bitte geben Sie mindestens drei Zeichen ein.</div>
 <?php elseif ($query === ''): ?>
     <div class="message">Bitte geben Sie einen Suchbegriff ein.</div>
 <?php endif; ?>
 
-<!-- Results -->
+<!-- Ergebnisse anzeigen (UC10) -->
 <?php if (mb_strlen($query) >= 3): ?>
 
     <?php if (empty($artistResults) && empty($artworkResults)): ?>
+        <!-- Leer-Zustand: keine Treffer -->
         <div class="message">
             Keine Künstler oder Kunstwerke für „<?= e($query); ?>" gefunden.
         </div>
 
     <?php else: ?>
 
-        <!-- ── Artists ── -->
+        <!-- Bereich: Künstler-Ergebnisse -->
         <?php if (!empty($artistResults)): ?>
             <h2>Künstler</h2>
             <div style="margin-bottom: 2rem;">
                 <?php foreach ($artistResults as $artist): ?>
                     <?php
-                    $artistId   = (int)    ($artist['ArtistID']  ?? 0);
-                    $firstName  = (string) ($artist['FirstName'] ?? '');
-                    $lastName   = (string) ($artist['LastName']  ?? '');
-                    $artistName = trim($firstName . ' ' . $lastName);
+                    $artistId    = (int)    ($artist['ArtistID']  ?? 0);
+                    $firstName   = (string) ($artist['FirstName'] ?? '');
+                    $lastName    = (string) ($artist['LastName']  ?? '');
+                    $artistName  = trim($firstName . ' ' . $lastName);
                     if ($artistName === '') $artistName = 'Unbekannter Künstler';
+
+                    // Prüfen, ob der Künstler bereits in der Session-Favoritenliste ist
                     $isFavArtist = in_array($artistId, $favoriteArtistIds, true);
                     ?>
                     <article class="mini-card" style="margin-bottom: 1rem;">
+                        <!-- Künstlerbild (UC15: Fallback auf Platzhalterbild bei fehlendem Bild) -->
                         <img
                             src="<?= e(artistImageUrl($artistId, 'square-medium')); ?>"
                             alt="<?= e($artistName); ?>"
                         >
                         <div>
                             <h3>
+                                <!-- Link zur Einzelansicht des Künstlers (UC11) -->
                                 <a href="<?= e(artistDetailUrl($artistId)); ?>">
                                     <?= e($artistName); ?>
                                 </a>
@@ -169,6 +194,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <div class="result-actions">
                                 <a class="btn btn-sm btn-primary"
                                    href="<?= e(artistDetailUrl($artistId)); ?>">Ansehen</a>
+                                <!-- Favoritenlink: Hinzufügen oder Favoriten anzeigen (UC18) -->
                                 <?php if ($isFavArtist): ?>
                                     <a class="btn btn-sm btn-warning"
                                        href="<?= e(base_url('pages/favorites.php')); ?>">In Favoriten</a>
@@ -185,29 +211,33 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
         <?php endif; ?>
 
-        <!-- ── Artworks ── -->
+        <!-- Bereich: Kunstwerk-Ergebnisse -->
         <?php if (!empty($artworkResults)): ?>
             <h2>Kunstwerke</h2>
             <div>
                 <?php foreach ($artworkResults as $artwork): ?>
                     <?php
-                    $artworkId   = (int)    ($artwork['ArtWorkID']     ?? 0);
-                    $title       = (string) ($artwork['Title']          ?? 'Unbekanntes Kunstwerk');
-                    $firstName   = (string) ($artwork['FirstName']      ?? '');
-                    $lastName    = (string) ($artwork['LastName']       ?? '');
+                    $artworkId   = (int)    ($artwork['ArtWorkID']    ?? 0);
+                    $title       = (string) ($artwork['Title']         ?? 'Unbekanntes Kunstwerk');
+                    $firstName   = (string) ($artwork['FirstName']     ?? '');
+                    $lastName    = (string) ($artwork['LastName']      ?? '');
                     $artistName  = trim($firstName . ' ' . $lastName);
                     if ($artistName === '') $artistName = 'Unbekannter Künstler';
-                    $year        = (string) ($artwork['YearOfWork']     ?? '');
-                    $imgFileName = (string) ($artwork['ImageFileName']  ?? '');
+                    $year        = (string) ($artwork['YearOfWork']    ?? '');
+                    $imgFileName = (string) ($artwork['ImageFileName'] ?? '');
+
+                    // Prüfen, ob das Kunstwerk bereits in der Session-Favoritenliste ist
                     $isFavWork   = in_array($artworkId, $favoriteArtworkIds, true);
                     ?>
                     <article class="mini-card" style="margin-bottom: 1rem;">
+                        <!-- Kunstwerkbild (UC15: Fallback auf Platzhalterbild) -->
                         <img
                             src="<?= e(artworkImageUrl($imgFileName, 'square-small')); ?>"
                             alt="<?= e($title); ?>"
                         >
                         <div>
                             <h3>
+                                <!-- Link zur Einzelansicht des Kunstwerks (UC12) -->
                                 <a href="<?= e(artworkDetailUrl($artworkId)); ?>">
                                     <?= e($title); ?>
                                 </a>
@@ -217,6 +247,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <div class="result-actions">
                                 <a class="btn btn-sm btn-primary"
                                    href="<?= e(artworkDetailUrl($artworkId)); ?>">Ansehen</a>
+                                <!-- Favoritenlink: Hinzufügen oder Favoriten anzeigen (UC18) -->
                                 <?php if ($isFavWork): ?>
                                     <a class="btn btn-sm btn-warning"
                                        href="<?= e(base_url('pages/favorites.php')); ?>">In Favoriten</a>
