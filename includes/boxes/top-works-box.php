@@ -1,11 +1,21 @@
 <?php
+/**
+ * Box „Top Werke" für die Startseite (UC02).
+ *
+ * Zeigt die am besten bewerteten Kunstwerke mit Sternbewertung.
+ * Erwartet ein Array aus assoziativen Arrays mit den Schlüsseln:
+ *   ArtWorkID, Title, FirstName, LastName, AvgRating
+ *
+ * Datenquelle: artworkRepository->getTopArtworks($limit)
+ * (nur Kunstwerke mit mindestens 3 Bewertungen werden berücksichtigt)
+ */
+
 require_once __DIR__ . '/../helpers.php';
 
 /**
- * Renders the Top Works box on the homepage.
- * Expects $artworks as raw associative arrays containing:
- *   ArtWorkID, Title, FirstName, LastName, AvgRating
- * Use artworkRepository->getTopArtworks($limit) after updating its SQL to JOIN artists.
+ * Rendert die Top-Werke-Box auf der Startseite.
+ *
+ * @param array $artworks Array aus assoziativen Arrays der Top-Kunstwerke
  */
 function renderTopWorksBox(array $artworks): void
 {
@@ -24,6 +34,8 @@ function renderTopWorksBox(array $artworks): void
                     $title      = (string) ($work['Title']     ?? 'Unbekanntes Kunstwerk');
                     $firstName  = (string) ($work['FirstName'] ?? '');
                     $lastName   = (string) ($work['LastName']  ?? '');
+
+                    // Vollständigen Künstlernamen zusammensetzen
                     $artistName = trim($firstName . ' ' . $lastName);
                     $rating     = $work['AvgRating'] ?? null;
                     ?>
@@ -31,15 +43,20 @@ function renderTopWorksBox(array $artworks): void
                         <a href="<?= e(artworkDetailUrl($id)); ?>">
                             <strong><?= e($title); ?></strong>
                             <span><?= e($artistName !== '' ? $artistName : 'Unbekannter Künstler'); ?></span>
+
                             <?php if ($rating !== null): ?>
-                                <?php $ratingPercent = max(0, min(100, ((float) $rating / 5) * 100)); ?>
+                                <?php
+                                // Bewertungsprozent für die CSS-Sternfüllung berechnen (0–100 %)
+                                $ratingPercent = max(0, min(100, ((float) $rating / 5) * 100));
+                                ?>
+                                <!-- Sterndarstellung über CSS-Variable (UC02: Sterne sichtbar) -->
                                 <span
                                     class="rating-stars"
                                     style="--rating-percent: <?= e(number_format($ratingPercent, 2, '.', '')); ?>%;"
                                     aria-label="<?= e(number_format((float) $rating, 1, ',', '.')); ?> von 5 Sternen"
                                 >
                                     <span class="rating-stars-empty" aria-hidden="true">★★★★★</span>
-                                    <span class="rating-stars-fill" aria-hidden="true">★★★★★</span>
+                                    <span class="rating-stars-fill"  aria-hidden="true">★★★★★</span>
                                 </span>
                                 <small><?= e(number_format((float) $rating, 1, ',', '.')); ?>/5</small>
                             <?php else: ?>
