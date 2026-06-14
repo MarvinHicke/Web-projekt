@@ -1,14 +1,14 @@
 <?php
-// Load application initialization, shared helpers, and required repositories.
+// Initialisierung, gemeinsame Hilfsfunktionen und benötigte Repositories laden.
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/genreRepository.php';
 require_once __DIR__ . '/../repositories/artworkRepository.php';
 
-// Read and validate the genre ID from the query string.
+// Genre-ID aus der URL lesen und in eine Ganzzahl umwandeln.
 $genreId = (int) ($_GET['id'] ?? 0);
 
-// Stop early if the provided genre ID is invalid.
+// Frühzeitig abbrechen, wenn keine gültige Genre-ID übergeben wurde.
 if ($genreId <= 0) {
     $pageTitle = 'Genre nicht gefunden';
 
@@ -22,21 +22,20 @@ if ($genreId <= 0) {
 }
 
 try {
-    // Open the database connection.
+    // Datenbankverbindung öffnen.
     $db = new dbaccess();
     $db->connect();
 
-    // Load the genre model object.
+    // Genreobjekt laden.
     $genreRepository = new genreRepository($db);
     $genreObj = $genreRepository->getById($genreId);
 
-    // Load the raw genre row to access all available database columns.
-    // This is useful when optional column names vary between dataset versions.
+    // Rohdaten des Genres laden, damit auch optionale Datenbankspalten verfügbar sind.
     $stmt = $db->preparedStatement("SELECT * FROM genres WHERE GenreID = :id");
     $stmt->execute(['id' => $genreId]);
     $genreRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Show a user-friendly message if no genre exists for the given ID.
+    // Benutzerfreundliche Fehlermeldung ausgeben, falls kein Genre gefunden wurde.
     if (!$genreRow) {
         $pageTitle = 'Genre nicht gefunden';
 
@@ -49,11 +48,11 @@ try {
         exit;
     }
 
-    // Load all artworks assigned to the current genre.
+    // Alle Kunstwerke laden, die dem aktuellen Genre zugeordnet sind.
     $artworks = (new artworkRepository($db))->getForGenre($genreId);
 
 } catch (Throwable $e) {
-    // Show a fallback error page if loading the genre or related artworks fails.
+    // Fallback-Fehlerseite anzeigen, falls das Laden der Daten fehlschlägt.
     $pageTitle = 'Fehler';
 
     require_once __DIR__ . '/../includes/header.php';
@@ -65,12 +64,12 @@ try {
     exit;
 }
 
-// Prepare display values for the genre detail page.
+// Anzeigewerte für die Genredetailseite vorbereiten.
 $genreName = (string) ($genreRow['GenreName'] ?? '');
 $genreEra = (string) ($genreRow['Era'] ?? '');
 $genreDescription = cleanHtml((string) ($genreRow['Description'] ?? ''));
 
-// Read the external genre link from possible database column variants.
+// Externen Genrelink aus möglichen Datenbankspalten lesen.
 $genreLink = (string) (
         $genreRow['GenreLink'] ??
         $genreRow['Genrelink'] ??
@@ -79,23 +78,23 @@ $genreLink = (string) (
         ''
 );
 
-// Build the main genre image URL.
+// Hauptbild des Genres vorbereiten.
 $genrePhoto = genreImageUrl($genreId);
 
-// Set the final page title and render the shared header.
+// Finalen Seitentitel setzen und Header laden.
 $pageTitle = $genreName . ' · Genre';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-    <!-- Main genre detail layout with image and metadata. -->
+    <!-- Hauptbereich der Genredetailseite mit Bild und Informationen. -->
     <section class="genre-detail-layout">
 
-        <!-- Genre image panel. -->
+        <!-- Bildbereich des Genres. -->
         <div class="genre-image-panel">
             <img src="<?= e($genrePhoto); ?>" alt="<?= e($genreName); ?>">
         </div>
 
-        <!-- Genre information panel with description and metadata. -->
+        <!-- Informationsbereich mit Beschreibung und Metadaten. -->
         <div class="genre-info-panel">
             <h1><?= e($genreName); ?></h1>
 
@@ -103,7 +102,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <p><strong>Beschreibung:</strong> <?= e($genreDescription); ?></p>
             <?php endif; ?>
 
-            <!-- Genre metadata table. -->
+            <!-- Tabelle mit Genredetails. -->
             <table class="table table-bordered">
                 <tbody>
                 <?php if ($genreEra !== ''): ?>
@@ -128,19 +127,19 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
     </section>
 
-    <!-- Related artworks assigned to the current genre. -->
+    <!-- Zugeordnete Kunstwerke des aktuellen Genres. -->
     <section class="mt-5">
         <h2>Kunstwerke des Genre '<?= e($genreName); ?>'</h2>
 
         <?php if (empty($artworks)): ?>
-            <!-- Empty-state message shown when the genre has no assigned artworks. -->
+            <!-- Hinweis, falls dem Genre keine Kunstwerke zugeordnet sind. -->
             <p class="text-muted">Keine Kunstwerke für dieses Genre gefunden.</p>
         <?php else: ?>
-            <!-- Responsive grid of related artwork cards. -->
+            <!-- Responsives Raster mit Kunstwerkkarten. -->
             <div class="row row-cols-2 row-cols-md-4 g-3">
                 <?php foreach ($artworks as $artwork): ?>
                     <?php
-                    // Prepare display values for the current artwork card.
+                    // Anzeigewerte für die aktuelle Kunstwerkkarte vorbereiten.
                     $awId       = $artwork->getArtworkid();
                     $awTitle    = $artwork->getTitle();
                     $awYear     = (string) ($artwork->getYearofwork() ?? '');
@@ -176,6 +175,6 @@ require_once __DIR__ . '/../includes/header.php';
     </section>
 
 <?php
-// Render the shared footer.
+// Gemeinsamen Footer einbinden.
 require_once __DIR__ . '/../includes/footer.php';
 ?>

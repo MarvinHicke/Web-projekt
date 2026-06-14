@@ -1,14 +1,14 @@
 <?php
-// Load application initialization, shared helpers, and required repositories.
+// Initialisierung, gemeinsame Hilfsfunktionen und benötigte Repositories laden.
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/artistRepository.php';
 require_once __DIR__ . '/../repositories/artworkRepository.php';
 
-// Read and validate the artist ID from the query string.
+// Künstler-ID aus der URL lesen und in eine Ganzzahl umwandeln.
 $artistId = (int) ($_GET['id'] ?? 0);
 
-// Stop early if the provided artist ID is invalid.
+// Frühzeitig abbrechen, wenn keine gültige Künstler-ID übergeben wurde.
 if ($artistId <= 0) {
     $pageTitle = 'Künstler nicht gefunden';
 
@@ -22,20 +22,19 @@ if ($artistId <= 0) {
 }
 
 try {
-    // Open the database connection.
+    // Datenbankverbindung öffnen.
     $db = new dbaccess();
     $db->connect();
 
-    // Load the artist model object for image and dimension helper methods.
+    // Künstlerobjekt laden, um Model-Getter für Bild- und Maßangaben verwenden zu können.
     $artistObj = (new artistRepository($db))->getById($artistId);
 
-    // Load the raw artist row to access all available database columns.
-    // This is useful when the model does not expose every optional field.
+    // Rohdaten des Künstlers laden, damit auch optionale Datenbankspalten verfügbar sind.
     $stmt = $db->preparedStatement("SELECT * FROM artists WHERE ArtistID = :id");
     $stmt->execute(['id' => $artistId]);
     $artistRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Show a user-friendly message if no artist exists for the given ID.
+    // Benutzerfreundliche Fehlermeldung ausgeben, falls kein Künstler gefunden wurde.
     if (!$artistRow) {
         $pageTitle = 'Künstler nicht gefunden';
 
@@ -48,11 +47,11 @@ try {
         exit;
     }
 
-    // Load all artworks assigned to the current artist.
+    // Alle Kunstwerke laden, die dem aktuellen Künstler zugeordnet sind.
     $artworks = (new artworkRepository($db))->getForArtist($artistId);
 
 } catch (Throwable $e) {
-    // Show a fallback error page if loading the artist or related artworks fails.
+    // Fallback-Fehlerseite anzeigen, falls das Laden der Daten fehlschlägt.
     $pageTitle = 'Fehler';
 
     require_once __DIR__ . '/../includes/header.php';
@@ -64,13 +63,13 @@ try {
     exit;
 }
 
-// Prepare display values for the artist detail page.
+// Anzeigewerte für die Künstlerdetailseite vorbereiten.
 $firstName   = (string) ($artistRow['FirstName'] ?? '');
 $lastName    = (string) ($artistRow['LastName'] ?? '');
 $fullName    = trim($firstName . ' ' . $lastName);
 $nationality = (string) ($artistRow['Nationality'] ?? $artistRow['nationality'] ?? '');
 
-// Read biography/details from possible database column variants.
+// Beschreibung/Biografie aus möglichen Datenbankspalten lesen.
 $details = cleanHtml(
         $artistRow['Details']     ??
         $artistRow['details']     ??
@@ -78,7 +77,7 @@ $details = cleanHtml(
         ''
 );
 
-// Read the external artist link from possible database column variants.
+// Externen Künstlerlink aus möglichen Datenbankspalten lesen.
 $artistLink = (string) (
         $artistRow['ArtistLink'] ??
         $artistRow['artistlink'] ??
@@ -87,7 +86,7 @@ $artistLink = (string) (
         ''
 );
 
-// Read birth and death years from possible database column variants.
+// Geburts- und Sterbejahr aus möglichen Datenbankspalten lesen.
 $birthYear = (string) (
         $artistRow['BirthYear']  ??
         $artistRow['birthyear']  ??
@@ -104,7 +103,7 @@ $deathYear = (string) (
         ''
 );
 
-// Build a readable life date string.
+// Lebensdaten als lesbaren Text zusammensetzen.
 if ($birthYear !== '' && $deathYear !== '') {
     $dateString = $birthYear . ' – ' . $deathYear;
 } elseif ($birthYear !== '') {
@@ -113,23 +112,23 @@ if ($birthYear !== '' && $deathYear !== '') {
     $dateString = '';
 }
 
-// Prepare image and dimension data for the artist image panel.
+// Bild- und Maßangaben für den Bildbereich vorbereiten.
 $imageFileName = $artistObj->getImagefilename();
 $mediumImage   = artistImageUrl($imageFileName, 'medium');
 
-// Check whether the current artist is already stored as a session favorite.
+// Prüfen, ob der aktuelle Künstler bereits in den Session-Favoriten gespeichert ist.
 $isFavorited = isset($_SESSION['favorites']['artists'])
         && in_array($artistId, array_map('intval', $_SESSION['favorites']['artists']), true);
 
-// Set the final page title and render the shared header.
+// Finalen Seitentitel setzen und Header laden.
 $pageTitle = $fullName . ' · Künstler';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-    <!-- Main artist detail layout with image and metadata. -->
+    <!-- Hauptbereich der Künstlerdetailseite mit Bild und Informationen. -->
     <section class="artist-detail-layout">
 
-        <!-- Artist image panel with clickable modal preview. -->
+        <!-- Bildbereich -->
         <div class="artist-image-panel">
             <img
                     src="<?= e($mediumImage); ?>"
@@ -139,7 +138,7 @@ require_once __DIR__ . '/../includes/header.php';
             <small class="d-block text-muted mt-1"></small>
         </div>
 
-        <!-- Artist information panel with biography, favorites, and metadata. -->
+        <!-- Informationsbereich mit Biografie, Favoritenbutton und Metadaten. -->
         <div class="artist-info-panel">
             <h1><?= e($fullName); ?></h1>
 
@@ -147,7 +146,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <p class="artist-bio"><?= e($details); ?></p>
             <?php endif; ?>
 
-            <!-- Session-based favorite button for artists. -->
+            <!-- Sessionbasierter Favoritenbutton für Künstler. -->
             <?php if ($isFavorited): ?>
                 <a class="btn btn-primary btn-sm mb-3"
                    href="<?= e(base_url('pages/remove-favorite.php') . '?type=artist&id=' . $artistId . '&redirect=single-artist.php'); ?>">
@@ -160,7 +159,7 @@ require_once __DIR__ . '/../includes/header.php';
                 </a>
             <?php endif; ?>
 
-            <!-- Artist metadata table. -->
+            <!-- Tabelle mit Künstlerdetails. -->
             <table class="table table-bordered">
                 <caption class="fw-bold text-start pb-2 caption-top">Künstlerdetails</caption>
                 <tbody>
@@ -193,15 +192,15 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
     </section>
 
-    <!-- Related artworks created by the current artist. -->
+    <!-- Zugeordnete Kunstwerke des aktuellen Künstlers. -->
     <section class="mt-5">
         <h2>Kunstwerke von <?= e($fullName); ?></h2>
 
         <?php if (empty($artworks)): ?>
-            <!-- Empty-state message shown when the artist has no assigned artworks. -->
+            <!-- Hinweis, falls dem Künstler keine Kunstwerke zugeordnet sind. -->
             <p class="text-muted">Keine Kunstwerke für diesen Künstler gefunden.</p>
         <?php else: ?>
-            <!-- Responsive grid of related artwork cards. -->
+            <!-- Responsives Raster mit Kunstwerkkarten. -->
             <div class="row row-cols-2 row-cols-md-4 g-3">
                 <?php foreach ($artworks as $artwork): ?>
                     <?php
@@ -241,6 +240,6 @@ require_once __DIR__ . '/../includes/header.php';
     </section>
 
 <?php
-// Render the shared footer.
+// Gemeinsamen Footer einbinden.
 require_once __DIR__ . '/../includes/footer.php';
 ?>

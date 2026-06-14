@@ -157,10 +157,10 @@ require_once __DIR__ . '/includes/header.php';
                         <h5 style="margin-bottom: 0.25rem;"><?= e($title); ?></h5>
                         <?php if ($rating !== null): ?>
                             <p style="margin-bottom: 0.5rem; opacity: 0.9;">
-                                Bewertung: <?= e(number_format((float)$rating, 1, ',', '.')); ?>/5
+                                Bewertung: <?= e(number_format((float)$rating, 1, ',', '.')); ?>/5 ★
                             </p>
                         <?php endif; ?>
-                        <a class="btn btn-sm btn-light" href="<?= e(artworkDetailUrl($id)); ?>">Ansehen</a>
+                        <a class="btn btn-sm btn-primary" href="<?= e(artworkDetailUrl($id)); ?>">Ansehen</a>
                     </div>
                 </div>
             <?php endforeach; ?>

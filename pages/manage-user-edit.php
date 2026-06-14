@@ -8,21 +8,26 @@
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../repositories/customerRepository.php';
 
+// Seitentitel für die Bearbeitungsseite setzen.
 $pageTitle = 'Benutzer bearbeiten';
 
+// Zugriffsschutz: Nur Administratoren dürfen Benutzer bearbeiten.
 if (!isAdmin())
 {
     header('Location: ' . base_url('index.php'));
     exit;
 }
 
+// Repository für Benutzerzugriffe initialisieren.
 $customerRepository = new customerRepository(db());
 
+// Statusvariablen für Fehlermeldungen, Erfolgsmeldungen und den ausgewählten Benutzer vorbereiten.
 $errors = [];
 $successMessage = '';
 $selectedUser = null;
 $selectedUserId = null;
 
+// ID des aktuell eingeloggten Admins vorbereiten.
 $currentAdminId = 0;
 
 if (isset($_SESSION['user']['CustomerID']))
@@ -30,16 +35,19 @@ if (isset($_SESSION['user']['CustomerID']))
     $currentAdminId = (int) $_SESSION['user']['CustomerID'];
 }
 
+// Maximale Eingabelängen für die Formularvalidierung.
 $nameMaxLength = 50;
 $textMaxLength = 255;
 $emailMaxLength = 100;
 
+// Prüfen, ob eine Benutzer-ID übergeben wurde.
 if (!isset($_GET['id']))
 {
     $errors[] = 'Es wurde kein Benutzer ausgewählt.';
 }
 else
 {
+    // Benutzer-ID aus der URL validieren.
     $selectedUserId = filter_var($_GET['id'], FILTER_VALIDATE_INT);
 
     if ($selectedUserId === false || $selectedUserId <= 0)
@@ -48,6 +56,7 @@ else
     }
     else
     {
+        // Ausgewählten Benutzer aus der Datenbank laden.
         $selectedUser = $customerRepository->GetById($selectedUserId);
 
         if (!$selectedUser)
@@ -57,6 +66,7 @@ else
     }
 }
 
+// Formularwerte mit den aktuellen Benutzerdaten vorbelegen.
 if ($selectedUser)
 {
     $firstName = (string) ($selectedUser['FirstName'] ?? '');
@@ -70,8 +80,10 @@ if ($selectedUser)
     $email = (string) ($selectedUser['Email'] ?? $selectedUser['UserName'] ?? '');
 }
 
+// Profildatenformular verarbeiten.
 if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['formType'] ?? '') === 'profile')
 {
+    // Eingaben aus dem Profilformular lesen und trimmen.
     $firstName = trim((string) ($_POST['firstName'] ?? ''));
     $lastName = trim((string) ($_POST['lastName'] ?? ''));
     $address = trim((string) ($_POST['address'] ?? ''));
@@ -82,6 +94,7 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
     $phone = trim((string) ($_POST['phone'] ?? ''));
     $email = trim((string) ($_POST['email'] ?? ''));
 
+    // Pflichtfelder und maximale Eingabelängen prüfen.
     if ($firstName === '')
     {
         $errors[] = 'Bitte geben Sie einen Vornamen ein.';
@@ -147,6 +160,7 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
         $errors[] = 'Die Telefonnummer darf maximal ' . $textMaxLength . ' Zeichen lang sein.';
     }
 
+    // E-Mail-Adresse prüfen.
     if ($email === '')
     {
         $errors[] = 'Bitte geben Sie eine E-Mail-Adresse ein.';
@@ -161,6 +175,7 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
         $errors[] = 'Die E-Mail darf maximal ' . $emailMaxLength . ' Zeichen lang sein.';
     }
 
+    // Prüfen, ob die E-Mail-Adresse bereits von einem anderen Benutzer verwendet wird.
     if (empty($errors))
     {
         $existingUser = $customerRepository->GetByUsername($email);
@@ -171,27 +186,29 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
         }
     }
 
+    // Profildaten speichern, wenn keine Validierungsfehler vorhanden sind.
     if (empty($errors))
     {
         $updated = $customerRepository->update(
-            (int) $selectedUserId,
-            [
-                'FirstName' => $firstName,
-                'LastName' => $lastName,
-                'Address' => $address,
-                'City' => $city,
-                'Region' => $region,
-                'Country' => $country,
-                'Postal' => $postal,
-                'Phone' => $phone,
-                'Email' => $email,
-            ]
+                (int) $selectedUserId,
+                [
+                        'FirstName' => $firstName,
+                        'LastName' => $lastName,
+                        'Address' => $address,
+                        'City' => $city,
+                        'Region' => $region,
+                        'Country' => $country,
+                        'Postal' => $postal,
+                        'Phone' => $phone,
+                        'Email' => $email,
+                ]
         );
 
         if ($updated)
         {
             $successMessage = 'Die Benutzerdaten wurden gespeichert.';
 
+            // Sessiondaten aktualisieren, falls der Admin sein eigenes Profil bearbeitet.
             if (isset($_SESSION['user']) && (int) $_SESSION['user']['CustomerID'] === (int) $selectedUserId)
             {
                 $_SESSION['user']['FirstName'] = $firstName;
@@ -199,6 +216,7 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
                 $_SESSION['user']['UserName'] = $email;
             }
 
+            // Benutzer nach dem Speichern erneut laden.
             $selectedUser = $customerRepository->GetById($selectedUserId);
         }
         else
@@ -208,24 +226,28 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
     }
 }
 
-// Handles role and status changes while protecting the current admin from unsafe self-changes.
+// Verarbeitet Rollen- und Statusänderungen und schützt den aktuellen Admin vor unsicheren Selbständerungen.
 if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['formType'] ?? '') === 'statusRole')
 {
+    // Neue Rollen- und Statuswerte aus dem Formular validieren.
     $newType = filter_var((string) ($_POST['type'] ?? ''), FILTER_VALIDATE_INT);
     $newState = filter_var((string) ($_POST['state'] ?? ''), FILTER_VALIDATE_INT);
 
+    // Aktuelle Rolle normalisieren.
     $currentType = 1;
     if ((int) $selectedUser['Type'] === 2)
     {
         $currentType = 2;
     }
 
+    // Aktuellen Status normalisieren.
     $currentState = 0;
     if ((int) $selectedUser['State'] === 1)
     {
         $currentState = 1;
     }
 
+    // Rolle und Status auf gültige Werte prüfen.
     if ($newType !== 1 && $newType !== 2)
     {
         $errors[] = 'Bitte wählen Sie eine gültige Rolle aus.';
@@ -236,11 +258,13 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
         $errors[] = 'Bitte wählen Sie einen gültigen Status aus.';
     }
 
+    // Verhindert, dass der aktuelle Admin sein eigenes Konto deaktiviert.
     if ((int) $selectedUserId === $currentAdminId && $newState === 0)
     {
         $errors[] = 'Sie können Ihr eigenes Konto nicht deaktivieren.';
     }
 
+    // Verhindert, dass der aktuelle Admin sich selbst die Admin-Rolle entfernt.
     if ((int) $selectedUserId === $currentAdminId && $currentType === 2 && $newType !== 2)
     {
         $errors[] = 'Sie können Ihre eigene Admin-Rolle nicht entfernen.';
@@ -250,6 +274,7 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
     {
         $changedSomething = false;
 
+        // Rolle ändern, falls ein anderer Rollenwert ausgewählt wurde.
         if ($newType !== $currentType)
         {
             if ($newType === 2)
@@ -271,6 +296,7 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
             }
         }
 
+        // Status ändern, falls ein anderer Statuswert ausgewählt wurde.
         if (empty($errors) && $newState !== $currentState)
         {
             $stateUpdated = $customerRepository->updateState((int) $selectedUserId, $newState);
@@ -287,6 +313,7 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
 
         if (empty($errors))
         {
+            // Rückmeldung abhängig davon setzen, ob tatsächlich etwas geändert wurde.
             if ($changedSomething)
             {
                 $successMessage = 'Status und Rolle wurden gespeichert.';
@@ -296,8 +323,10 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
                 $successMessage = 'Status und Rolle wurden nicht verändert.';
             }
 
+            // Benutzer nach Änderungen erneut laden.
             $selectedUser = $customerRepository->GetById((int) $selectedUserId);
 
+            // Sessionrolle aktualisieren, falls der Admin sein eigenes Konto bearbeitet hat.
             if (isset($_SESSION['user']) && (int) $_SESSION['user']['CustomerID'] === (int) $selectedUserId)
             {
                 $_SESSION['user']['Type'] = (int) $selectedUser['Type'];
@@ -306,12 +335,14 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
     }
 }
 
-// Allows administrators to set a new password for the selected user.
+// Ermöglicht Administratoren, für den ausgewählten Benutzer ein neues Passwort zu setzen.
 if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['formType'] ?? '') === 'adminPassword')
 {
+    // Neue Passwortwerte aus dem Formular lesen.
     $newPassword = (string) ($_POST['newPassword'] ?? '');
     $confirmPassword = (string) ($_POST['confirmPassword'] ?? '');
 
+    // Passwort validieren.
     if ($newPassword === '')
     {
         $errors[] = 'Bitte geben Sie ein neues Passwort ein.';
@@ -327,6 +358,7 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
         $errors[] = 'Die Passwortbestätigung stimmt nicht überein.';
     }
 
+    // Neues Passwort gehasht speichern.
     if (empty($errors))
     {
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
@@ -344,14 +376,17 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
     }
 }
 
+// Gemeinsamen Header einbinden.
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+    <!-- Überschrift der Admin-Bearbeitungsseite. -->
     <section class="page-heading manage-user-edit-heading">
         <h1>Benutzer bearbeiten</h1>
         <p>Hier können Profildaten, Status, Rolle und Passwort eines Benutzerkontos verwaltet werden.</p>
     </section>
 
+    <!-- Fehlermeldungen anzeigen. -->
 <?php foreach ($errors as $error): ?>
     <?php
     $alertType = 'danger';
@@ -360,6 +395,7 @@ require_once __DIR__ . '/../includes/header.php';
     ?>
 <?php endforeach; ?>
 
+    <!-- Erfolgsmeldung anzeigen. -->
 <?php if ($successMessage !== ''): ?>
     <?php
     $alertType = 'success';
@@ -370,6 +406,7 @@ require_once __DIR__ . '/../includes/header.php';
 
 <?php if ($selectedUser): ?>
     <?php
+    // Rollenanzeige für den ausgewählten Benutzer vorbereiten.
     $typeLabel = 'User';
     $typeClass = 'manage-badge-user';
 
@@ -379,6 +416,7 @@ require_once __DIR__ . '/../includes/header.php';
         $typeClass = 'manage-badge-admin';
     }
 
+    // Statusanzeige für den ausgewählten Benutzer vorbereiten.
     $stateLabel = 'Deaktiviert';
     $stateClass = 'manage-badge-inactive';
 
@@ -388,6 +426,7 @@ require_once __DIR__ . '/../includes/header.php';
         $stateClass = 'manage-badge-active';
     }
 
+    // Vollständigen Namen für die Zusammenfassung vorbereiten.
     $selectedUserFullName = trim((string) ($selectedUser['FirstName'] ?? '') . ' ' . (string) ($selectedUser['LastName'] ?? ''));
 
     if ($selectedUserFullName === '')
@@ -396,6 +435,7 @@ require_once __DIR__ . '/../includes/header.php';
     }
     ?>
 
+    <!-- Zusammenfassung des aktuell ausgewählten Benutzers. -->
     <section class="data-box manage-user-edit-section user-edit-summary">
         <h2>Ausgewählter Benutzer</h2>
 
@@ -426,6 +466,7 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
     </section>
 
+    <!-- Formular zum Bearbeiten der Profildaten. -->
     <section class="data-box manage-user-edit-section user-edit-profile-section">
         <h2>Profildaten</h2>
 
@@ -436,26 +477,26 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="col-md-6 mb-3">
                     <label for="firstName" class="form-label">Vorname</label>
                     <input
-                        type="text"
-                        class="form-control"
-                        id="firstName"
-                        name="firstName"
-                        value="<?= e($firstName); ?>"
-                        maxlength="50"
-                        required
+                            type="text"
+                            class="form-control"
+                            id="firstName"
+                            name="firstName"
+                            value="<?= e($firstName); ?>"
+                            maxlength="50"
+                            required
                     >
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label for="lastName" class="form-label">Nachname</label>
                     <input
-                        type="text"
-                        class="form-control"
-                        id="lastName"
-                        name="lastName"
-                        value="<?= e($lastName); ?>"
-                        maxlength="50"
-                        required
+                            type="text"
+                            class="form-control"
+                            id="lastName"
+                            name="lastName"
+                            value="<?= e($lastName); ?>"
+                            maxlength="50"
+                            required
                     >
                 </div>
             </div>
@@ -463,13 +504,13 @@ require_once __DIR__ . '/../includes/header.php';
             <div class="mb-3">
                 <label for="address" class="form-label">Adresse</label>
                 <input
-                    type="text"
-                    class="form-control"
-                    id="address"
-                    name="address"
-                    value="<?= e($address); ?>"
-                    maxlength="255"
-                    required
+                        type="text"
+                        class="form-control"
+                        id="address"
+                        name="address"
+                        value="<?= e($address); ?>"
+                        maxlength="255"
+                        required
                 >
             </div>
 
@@ -477,25 +518,25 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="col-md-6 mb-3">
                     <label for="city" class="form-label">Stadt</label>
                     <input
-                        type="text"
-                        class="form-control"
-                        id="city"
-                        name="city"
-                        value="<?= e($city); ?>"
-                        maxlength="255"
-                        required
+                            type="text"
+                            class="form-control"
+                            id="city"
+                            name="city"
+                            value="<?= e($city); ?>"
+                            maxlength="255"
+                            required
                     >
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label for="region" class="form-label">Region</label>
                     <input
-                        type="text"
-                        class="form-control"
-                        id="region"
-                        name="region"
-                        value="<?= e($region); ?>"
-                        maxlength="255"
+                            type="text"
+                            class="form-control"
+                            id="region"
+                            name="region"
+                            value="<?= e($region); ?>"
+                            maxlength="255"
                     >
                 </div>
             </div>
@@ -504,25 +545,25 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="col-md-6 mb-3">
                     <label for="country" class="form-label">Land</label>
                     <input
-                        type="text"
-                        class="form-control"
-                        id="country"
-                        name="country"
-                        value="<?= e($country); ?>"
-                        maxlength="255"
-                        required
+                            type="text"
+                            class="form-control"
+                            id="country"
+                            name="country"
+                            value="<?= e($country); ?>"
+                            maxlength="255"
+                            required
                     >
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label for="postal" class="form-label">Postleitzahl</label>
                     <input
-                        type="text"
-                        class="form-control"
-                        id="postal"
-                        name="postal"
-                        value="<?= e($postal); ?>"
-                        maxlength="255"
+                            type="text"
+                            class="form-control"
+                            id="postal"
+                            name="postal"
+                            value="<?= e($postal); ?>"
+                            maxlength="255"
                     >
                 </div>
             </div>
@@ -530,25 +571,25 @@ require_once __DIR__ . '/../includes/header.php';
             <div class="mb-3">
                 <label for="phone" class="form-label">Telefon</label>
                 <input
-                    type="text"
-                    class="form-control"
-                    id="phone"
-                    name="phone"
-                    value="<?= e($phone); ?>"
-                    maxlength="255"
+                        type="text"
+                        class="form-control"
+                        id="phone"
+                        name="phone"
+                        value="<?= e($phone); ?>"
+                        maxlength="255"
                 >
             </div>
 
             <div class="mb-3">
                 <label for="email" class="form-label">E-Mail / Benutzername</label>
                 <input
-                    type="email"
-                    class="form-control"
-                    id="email"
-                    name="email"
-                    value="<?= e($email); ?>"
-                    maxlength="100"
-                    required
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        name="email"
+                        value="<?= e($email); ?>"
+                        maxlength="100"
+                        required
                 >
             </div>
 
@@ -558,6 +599,7 @@ require_once __DIR__ . '/../includes/header.php';
         </form>
     </section>
 
+    <!-- Formular zum Ändern von Status und Rolle. -->
     <section class="data-box manage-user-edit-section user-edit-status-section">
         <h2>Status und Rolle</h2>
 
@@ -566,6 +608,7 @@ require_once __DIR__ . '/../includes/header.php';
         </p>
 
         <?php
+        // Aktuelle Rolle und aktuellen Status für die Select-Felder vorbereiten.
         $selectedTypeValue = 1;
         if ((int) $selectedUser['Type'] === 2)
         {
@@ -614,6 +657,7 @@ require_once __DIR__ . '/../includes/header.php';
         </form>
     </section>
 
+    <!-- Formular zum Setzen eines neuen Passworts durch Administratoren. -->
     <section class="data-box manage-user-edit-section user-edit-password-section">
         <h2>Passwort setzen</h2>
 
@@ -655,6 +699,7 @@ require_once __DIR__ . '/../includes/header.php';
     </section>
 <?php endif; ?>
 
+    <!-- Navigation zurück zur Benutzerverwaltung. -->
     <div class="manage-user-edit-actions">
         <?php
         $buttonText = 'Zurück zur Benutzerliste';

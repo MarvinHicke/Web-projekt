@@ -1,14 +1,14 @@
 <?php
-// Load application initialization, shared helpers, and required repositories.
+// Initialisierung, gemeinsame Hilfsfunktionen und benötigte Repositories laden.
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/subjectRepository.php';
 require_once __DIR__ . '/../repositories/artworkRepository.php';
 
-// Read and validate the subject ID from the query string.
+// Subject-ID aus der URL lesen und in eine Ganzzahl umwandeln.
 $subjectId = (int) ($_GET['id'] ?? 0);
 
-// Stop early if the provided subject ID is invalid.
+// Frühzeitig abbrechen, wenn keine gültige Subject-ID übergeben wurde.
 if ($subjectId <= 0) {
     $pageTitle = 'Thema nicht gefunden';
 
@@ -22,17 +22,16 @@ if ($subjectId <= 0) {
 }
 
 try {
-    // Open the database connection.
+    // Datenbankverbindung öffnen.
     $db = new dbaccess();
     $db->connect();
 
-    // Load the raw subject row to access all available database columns.
-    // This is useful when optional column names vary between dataset versions.
+    // Rohdaten des Subjects laden, damit auch optionale Datenbankspalten verfügbar sind.
     $stmt = $db->preparedStatement("SELECT * FROM subjects WHERE SubjectID = :id");
     $stmt->execute(['id' => $subjectId]);
     $subjectRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Show a user-friendly message if no subject exists for the given ID.
+    // Benutzerfreundliche Fehlermeldung ausgeben, falls kein Subject gefunden wurde.
     if (!$subjectRow) {
         $pageTitle = 'Thema nicht gefunden';
 
@@ -45,11 +44,11 @@ try {
         exit;
     }
 
-    // Load all artworks assigned to the current subject.
+    // Alle Kunstwerke laden, die dem aktuellen Subject zugeordnet sind.
     $artworks = (new artworkRepository($db))->getForSubject($subjectId);
 
 } catch (Throwable $e) {
-    // Show a fallback error page if loading the subject or related artworks fails.
+    // Fallback-Fehlerseite anzeigen, falls das Laden der Daten fehlschlägt.
     $pageTitle = 'Fehler';
 
     require_once __DIR__ . '/../includes/header.php';
@@ -61,10 +60,10 @@ try {
     exit;
 }
 
-// Prepare display values for the subject detail page.
+// Anzeigewerte für die Subjectdetailseite vorbereiten.
 $subjectName = (string) ($subjectRow['SubjectName'] ?? '');
 
-// Read the external subject link from possible database column variants.
+// Externen Subjectlink aus möglichen Datenbankspalten lesen.
 $subjectLink = (string) (
         $subjectRow['SubjectLink'] ??
         $subjectRow['subjectlink'] ??
@@ -73,27 +72,27 @@ $subjectLink = (string) (
         ''
 );
 
-// Build the main subject image URL.
+// Hauptbild des Subjects vorbereiten.
 $subjectPhoto = subjectImageUrl($subjectId);
 
-// Set the final page title and render the shared header.
+// Finalen Seitentitel setzen und Header laden.
 $pageTitle = $subjectName . ' · Thema';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-    <!-- Main subject detail layout with image and metadata. -->
+    <!-- Hauptbereich der Subjectdetailseite mit Bild und Informationen. -->
     <section class="subject-detail-layout">
 
-        <!-- Subject image panel. -->
+        <!-- Bildbereich des Subjects. -->
         <div class="subject-image-panel">
             <img src="<?= e($subjectPhoto); ?>" alt="<?= e($subjectName); ?>">
         </div>
 
-        <!-- Subject information panel with external reference link. -->
+        <!-- Informationsbereich mit externem Link. -->
         <div class="subject-info-panel">
             <h1><?= e($subjectName); ?></h1>
 
-            <!-- Subject metadata table. -->
+            <!-- Tabelle mit Subjectdetails. -->
             <table class="table table-bordered">
                 <tbody>
                 <?php if ($subjectLink !== ''): ?>
@@ -111,19 +110,19 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
     </section>
 
-    <!-- Related artworks assigned to the current subject. -->
+    <!-- Zugeordnete Kunstwerke des aktuellen Subjects. -->
     <section class="mt-5">
         <h2>Kunstwerke zum Thema '<?= e($subjectName); ?>'</h2>
 
         <?php if (empty($artworks)): ?>
-            <!-- Empty-state message shown when the subject has no assigned artworks. -->
+            <!-- Hinweis, falls dem Subject keine Kunstwerke zugeordnet sind. -->
             <p class="text-muted">Keine Kunstwerke für dieses Thema gefunden.</p>
         <?php else: ?>
-            <!-- Responsive grid of related artwork cards. -->
+            <!-- Responsives Raster mit Kunstwerkkarten. -->
             <div class="row row-cols-2 row-cols-md-4 g-3">
                 <?php foreach ($artworks as $artwork): ?>
                     <?php
-                    // Prepare display values for the current artwork card.
+                    // Anzeigewerte für die aktuelle Kunstwerkkarte vorbereiten.
                     $awId       = $artwork->getArtworkid();
                     $awTitle    = $artwork->getTitle();
                     $awYear     = (string) ($artwork->getYearofwork() ?? '');
@@ -159,6 +158,6 @@ require_once __DIR__ . '/../includes/header.php';
     </section>
 
 <?php
-// Render the shared footer.
+// Gemeinsamen Footer einbinden.
 require_once __DIR__ . '/../includes/footer.php';
 ?>

@@ -1,61 +1,61 @@
 <?php
-// Enable detailed error output during development.
+// Detaillierte Fehlerausgabe während der Entwicklung aktivieren.
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-// Set the page title before loading the shared header.
+// Seitentitel vor dem Laden des Headers setzen.
 $pageTitle = 'Genre durchsuchen';
 
-// Load application initialization, shared helpers, and the genre repository.
+// Initialisierung, gemeinsame Hilfsfunktionen und Repository laden.
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/genreRepository.php';
 
 try {
-    // Open the database connection and load all genres.
+    // Datenbankverbindung öffnen und Genres laden.
     $db = new dbaccess();
     $db->connect();
 
     $genreRepository = new genreRepository($db);
     $genres = $genreRepository->findAll();
 } catch (Throwable $e) {
-    // Stop execution and show the error message during development.
+    // Fehler während der Entwicklung direkt ausgeben.
     die($e->getMessage());
 }
 
-// Render the shared header after all page data has been prepared.
+// Gemeinsamen Header einbinden, nachdem die Seitendaten vorbereitet wurden.
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-    <!-- Page heading for the genre browse page. -->
+    <!-- Seitenüberschrift für die Genreübersicht. -->
     <section class="page-heading">
         <h1>Genres durchsuchen</h1>
-        <p>Entdecken Sie Kunstrichtungen und Epochen.</p>
+        <p>Entdecken Sie Kunstrichtungen und ihre Epochen.</p>
     </section>
 
 <?php if (empty($genres)): ?>
-    <!-- Empty-state message shown when no genres are available. -->
+    <!-- Hinweis, falls keine Genres vorhanden sind. -->
     <section class="message">
         Es wurden keine Genres gefunden.
     </section>
 <?php else: ?>
-    <!-- Responsive grid containing all genre cards. -->
+    <!-- Kartenraster mit allen Genres. -->
     <section class="genre-card-grid" aria-label="Liste der Genres">
         <?php foreach ($genres as $genre): ?>
             <?php
-            // Prepare display values for the current genre card.
+            // Anzeigewerte für die aktuelle Genrekarte vorbereiten.
             $genreId = $genre->getGenreID();
             $genreName = $genre->getGenreName();
             $era = $genre->getEra();
             $description = $genre->getDescription();
 
-            // Use a fallback label if the genre name is missing.
+            // Fallback verwenden, falls kein Genrename vorhanden ist.
             if ($genreName === '') {
                 $genreName = 'Unbekanntes Genre';
             }
 
-            // Build the genre image URL or use a placeholder image as fallback.
+            // Genrebild laden oder Platzhalter verwenden.
             $imageFileName = $genre->getImagefilename();
 
             $imageUrl = $imageFileName
@@ -63,7 +63,7 @@ require_once __DIR__ . '/../includes/header.php';
                     : base_url('images/placeholder.jpg');
             ?>
 
-            <!-- Single genre card. -->
+            <!-- Einzelne Genrekarte. -->
             <article class="genre-card-link-wrapper">
                 <a href="<?= e(genreDetailUrl($genreId)); ?>">
                     <img
@@ -97,6 +97,6 @@ require_once __DIR__ . '/../includes/header.php';
 <?php endif; ?>
 
 <?php
-// Render the shared footer.
+// Gemeinsamen Footer einbinden.
 require_once __DIR__ . '/../includes/footer.php';
 ?>
