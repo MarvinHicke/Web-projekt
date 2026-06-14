@@ -1,4 +1,18 @@
 <?php
+/**
+ * Startseite der Art Gallery Webanwendung.
+ *
+ * Diese Seite dient als Einstiegspunkt für alle Besucher.
+ * Sie zeigt ein Bootstrap-Karussell mit den am besten bewerteten Kunstwerken,
+ * ein Login-Formular für nicht angemeldete Nutzer sowie drei Datenboxen:
+ * Top-Werke, meistbewertete Künstler und neueste Bewertungen.
+ *
+ * Die Datenboxen sind als ausgelagerte Funktionen in eigenen Dateien
+ * eingebunden (UC02-Anforderung).
+ *
+ * Verantwortlich: D
+ */
+
 $pageTitle = 'Startseite · Art Gallery';
 
 require_once __DIR__ . '/includes/init.php';
@@ -6,10 +20,13 @@ require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/repositories/artworkRepository.php';
 require_once __DIR__ . '/repositories/artistRepository.php';
 require_once __DIR__ . '/repositories/reviewRepository.php';
+
+// Ausgelagerte Boxen-Funktionen einbinden (UC02: Boxen als Funktionen in eigenen Dateien)
 require_once __DIR__ . '/includes/boxes/top-works-box.php';
 require_once __DIR__ . '/includes/boxes/most-reviewed-artists-box.php';
 require_once __DIR__ . '/includes/boxes/most-recent-reviews-box.php';
 
+// Standardwerte: leere Listen, falls die DB nicht erreichbar ist
 $topArtworks         = [];
 $carouselArtworks    = [];
 $mostReviewedArtists = [];
@@ -23,52 +40,52 @@ try {
     $artistRepo  = new artistRepository($db);
     $reviewRepo  = new reviewRepository($db);
 
-    $topArtworkCandidates = $artworkRepo->getTopArtworks(20);
-    $topArtworks          = array_slice($topArtworkCandidates, 0, 3);
+    // 30 Kandidaten abrufen, damit nach der Bildfilterung genug für das Karussell übrig bleiben
+    $topArtworkCandidates = $artworkRepo->getTopArtworks(30);
 
-    // Im Carousel werden nur Kunstwerke mit einem tatsächlich vorhandenen Bild gezeigt.
-    $carouselArtworks     = array_values(array_filter(
-        $topArtworkCandidates,
-        static function (array $work): bool {
-            $imageFileName = (string) ($work['ImageFileName'] ?? '');
-            return !isPlaceholderImageUrl(artworkImageUrl($imageFileName, 'large'));
-        }
-    ));
-    $carouselArtworks = array_slice($carouselArtworks, 0, 5);
-    $mostReviewedArtists = $artistRepo->getMostReviewedArtists(3);
-    $latestReviews       = $reviewRepo->getLatestReviewsWithDetails(3);
-} catch (Exception $e) {
-    // DB not available — widgets show empty state
-}
+    // Für die Boxen werden die ersten 5 Ergebnisse verwendet
+    $topArtworks = array_slice($topArtworkCandidates, 0, 5);
 
-    // Boxes show top 3
-    $topArtworks = array_slice($topArtworkCandidates, 0, 3);
-
-    // Carousel: filter from all candidates, only artworks with a real image file on disk
+    /**
+     * Karussell-Filter: Nur Kunstwerke anzeigen, für die tatsächlich
+     * eine Bilddatei auf dem Server vorhanden ist.
+     * Es werden maximal 5 Einträge aufgenommen.
+     */
     $carouselArtworks = [];
     foreach ($topArtworkCandidates as $work) {
         $fileName = trim((string) ($work['ImageFileName'] ?? ''));
         if ($fileName === '') continue;
-        if (!str_ends_with(strtolower($fileName), '.jpg')) $fileName .= '.jpg';
+
+        // .jpg-Endung ergänzen, falls sie im Dateinamen fehlt
+        if (!str_ends_with(strtolower($fileName), '.jpg')) {
+            $fileName .= '.jpg';
+        }
+
+        // Datei in verschiedenen Größenordnern suchen
         foreach (['large', 'medium', 'small', 'square-small'] as $size) {
             if (file_exists(__DIR__ . '/images/works/' . $size . '/' . $fileName)) {
                 $carouselArtworks[] = $work;
-                break;
+                break; // Sobald eine Größe gefunden wurde, nächstes Kunstwerk
             }
         }
+
+        // Maximale Karussell-Größe: 5 Einträge
         if (count($carouselArtworks) >= 5) break;
     }
 
     $mostReviewedArtists = $artistRepo->getMostReviewedArtists(3);
-    $latestReviews       = $reviewRepo->getLatestReviewsWithDetails(3);
+
+    // Neueste Bewertungen mit Kunstwerkname per JOIN (eigene Methode, gibt Arrays zurück)
+    $latestReviews = $reviewRepo->getLatestReviewsWithDetails(3);
+
 } catch (Exception $e) {
-    // DB not available — widgets show empty state
+    // Datenbankfehler: Seite wird mit leeren Listen gerendert, kein Absturz
 }
 
 require_once __DIR__ . '/includes/header.php';
 ?>
 
-<!-- ===== HERO ===== -->
+<!-- ===== HERO-BEREICH ===== -->
 <section class="hero">
     <div>
         <p class="eyebrow">Willkommen bei</p>
@@ -78,6 +95,7 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </section>
 
+<!-- Login-Formular nur für nicht angemeldete Benutzer (UC22) -->
 <?php if (!isLoggedIn()): ?>
 <section class="home-login-panel" aria-labelledby="home-login-title">
     <div>
@@ -115,11 +133,12 @@ require_once __DIR__ . '/includes/header.php';
 </section>
 <?php endif; ?>
 
-<!-- ===== BOOTSTRAP CAROUSEL ===== -->
+<!-- ===== BOOTSTRAP-KARUSSELL (UC02) ===== -->
 <?php if (!empty($carouselArtworks)): ?>
 <section class="carousel-section" aria-label="Vorgestellte Kunstwerke">
     <div id="artworkCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
 
+        <!-- Indikatorpunkte: einer pro Slide -->
         <div class="carousel-indicators">
             <?php foreach ($carouselArtworks as $i => $work): ?>
                 <button
@@ -135,11 +154,12 @@ require_once __DIR__ . '/includes/header.php';
         <div class="carousel-inner" style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.15);">
             <?php foreach ($carouselArtworks as $i => $work): ?>
                 <?php
-                $id            = (int)    ($work['ArtWorkID']    ?? 0);
-                $title         = (string) ($work['Title']        ?? 'Unbekanntes Kunstwerk');
-                $imageFileName = (string) ($work['ImageFileName'] ?? '');
+                $id            = (int)    ($work['ArtWorkID']     ?? 0);
+                $title         = (string) ($work['Title']          ?? 'Unbekanntes Kunstwerk');
+                $imageFileName = (string) ($work['ImageFileName']  ?? '');
                 $rating        = $work['AvgRating'] ?? null;
                 ?>
+                <!-- Jeder Slide ist ein klickbarer Link zur Einzelansicht (UC02) -->
                 <div class="carousel-item <?= $i === 0 ? 'active' : ''; ?>">
                     <a href="<?= e(artworkDetailUrl($id)); ?>">
                         <img
@@ -162,6 +182,7 @@ require_once __DIR__ . '/includes/header.php';
             <?php endforeach; ?>
         </div>
 
+        <!-- Navigationsschaltflächen des Karussells -->
         <button class="carousel-control-prev" type="button" data-bs-target="#artworkCarousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Zurück</span>
@@ -172,13 +193,10 @@ require_once __DIR__ . '/includes/header.php';
         </button>
     </div>
 </section>
-<?php elseif (!empty($carouselArtworks)): ?>
-<section class="message">
-    Für das Carousel sind momentan weniger als drei Kunstwerke mit vorhandenen Bildern verfügbar.
-</section>
 <?php endif; ?>
 
-<!-- ===== THREE DATA BOXES ===== -->
+<!-- ===== DREI DATENBOXEN (UC02) ===== -->
+<!-- Jede Box ist eine ausgelagerte Funktion in einer eigenen Datei -->
 <section class="three-box-grid" aria-label="Datenboxen auf der Startseite"
          style="margin-top: 1rem; padding-top: 1rem;">
     <?php renderTopWorksBox($topArtworks); ?>
