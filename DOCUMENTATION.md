@@ -81,34 +81,34 @@ Die folgende Tabelle bildet den Stand der Anwendung anhand des vorhandenen
 Quellcodes ab. `Teilweise` bedeutet, dass eine sichtbare oder technische
 Grundlage vorhanden ist, aber noch Anforderungen des Use Cases fehlen.
 
-| Use Case | Bezeichnung | Verantwortlich | Status | Umsetzung und offene Punkte |
-| --- | --- | --- | --- | --- |
-| UC01 | Bootstrap Theme and Site Design | Sehyang Na | Fertig | Bootstrap 5 sowie Google Sans und Manrope werden lokal eingebunden. Der externe Font-Import wurde entfernt und das Design global vereinheitlicht. |
-| UC02 | Home Page | Fatemeh Nezamolmaleki | Fertig | Startseite mit Hero, Login-Formular, mindestens drei realen Carousel-Bildern ohne Placeholder sowie drei ausgelagerten Datenboxen ist vorhanden. Top-Werke werden mit Sternbewertung dargestellt. |
-| UC03 | Navigation | Sehyang Na | Fertig | Hauptnavigation, Utility-Menü und globale Suche sind überall über den Header verfügbar. Themen sowie zustandsabhängige Konto-, Anmelde-, Abmelde- und Admin-Links sind enthalten. |
-| UC04 | About Us | Sehyang Na | Fertig | Die Seite beschreibt das hypothetische Semesterprojekt, Kurs, Semester, Gruppe, Teammitglieder und Arbeitsverteilung. |
-| UC05 | Browse Artists | Lisanne Godlinski  | Teilweise | Künstlerliste, Bilder, Fallbacks, Detailverlinkung und Favoriten-Schaltfläche sind vorhanden. Die geforderte sichtbare Sortierung nach Namen auf- und absteigend fehlt noch. |
-| UC06 | Browse Artworks | Fatemeh Nezamolmaleki  | Fertig | Kunstwerke werden mit Bildern und Detaillinks angezeigt. Sortierung nach Titel, Künstler oder Jahr sowie auf- und absteigende Richtung sind umgesetzt. |
-| UC07 | Browse Genres | Lisanne Godlinski | Teilweise | Genre-Liste mit Bildern und Fallbacks ist vorhanden. Die Sortierung nach Epoche und Name sowie die Verlinkung auf eine noch fehlende Einzelansicht müssen fertiggestellt werden. |
-| UC08 | Browse Subjects | Lisanne Godlinski | Teilweise | Subject-Liste mit Bildern und Fallbacks ist vorhanden. Die Sortierung nach SubjectName sowie die Verlinkung auf eine noch fehlende Einzelansicht müssen fertiggestellt werden. |
-| UC09 | Simple Search | Fatemeh Nezamolmaleki  | Fertig | Das Suchfeld ist global verfügbar, verlangt mindestens drei Zeichen und sucht per Präfixsuche nach Künstlernachnamen und Kunstwerktiteln. |
-| UC10 | Search Results | Fatemeh Nezamolmaleki  | Fertig | Künstler und Kunstwerke werden mit Bild, verlinktem Titel, Detailbutton und Favoritenstatus getrennt dargestellt. Künstler können nach Name und Kunstwerke nach Titel, Künstler oder Jahr jeweils auf- oder absteigend sortiert werden. |
-| UC11 | Display Single Artist | Lisanne Godlinski  | Testen | Künstlerdaten, Bild, Biografie, Detailtabelle, Favoritenstatus und verlinkte Kunstwerke sind vorhanden. Fehlerweiterleitung und vollständige Ausgabe aller DB-Felder müssen abschließend geprüft werden. |
-| UC12 | Display Single Artwork | Fatemeh Nezamolmaleki  | Testen | Kunstwerk-, Künstler-, Galerie-, Genre-, Themen-, Bewertungs- und Rezensionsdaten werden angezeigt. Bootstrap-Modal, Accordion, Favoriten, Review-Formular und eine durchschnittliche Sternbewertung sind integriert; Endtest mit mehreren Datensätzen steht aus. |
-| UC13 | Display Single Genre | Lisanne Godlinski  | Offen | `single-genre.php` ist noch nicht vorhanden. Genre-Informationen und zugehörige Kunstwerke müssen noch umgesetzt werden. |
-| UC14 | Display Single Subject | Lisanne Godlinski | Offen | `single-subject.php` ist noch nicht vorhanden. Subject-Informationen und zugehörige Kunstwerke müssen noch umgesetzt werden. |
-| UC15 | Missing Images | Sehyang Na | Fertig | Gemeinsame PHP-Helper prüfen mehrere Bildgrößen und liefern für fehlende Kunstwerke, Künstler, Genres und Themen `images/placeholder.jpg`. Das Startseiten-Carousel schließt Placeholder-Bilder aus. |
-| UC16 | Add A Review | Linus Meyer | Fertig | Angemeldete Benutzer können Bewertungen mit Rating und Kommentar speichern. Pflichtfelder, Ratingbereich und einmalige Bewertung pro Artwork werden geprüft. |
-| UC17 | Delete A Review | Linus Meyer | Fertig | Nur Administratoren können Bewertungen per POST nach Bestätigungsdialog löschen; anschließend wird die Artwork-Seite erneut geladen. |
-| UC18 | Add To Favorites List | Linus Meyer | Fertig | Künstler und Kunstwerke werden getrennt und ohne Duplikate in der PHP-Session gespeichert. |
-| UC19 | View Favorites List | Linus Meyer  | Fertig | Favorisierte Künstler und Kunstwerke werden in getrennten Bereichen angezeigt und können wieder entfernt werden. |
-| UC20 | Register User | Linus Meyer  | Testen | Registrierung, Pflichtfeldprüfung, E-Mail-Prüfung, Passwort-Hashing und Prüfung auf bestehende Benutzernamen sind vorhanden. Vollständiger DB-Integrationstest steht aus. |
-| UC21 | Manage Users | Linus Meyer | Offen | Admin-Zugriffsschutz ist vorhanden, die eigentliche Liste und Bearbeitung von Benutzern ist jedoch noch nicht implementiert. |
-| UC22 | Login as User | Linus Meyer  | Fertig | Datenbankgestützte Anmeldung, Passwortprüfung, Session-Aufbau, gestaltete Fehlermeldungen, Benutzeranzeige und Abmeldung sind umgesetzt. Das Anmeldeformular ist zusätzlich auf der Startseite verfügbar. |
-| UC23 | My Account | Linus Meyer  | Testen | Angemeldete Benutzer können Profil- und Passwortdaten bearbeiten. Validierung und Zugriffsschutz sind vorhanden; Sonderfälle müssen abschließend getestet werden. |
-| UC24 | Advanced Search | Fatemeh Nezamolmaleki  | Offen | Die Seite ist als Navigationseintrag und Platzhalter vorhanden. Kriterien für Artist- und Artwork-Suche sowie Ergebnisübergabe fehlen noch. |
-| UC25 | Map to Museum | Fatemeh Nezamolmaleki  | Offen | Im Galerie-Accordion ist noch keine OpenStreetMap-Karte mit Marker eingebunden. |
-| UC26 | Global Error Page | Sehyang Na | Fertig | Apache-Fehler 400, 401, 403, 404 und 500 werden über `.htaccess` an die globale Fehlerseite weitergeleitet; Directory Listing ist deaktiviert. |
+| Use Case | Bezeichnung | Verantwortlich        | Status    | Umsetzung und offene Punkte |
+| --- | --- |-----------------------|-----------| --- |
+| UC01 | Bootstrap Theme and Site Design | Sehyang Na            | Fertig    | Bootstrap 5 sowie Google Sans und Manrope werden lokal eingebunden. Der externe Font-Import wurde entfernt und das Design global vereinheitlicht. |
+| UC02 | Home Page | Fatemeh Nezamolmaleki | Fertig    | Startseite mit Hero, Login-Formular, mindestens drei realen Carousel-Bildern ohne Placeholder sowie drei ausgelagerten Datenboxen ist vorhanden. Top-Werke werden mit Sternbewertung dargestellt. |
+| UC03 | Navigation | Sehyang Na            | Fertig    | Hauptnavigation, Utility-Menü und globale Suche sind überall über den Header verfügbar. Themen sowie zustandsabhängige Konto-, Anmelde-, Abmelde- und Admin-Links sind enthalten. |
+| UC04 | About Us | Sehyang Na            | Fertig    | Die Seite beschreibt das hypothetische Semesterprojekt, Kurs, Semester, Gruppe, Teammitglieder und Arbeitsverteilung. |
+| UC05 | Browse Artists | Lisanne Godlinski     | Teilweise | Künstlerliste, Bilder, Fallbacks, Detailverlinkung und Favoriten-Schaltfläche sind vorhanden. Die geforderte sichtbare Sortierung nach Namen auf- und absteigend fehlt noch. |
+| UC06 | Browse Artworks | Fatemeh Nezamolmaleki | Fertig    | Kunstwerke werden mit Bildern und Detaillinks angezeigt. Sortierung nach Titel, Künstler oder Jahr sowie auf- und absteigende Richtung sind umgesetzt. |
+| UC07 | Browse Genres | Lisanne Godlinski     | Teilweise | Genre-Liste mit Bildern und Fallbacks ist vorhanden. Die Sortierung nach Epoche und Name sowie die Verlinkung auf eine noch fehlende Einzelansicht müssen fertiggestellt werden. |
+| UC08 | Browse Subjects | Lisanne Godlinski     | Teilweise | Subject-Liste mit Bildern und Fallbacks ist vorhanden. Die Sortierung nach SubjectName sowie die Verlinkung auf eine noch fehlende Einzelansicht müssen fertiggestellt werden. |
+| UC09 | Simple Search | Fatemeh Nezamolmaleki | Fertig    | Das Suchfeld ist global verfügbar, verlangt mindestens drei Zeichen und sucht per Präfixsuche nach Künstlernachnamen und Kunstwerktiteln. |
+| UC10 | Search Results | Fatemeh Nezamolmaleki | Fertig    | Künstler und Kunstwerke werden mit Bild, verlinktem Titel, Detailbutton und Favoritenstatus getrennt dargestellt. Künstler können nach Name und Kunstwerke nach Titel, Künstler oder Jahr jeweils auf- oder absteigend sortiert werden. |
+| UC11 | Display Single Artist | Lisanne Godlinski     | Testen    | Künstlerdaten, Bild, Biografie, Detailtabelle, Favoritenstatus und verlinkte Kunstwerke sind vorhanden. Fehlerweiterleitung und vollständige Ausgabe aller DB-Felder müssen abschließend geprüft werden. |
+| UC12 | Display Single Artwork | Fatemeh Nezamolmaleki | Testen    | Kunstwerk-, Künstler-, Galerie-, Genre-, Themen-, Bewertungs- und Rezensionsdaten werden angezeigt. Bootstrap-Modal, Accordion, Favoriten, Review-Formular und eine durchschnittliche Sternbewertung sind integriert; Endtest mit mehreren Datensätzen steht aus. |
+| UC13 | Display Single Genre | Lisanne Godlinski     | Offen     | `single-genre.php` ist noch nicht vorhanden. Genre-Informationen und zugehörige Kunstwerke müssen noch umgesetzt werden. |
+| UC14 | Display Single Subject | Lisanne Godlinski     | Offen     | `single-subject.php` ist noch nicht vorhanden. Subject-Informationen und zugehörige Kunstwerke müssen noch umgesetzt werden. |
+| UC15 | Missing Images | Sehyang Na            | Fertig    | Gemeinsame PHP-Helper prüfen mehrere Bildgrößen und liefern für fehlende Kunstwerke, Künstler, Genres und Themen `images/placeholder.jpg`. Das Startseiten-Carousel schließt Placeholder-Bilder aus. |
+| UC16 | Add A Review | Linus Meyer           | Fertig    | Angemeldete Benutzer können Bewertungen mit Rating und Kommentar speichern. Pflichtfelder, Ratingbereich und einmalige Bewertung pro Artwork werden geprüft. |
+| UC17 | Delete A Review | Linus Meyer           | Fertig    | Nur Administratoren können Bewertungen per POST nach Bestätigungsdialog löschen; anschließend wird die Artwork-Seite erneut geladen. |
+| UC18 | Add To Favorites List | Linus Meyer           | Fertig    | Künstler und Kunstwerke werden getrennt und ohne Duplikate in der PHP-Session gespeichert. |
+| UC19 | View Favorites List | Linus Meyer           | Fertig    | Favorisierte Künstler und Kunstwerke werden in getrennten Bereichen angezeigt und können wieder entfernt werden. |
+| UC20 | Register User | Linus Meyer           | Testen    | Registrierung, Pflichtfeldprüfung, E-Mail-Prüfung, Passwort-Hashing und Prüfung auf bestehende Benutzernamen sind vorhanden. Vollständiger DB-Integrationstest steht aus. |
+| UC21 | Manage Users | Linus Meyer           | Offen     | Admin-Zugriffsschutz ist vorhanden, die eigentliche Liste und Bearbeitung von Benutzern ist jedoch noch nicht implementiert. |
+| UC22 | Login as User | Linus Meyer           | Fertig    | Datenbankgestützte Anmeldung, Passwortprüfung, Session-Aufbau, gestaltete Fehlermeldungen, Benutzeranzeige und Abmeldung sind umgesetzt. Das Anmeldeformular ist zusätzlich auf der Startseite verfügbar. |
+| UC23 | My Account | Linus Meyer           | Testen    | Angemeldete Benutzer können Profil- und Passwortdaten bearbeiten. Validierung und Zugriffsschutz sind vorhanden; Sonderfälle müssen abschließend getestet werden. |
+| UC24 | Advanced Search | Marvin Hicke   | Fertig    | Die Seite ist als Navigationseintrag und Platzhalter vorhanden. Kriterien für Artist- und Artwork-Suche sowie Ergebnisübergabe fehlen noch. |
+| UC25 | Map to Museum | Marvin Hicke          | Fertig    | Im Galerie-Accordion ist noch keine OpenStreetMap-Karte mit Marker eingebunden. |
+| UC26 | Global Error Page | Sehyang Na            | Fertig    | Apache-Fehler 400, 401, 403, 404 und 500 werden über `.htaccess` an die globale Fehlerseite weitergeleitet; Directory Listing ist deaktiviert. |
 
 ## Funktionsbereiche nach Use Cases
 

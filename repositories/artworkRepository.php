@@ -290,7 +290,8 @@ class artworkRepository
     {
         $dir = (strtoupper($direction) === 'DESC') ? 'DESC' : 'ASC';
 
-        switch (strtolower($sortBy)) {
+        switch (strtolower($sortBy))
+        {
             case 'year':
                 $orderClause = "a.YearOfWork $dir";
                 break;

@@ -118,4 +118,26 @@ else
     echo "Ergebnis: Keine Treffer gefunden.<br>";
 }
 
+echo "<h2>Methode: artworkRepository - Methode: advancedSearch('Mona')</h2>";
+$artworks = $artworkRepo->advancedSearch('Mona');
+
+if (!empty($artworks))
+{
+    echo "Ergebnis: " . $artworks[0]->getTitle() . " gefunden<br>";
+} else
+{
+    echo "Ergebnis: Keine passenden Kunstwerke gefunden<br>";
+}
+
+echo "<h2>Methode: artworkRepository - Methode: advancedSearch('', null, null, 1) - Nach Genre ID 1</h2>";
+$genreArtworks = $artworkRepo->advancedSearch('', null, null, 1);
+
+if (!empty($genreArtworks))
+{
+    echo "Ergebnis: " . count($genreArtworks) . " Kunstwerke für Genre gefunden<br>";
+} else
+{
+    echo "Ergebnis: Keine Kunstwerke für dieses Genre gefunden<br>";
+}
+
 $db->close();

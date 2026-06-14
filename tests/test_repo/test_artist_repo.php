@@ -83,6 +83,17 @@ else
     echo "Ergebnis: Keine passenden Künstler gefunden.<br>";
 }
 
+echo "<h2>Methode: artistRepository - Methode: AdvancedSearch('Picasso')</h2>";
+$artists = $artistRepo->advancedSearch('Picasso');
+
+if (!empty($artists))
+{
+    echo "Ergebnis: " . $artists[0]->getFirstName() . " " . $artists[0]->getLastName() . " gefunden<br>";
+} else
+{
+    echo "Ergebnis: Keine passenden Künstler gefunden<br>";
+}
+
 $db->close();
 
 

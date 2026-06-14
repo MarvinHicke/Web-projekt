@@ -9,8 +9,10 @@ class artist
     private $firstName;
     private $lastName;
     private $nationality;
-    private $gender;
     private $birthYear;
+    private $yearOfDeath;
+    private $details;
+    private $artistLink;
     private $imageFilename;
     private $width;
     private $height;
@@ -22,12 +24,14 @@ class artist
      */
     public function __construct($data)
     {
-        $this->id = $data['ArtistID'];
-        $this->firstName = $data['FirstName'];
-        $this->lastName = $data['LastName'];
-        $this->nationality = $data['Nationality'];
-        $this->gender      = isset($data['Gender']) ? $data['Gender'] : (isset($data['gender']) ? $data['gender'] : 'unbekannt');
-        $this->birthYear   = isset($data['BirthYear']) ? $data['BirthYear'] : (isset($data['birthyear']) ? $data['birthyear'] : null);
+        $this->id = isset($data['ArtistID']) ? $data['ArtistID'] : null;
+        $this->firstName = isset($data['FirstName']) ? $data['FirstName'] : null;
+        $this->lastName = isset($data['LastName']) ? $data['LastName'] : null;
+        $this->nationality = isset($data['Nationality']) ? $data['Nationality'] : null;
+        $this->birthYear = isset($data['YearOfBirth']) ? $data['YearOfBirth'] : null;
+        $this->yearOfDeath = isset($data['YearOfDeath']) ? $data['YearOfDeath'] : null;
+        $this->details = isset($data['Details']) ? $data['Details'] : null;
+        $this->artistLink = isset($data['ArtistLink']) ? $data['ArtistLink'] : null;
 
         $this->imageFilename =
             $data['ImageFileName']
@@ -39,6 +43,16 @@ class artist
     }
 
     // Getter
+
+    /**
+     * Gibt die eindeutige ID des Künstlers zurück
+     *
+     * @return int Die ID
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
      * Gibt den Vornamen des Künstlers zurück
@@ -71,16 +85,6 @@ class artist
     }
 
     /**
-     * Gibt das Geschlecht des Künstlers zurück
-     *
-     * @return string Das Geschlecht
-     */
-    public function getGender()
-    {
-        return $this->gender;
-    }
-
-    /**
      * Gibt das Geburtsjahr des Künstlers zurück
      *
      * @return int Das Geburtsjahr
@@ -91,13 +95,33 @@ class artist
     }
 
     /**
-     * Gibt die eindeutige ID des Künstlers zurück
+     * Gibt das Todesjahr des Künstlers zurück
      *
-     * @return int Die ID
+     * @return int Das Todesjahr
      */
-    public function getId()
+    public function getYearOfDeath()
     {
-        return $this->id;
+        return $this->yearOfDeath;
+    }
+
+    /**
+     * Gibt die Biografie/Details des Künstlers zurück
+     *
+     * @return string Die Details
+     */
+    public function getDetails()
+    {
+        return $this->details;
+    }
+
+    /**
+     * Gibt den externen Link zum Künstler zurück
+     *
+     * @return string Der Link
+     */
+    public function getArtistLink()
+    {
+        return $this->artistLink;
     }
 
     public function getImagefilename()
