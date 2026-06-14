@@ -494,7 +494,7 @@ require_once __DIR__ . "/../includes/header.php";
 </section>
 
 <section class="data-box account-section account-reviews-section">
-<h2>Meine Reviews</h2>
+<h2>Meine Bewertungen</h2>
 
 <?php if (empty($ownReviews)): ?>
     <?php
@@ -588,30 +588,7 @@ require_once __DIR__ . "/../includes/header.php";
         include __DIR__ . '/../components/button.php';
         ?>
     </div>
-
-    <button type="submit" class="btn btn-primary">
-        Passwort speichern
-    </button>
-</form>
-
-<h2>Meine Bewertungen</h2>
-<p>Hier werden später deine eigenen Bewertungen angezeigt.</p>
-
-<h2>Meine Favoriten</h2>
-<p>Hier kannst du deine favorisierten Künstler und Kunstwerke ansehen.</p>
-
-<?php
-$buttonText = 'Favoriten anzeigen';
-$buttonHref = base_url('pages/favorites.php');
-$buttonVariant = 'primary';
-include __DIR__ . '/../components/button.php';
-?>
-<?php
-$buttonText = 'Abmelden';
-$buttonHref = base_url('pages/logout.php');
-$buttonVariant = 'danger';
-include __DIR__ . '/../components/button.php';
-?>
+</section>
 
 <?php
 require_once __DIR__ . "/../includes/footer.php";

@@ -1,3 +1,6 @@
+<?php
+// Die Komponente übernimmt einen optionalen aktuellen Suchbegriff aus $currentSearch.
+?>
 <form method="get" class="search-bar d-flex gap-2">
 
     <input

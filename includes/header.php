@@ -15,7 +15,7 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
     <link rel="stylesheet" href="<?= e(base_url('assets/css/bootstrap.min.css')); ?>">
     <link rel="stylesheet" href="<?= e(base_url('assets/css/theme_bootswatch.css')); ?>">
     <link rel="stylesheet" href="<?= e(base_url('assets/css/components.css')); ?>">
-    <link rel="stylesheet" href="<?= e(base_url('assets/css/styles.css')); ?>?v=4">
+    <link rel="stylesheet" href="<?= e(base_url('assets/css/styles.css')); ?>?v=5">
 </head>
 <body>
 
@@ -23,6 +23,7 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
     <div class="header-top">
         <a class="logo" href="<?= e(base_url('index.php')); ?>">Art Gallery</a>
 
+        <?php // Das Utility-Menü passt seine Links an Loginstatus und Benutzerrolle an. ?>
         <nav class="utility-nav" aria-label="Hilfsnavigation">
             <ul>
                 <li><a href="<?= e(base_url('pages/favorites.php')); ?>">Favoriten</a></li>
@@ -40,6 +41,7 @@ $currentSearch = isset($_GET['q']) ? trim((string) $_GET['q']) : '';
         </nav>
     </div>
 
+    <?php // Die Hauptnavigation bleibt auf allen Seiten identisch verfügbar. ?>
     <nav class="main-nav" aria-label="Hauptnavigation">
         <ul>
             <li><a href="<?= e(base_url('index.php')); ?>">Startseite</a></li>

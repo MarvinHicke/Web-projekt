@@ -140,6 +140,12 @@ $pageTitle = $title . ' · Kunstwerk';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<div style="margin-bottom: 1rem;">
+    <a class="button-link" href="<?= e(base_url('pages/browse-artworks.php')); ?>">
+        ← Zurück zu Kunstwerke
+    </a>
+</div>
+
 <!-- ===== BOOTSTRAP MODAL (large image) ===== -->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">

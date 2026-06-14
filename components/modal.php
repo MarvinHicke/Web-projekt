@@ -1,3 +1,6 @@
+<?php
+// Der Titel wird escaped; $modalContent darf bereits vorbereitetes Komponenten-HTML enthalten.
+?>
 <div class="custom-modal">
 
     <div class="custom-modal-content">

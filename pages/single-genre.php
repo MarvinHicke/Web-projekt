@@ -19,9 +19,10 @@ try {
     $db = new dbaccess();
     $db->connect();
 
-    $genreObj = (new genreRepository($db))->getById($genreId);
+    $genreRepository = new genreRepository($db);
+    $genreObj = $genreRepository->getById($genreId);
 
-    // Raw SELECT * to capture all DB columns including Details, ArtistLink, BirthYear, DeathYear
+    // Read the raw row because link column names vary between dataset versions.
     $stmt = $db->preparedStatement("SELECT * FROM genres WHERE GenreID = :id");
     $stmt->execute(['id' => $genreId]);
     $genreRow = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -41,13 +42,15 @@ try {
     $pageTitle = 'Fehler';
     require_once __DIR__ . '/../includes/header.php';
     echo '<section class="page-heading"><h1>Ladefehler</h1>'
-            . '<a class="button-link" href="' . e(base_url('pages/browse-genres.php')) . '">Zurück</a></section>';
+        . '<a class="button-link" href="' . e(base_url('pages/browse-genre.php')) . '">Zurück</a></section>';
     require_once __DIR__ . '/../includes/footer.php';
     exit;
 }
 
 // ── display values ─────────────────────────────────────────────────────────
-$genreName   = (string) ($genreRow['GenreName']   ?? '');
+$genreName = (string) ($genreRow['GenreName'] ?? '');
+$genreEra = (string) ($genreRow['Era'] ?? '');
+$genreDescription = cleanHtml((string) ($genreRow['Description'] ?? ''));
 // Details and ArtistLink — try multiple casing variants (DB column names vary)
 $genreLink  = (string) (
         $genreRow['GenreLink']  ??
@@ -75,10 +78,18 @@ require_once __DIR__ . '/../includes/header.php';
             <p><strong>Beschreibung:</strong> <?= e($description); ?></p>
 
 
-            <!-- Details table -->
+            <?php if ($genreDescription !== ''): ?>
+                <p><?= e($genreDescription); ?></p>
+            <?php endif; ?>
+
             <table class="table table-bordered">
-                <caption class="fw-bold text-start pb-2 caption-top"></caption>
                 <tbody>
+                <?php if ($genreEra !== ''): ?>
+                    <tr>
+                        <th scope="row">Epoche</th>
+                        <td><?= e($genreEra); ?></td>
+                    </tr>
+                <?php endif; ?>
                 <?php if ($genreLink !== ''): ?>
                     <tr>
                         <th scope="row">Weitere Infos</th>

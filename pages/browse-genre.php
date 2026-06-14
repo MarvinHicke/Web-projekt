@@ -20,23 +20,18 @@ try {
     die($e->getMessage());
 }
 
-$_SESSION["favorites"] ??= [];
-$_SESSION["favorites"]["genres"] ??= [];
-
-$favoriteGenresIds = array_map('intval', $_SESSION["favorites"]["genres"]);
-
 require_once __DIR__.'/../includes/header.php';
 
 ?>
     <section class="page-heading">
         <h1>Genres durchsuchen</h1>
-        <p>Entdecken sie Genre</p>
+        <p>Entdecken Sie Kunstrichtungen und Epochen.</p>
     </section>
 
 
 <?php if (empty($genres)): ?>
     <section class="message">
-        Es wurde kein Genre gefunden.
+        Es wurden keine Genres gefunden.
     </section>
 <?php else: ?>
     <section class="genre-card-grid" aria-label="Liste der Genres">

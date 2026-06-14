@@ -1,6 +1,7 @@
 <article class="col">
     <div class="card h-100 shadow-sm ui-card">
         <a href="<?= e(artistDetailUrl((int) $artist->getId())); ?>">
+            <?php // Der zentrale Helper liefert bei fehlendem Künstlerbild den Placeholder. ?>
             <img
                 src="<?= e(artistImageUrl((int) $artist->getId(), 'square-medium')); ?>"
                 class="card-img-top entity-card-img"
@@ -34,8 +35,6 @@
                 $buttonVariant = 'outline-primary';
                 include __DIR__ . '/button.php';
                 ?>
-            <?php elseif (($showFavoriteStatus ?? false) === true): ?>
-                <a class="btn btn-warning" href="<?= e(base_url('pages/favorites.php')); ?>">In Favoriten</a>
             <?php endif; ?>
 
             <?php if (($showRemoveFavoriteButton ?? false) === true): ?>

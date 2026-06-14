@@ -21,11 +21,6 @@ try {
     die($e->getMessage());
 }
 
-$_SESSION["favorites"] ??= [];
-$_SESSION["favorites"]["artists"] ??= [];
-
-$favoriteArtistIds = array_map('intval', $_SESSION["favorites"]["artists"]);
-
 require_once __DIR__.'/../includes/header.php';
 
 ?>

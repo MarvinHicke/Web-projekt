@@ -8,10 +8,6 @@ $pageTitle = 'Kunstwerke durchsuchen';
 $sort = safeParam((string) ($_GET['sort'] ?? 'title'), ['title', 'artist', 'year'], 'title');
 $direction = safeParam(strtolower((string) ($_GET['direction'] ?? 'asc')), ['asc', 'desc'], 'asc');
 
-$_SESSION['favorites'] ??= [];
-$_SESSION['favorites']['artworks'] ??= [];
-$favoriteArtworkIds = array_map('intval', $_SESSION['favorites']['artworks']);
-
 try {
     $db = new dbaccess();
     $db->connect();
@@ -78,17 +74,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <h2><a href="<?= e(artworkDetailUrl($artworkId)); ?>"><?= e($title); ?></a></h2>
                     <p><strong>Künstler:</strong> <?= e($artistName !== '' ? $artistName : 'Unbekannt'); ?></p>
                     <p><strong>Jahr:</strong> <?= e($year !== '' ? $year : 'Unbekannt'); ?></p>
-                    <div class="result-actions">
-                        <a class="btn btn-sm btn-primary" href="<?= e(artworkDetailUrl($artworkId)); ?>">Ansehen</a>
-                        <?php if (in_array((int) $artworkId, $favoriteArtworkIds, true)): ?>
-                            <a class="btn btn-sm btn-warning" href="<?= e(base_url('pages/favorites.php')); ?>">In Favoriten</a>
-                        <?php else: ?>
-                            <a class="btn btn-sm btn-outline-primary"
-                               href="<?= e(base_url('pages/add-favorite.php') . '?type=artwork&id=' . $artworkId . '&redirect=browse-artworks.php'); ?>">
-                                Zu Favoriten
-                            </a>
-                        <?php endif; ?>
-                    </div>
+                    <a class="btn btn-sm btn-primary" href="<?= e(artworkDetailUrl($artworkId)); ?>">Ansehen</a>
                 </div>
             </article>
         <?php endforeach; ?>
