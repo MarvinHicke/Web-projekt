@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/subjectRepository.php';
+require_once __DIR__ . '/../repositories/artworkRepository.php';
+
 
 $subjectId = (int) ($_GET['id'] ?? 0);
 
@@ -34,7 +36,7 @@ try {
         exit;
     }
 
-    $subjects = (new subjectRepository($db))->findAll();
+    $artworks = (new artworkRepository($db))->getForSubject($subjectId);
 
 } catch (Exception $e) {
     $pageTitle = 'Fehler';
@@ -92,7 +94,7 @@ require_once __DIR__ . '/../includes/header.php';
 
 <!-- ===== ARTWORKS GRID ===== -->
 <section class="mt-5">
-    <h2>Thema: <?= e($subjectName); ?></h2>
+    <h2>Kunstwerke zum Thema '<?= e($subjectName); ?>'</h2>
 
     <?php if (empty($artworks)): ?>
         <p class="text-muted">Keine Kunstwerke für dieses Thema gefunden.</p>

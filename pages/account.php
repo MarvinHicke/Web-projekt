@@ -1,4 +1,10 @@
 <?php
+/**
+ * Mein-Konto-Seite für UC23.
+ *
+ * Ermöglicht eingeloggten Benutzern das Bearbeiten ihrer Profildaten, das
+ * Ändern ihres Passworts sowie das Anzeigen eigener Reviews und Favoriten.
+ */
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../repositories/customerRepository.php';
 require_once __DIR__ . '/../repositories/reviewRepository.php';
@@ -22,6 +28,7 @@ $passwordErrors = [];
 $passwordSuccessMessage = '';
 $passwordMinLength = 8;
 
+// Loads the current account from the database and falls back to session data if needed.
 $accountUser = $customerRepository->GetById((int) $currentUser['CustomerID']);
 
 if (!$accountUser)
@@ -184,6 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['formType'] ?? '') === 'pas
 
         $currentPasswordIsValid = false;
 
+        // Accepts hashed passwords and legacy plaintext passwords before storing the new password hashed.
         if ($loginUser) {
             $storedPassword = (string) ($loginUser['Pass'] ?? '');
             $passwordInfo = password_get_info($storedPassword);

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Registrierungsseite für UC20.
+ *
+ * Validiert Profildaten und erstellt danach einen
+ * neuen Kunden inklusive Login-Datensatz.
+ */
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../repositories/customerRepository.php';
 $pageTitle = "Registrieren";
@@ -123,6 +129,7 @@ if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
         $passwordHash=password_hash($password,PASSWORD_DEFAULT);
         $customerRepository = new customerRepository(db());
 
+        // Uses the e-mail address as login username and prevents duplicate accounts.
         if ($customerRepository->GetByUsername($email)) {
             $errors[] = "Diese E-Mail ist bereits registriert.";
         } else {

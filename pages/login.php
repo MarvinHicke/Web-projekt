@@ -1,4 +1,10 @@
 <?php
+/**
+ * Login-Seite für UC22.
+ *
+ * Prüft aktive Benutzerkonten gegen die customerlogon-Tabelle und unterstützt
+ * sowohl gehashte Passwörter als auch alte Klartext-Passwörter aus Seed-Daten.
+ */
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../repositories/customerRepository.php';
 $pageTitle = "Anmelden";
@@ -28,6 +34,7 @@ if(($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST")
         $customerRepository = new customerRepository(db());
         $user = $customerRepository->GetByUsername($email);
 
+        // Supports both newly hashed passwords and legacy plaintext seed passwords.
         $passwordIsValid = false;
 
         if ($user && (int)($user['State'] ?? 0) === 1) {

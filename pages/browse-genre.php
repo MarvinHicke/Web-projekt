@@ -34,12 +34,47 @@ require_once __DIR__.'/../includes/header.php';
         Es wurden keine Genres gefunden.
     </section>
 <?php else: ?>
-    <section class="container my-4" aria-label="Liste der Genres">
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            <?php foreach ($genres as $genre): ?>
-                <?php include __DIR__ . '/../components/genre-card.php'; ?>
-            <?php endforeach; ?>
-        </div>
+    <section class="genre-card-grid" aria-label="Liste der Genres">
+        <?php foreach ($genres as $genre): ?>
+            <?php
+            $genreId = $genre->getGenreID();
+
+            $genreName = $genre->getGenreName();
+
+            $era = $genre->getEra();
+
+            $description = $genre->getDescription();
+
+            if ($genreName === '') {
+                $genreName = 'Unbekanntes Genre';
+            }
+
+            $imageFileName = $genre->getImagefilename();
+
+            $imageUrl = $imageFileName
+                    ? genreImageUrl($imageFileName, 'square-medium')
+                    : base_url('images/placeholder.jpg');
+            ?>
+
+            <article class="genre-card-link-wrapper">
+                <a class="genre-card-link" href="<?= e(genreDetailUrl($genreId)); ?>">
+                    <img
+                            src="<?= e($imageUrl); ?>"
+                            alt="<?= e($genreName); ?>"
+                            class="genre-card-image"
+                    >
+
+                    <div class="genre-card-content">
+
+                        <h2><a href="<?= e(genreDetailUrl($genreId)); ?>"><?= e($genreName); ?></a></h2>
+                        <p><strong>Era:</strong> <?= e($era !== '' ? $era : 'Unbekannt'); ?></p>
+
+                        <div class="result-actions">
+                            <a class="btn btn-sm btn-primary" href="<?= e(genreDetailUrl($genreId)); ?>">Ansehen</a>
+                        </div>
+                </a>
+            </article>
+        <?php endforeach; ?>
     </section>
 <?php endif; ?>
 

@@ -104,27 +104,13 @@ require_once __DIR__ . '/includes/header.php';
     <form method="post" action="<?= e(base_url('pages/login.php')); ?>" class="home-login-form">
         <div>
             <label class="form-label" for="home-login-email">E-Mail</label>
-            <input
-                class="form-control"
-                type="email"
-                id="home-login-email"
-                name="email"
-                autocomplete="email"
-                required
-                maxlength="100"
-            >
+            <input class="form-control" type="email" id="home-login-email" name="email"
+                   autocomplete="email" required maxlength="100">
         </div>
         <div>
             <label class="form-label" for="home-login-password">Passwort</label>
-            <input
-                class="form-control"
-                type="password"
-                id="home-login-password"
-                name="password"
-                autocomplete="current-password"
-                required
-                minlength="8"
-            >
+            <input class="form-control" type="password" id="home-login-password" name="password"
+                   autocomplete="current-password" required minlength="8">
         </div>
         <button class="btn btn-primary" type="submit">Anmelden</button>
     </form>

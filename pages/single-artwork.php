@@ -55,7 +55,7 @@ try {
     exit;
 }
 
-// ── handle add-review POST (PRG pattern) ─────────────────────────────────────
+// UC16: Validate and save review submissions using the Post/Redirect/Get pattern.
 $reviewErrors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_review']))
@@ -192,7 +192,7 @@ require_once __DIR__ . '/../includes/header.php';
             <p class="artwork-description"><?= e($description); ?></p>
         <?php endif; ?>
 
-        <!-- Favorite -->
+        <!-- UC18: Session-based artwork favorite button. -->
         <?php if ($isFavorited): ?>
             <a class="btn btn-primary btn-sm mb-3"
                href="<?= e(base_url('pages/remove-favorite.php') . '?type=artwork&id=' . urlencode((string) $artworkId) . '&redirect=single-artwork.php'); ?>">
@@ -356,7 +356,7 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
 </article>
 
-<!-- ===== REVIEWS ===== -->
+<!-- UC12/UC17: Review display and admin review deletion. -->
 <section id="reviews" class="reviews-section mt-5">
     <h2>Bewertungen</h2>
 
