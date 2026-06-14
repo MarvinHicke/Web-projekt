@@ -1,14 +1,48 @@
 /**
- * Main Sprint 1 stylesheet.
- * Project-specific styles.
- * Bootstrap and fonts are included locally.
+ * Haupt-Stylesheet der Art Gallery Webanwendung.
+ *
+ * Dieses Stylesheet enthält alle projektspezifischen Stile.
+ * Bootstrap wird separat lokal eingebunden (assets/css/bootstrap.min.css).
+ * Externe Quellen wie Google Fonts oder CDNs werden NICHT verwendet –
+ * alle Schriften sind lokal im Ordner assets/fonts/ gespeichert (UC01).
+ *
+ * Struktur:
+ *  1. Lokale Schriften (Font Face)
+ *  2. Grundstile (Reset, Body, Typografie)
+ *  3. Header & Navigation
+ *  4. Suche
+ *  5. Schaltflächen & Links
+ *  6. Seitenlayout (Shell)
+ *  7. Allgemeine Sektionen (Hero, Box, Heading, Sort, Message)
+ *  8. Login-Panel auf der Startseite
+ *  9. Karussell
+ * 10. Startseiten-Datenboxen (Top Werke, Künstler, Bewertungen)
+ * 11. Sternbewertung
+ * 12. Browse Artworks / Artists / Genres / Subjects
+ * 13. Suchergebnisse
+ * 14. Einzelansicht Kunstwerk & Künstler
+ * 15. Über uns
+ * 16. Login / Registrierung
+ * 17. Favoriten
+ * 18. Erweiterte Suche
+ * 19. Hilfsstile
+ * 20. Responsive Breakpoints
  */
+
+
+/* ==========================================================================
+   1. LOKALE SCHRIFTEN (UC01: keine externen Abhängigkeiten)
+   Zwei Google-Schriften werden lokal eingebunden:
+   - Google Sans: für Überschriften und das Logo
+   - Manrope:     für Fließtext
+   ========================================================================== */
+
 @font-face {
     font-family: "Google Sans";
     src: url("../fonts/GoogleSans-VariableFont.ttf") format("truetype");
     font-weight: 400 800;
     font-style: normal;
-    font-display: swap;
+    font-display: swap; /* Schrift wird geladen, Fallback-Schrift wird bis dahin angezeigt */
 }
 
 @font-face {
@@ -27,17 +61,23 @@
     font-display: swap;
 }
 
+
+/* ==========================================================================
+   2. GRUNDSTILE – Reset, Body, Typografie
+   ========================================================================== */
+
 * {
-    box-sizing: border-box;
+    box-sizing: border-box; /* Abstände und Rahmen werden in die Elementgröße eingerechnet */
 }
 
 body {
     margin: 0;
     font-family: "Manrope", Arial, Helvetica, sans-serif;
     color: #222;
-    background: #f5f1ea;
+    background: #f5f1ea; /* Warmer, cremefarbener Hintergrund */
 }
 
+/* Überschriften und Logo verwenden Google Sans */
 h1,
 h2,
 h3,
@@ -47,11 +87,11 @@ h6,
 .logo {
     font-family: "Google Sans", "Manrope", Arial, sans-serif;
     font-weight: 700;
-    color: #2d2118;
+    color: #2d2118; /* Dunkelbraun passend zum Farbschema */
 }
 
 a {
-    color: #6f3d20;
+    color: #6f3d20; /* Braun für Links, passend zum Erdton-Farbschema */
     text-decoration: none;
 }
 
@@ -61,8 +101,14 @@ a:hover {
 
 img {
     display: block;
-    max-width: 100%;
+    max-width: 100%; /* Bilder skalieren nie über ihre Breite hinaus */
 }
+
+
+/* ==========================================================================
+   3. HEADER & NAVIGATION (UC03)
+   Sticky Header mit Logo, Hauptnavigation, Suche und Utility-Menü.
+   ========================================================================== */
 
 .site-header {
     display: flex;
@@ -73,7 +119,7 @@ img {
     padding: 16px 32px;
     background: #fffaf2;
     border-bottom: 1px solid #e3d8c8;
-    position: sticky;
+    position: sticky; /* Header bleibt beim Scrollen oben sichtbar */
     top: 0;
     z-index: 10;
 }
@@ -90,6 +136,7 @@ img {
     font-size: 24px;
 }
 
+/* Listen in der Navigation ohne Aufzählungszeichen und mit horizontalem Layout */
 .utility-nav ul,
 .main-nav ul {
     list-style: none;
@@ -121,6 +168,7 @@ img {
     text-decoration: underline;
 }
 
+/* Dropdown-Menü für „Durchsuchen" (Bootstrap dropdown, UC03) */
 .dropdown {
     position: relative;
 }
@@ -146,10 +194,17 @@ img {
     white-space: nowrap;
 }
 
+/* Dropdown erscheint bei Hover oder Tastaturfokus (UC03) */
 .dropdown:hover .dropdown-menu,
 .dropdown:focus-within .dropdown-menu {
     display: flex !important;
 }
+
+
+/* ==========================================================================
+   4. GLOBALE SUCHE (UC09)
+   Suchfeld überall im Header verfügbar.
+   ========================================================================== */
 
 .global-search {
     display: flex;
@@ -169,6 +224,12 @@ img {
     min-width: 230px;
 }
 
+
+/* ==========================================================================
+   5. SCHALTFLÄCHEN & LINKS
+   Einheitliches Button-Design im Erdton-Farbschema.
+   ========================================================================== */
+
 button,
 .button-link {
     display: inline-block;
@@ -176,23 +237,36 @@ button,
     border: 0;
     border-radius: 8px;
     color: #fff;
-    background: #6f3d20;
+    background: #6f3d20; /* Primärfarbe: Braun */
     cursor: pointer;
 }
 
 button:hover,
 .button-link:hover {
-    background: #4f2b17;
+    background: #4f2b17; /* Dunklere Variante beim Hover */
     color: #fff;
     text-decoration: none;
 }
 
+
+/* ==========================================================================
+   6. SEITENLAYOUT – zentrierte Inhaltsbreite
+   ========================================================================== */
+
+/* Inhaltsbereich: maximal 1120 px breit, zentriert mit Innenabstand */
 .page-shell {
     width: min(1120px, 100%);
     margin: 0 auto;
     padding: 32px 20px;
 }
 
+
+/* ==========================================================================
+   7. ALLGEMEINE SEKTIONEN
+   Einheitliche Karten-Optik für Sektionen, Boxen, Meldungen usw.
+   ========================================================================== */
+
+/* Gemeinsame Grundstile für alle Inhaltsblöcke */
 .hero,
 .carousel-placeholder,
 .page-heading,
@@ -208,6 +282,7 @@ button:hover,
     margin-bottom: 24px;
 }
 
+/* Hero-Bereich der Startseite mit Verlaufshintergrund */
 .hero {
     min-height: 170px;
     display: flex;
@@ -221,8 +296,15 @@ button:hover,
 }
 
 .hero h1 {
+    /* Schriftgröße passt sich flüssig an die Bildschirmbreite an */
     font-size: clamp(2.25rem, 5vw, 3.25rem);
 }
+
+
+/* ==========================================================================
+   8. LOGIN-PANEL AUF DER STARTSEITE (UC22)
+   Zeigt das Anmeldeformular für nicht eingeloggte Nutzer.
+   ========================================================================== */
 
 .home-login-panel {
     display: grid;
@@ -236,6 +318,7 @@ button:hover,
     border-radius: 18px;
 }
 
+/* Formularfelder nebeneinander mit Submit-Button am Ende */
 .home-login-form {
     display: grid;
     grid-template-columns: 1fr 1fr auto;
@@ -250,6 +333,7 @@ button:hover,
     font-size: 44px;
 }
 
+/* Kleingedruckte Kategoriebezeichnung über dem Titel */
 .eyebrow {
     margin: 0 0 8px;
     text-transform: uppercase;
@@ -259,6 +343,13 @@ button:hover,
     color: #8b6148;
 }
 
+
+/* ==========================================================================
+   9. BOOTSTRAP-KARUSSELL (UC02)
+   Zusätzliche Stile für das Kunstwerk-Karussell auf der Startseite.
+   ========================================================================== */
+
+/* Dreispaltiges Raster für Karussell-Karten und Datenboxen */
 .carousel-strip,
 .three-box-grid {
     display: grid;
@@ -266,6 +357,7 @@ button:hover,
     gap: 20px;
 }
 
+/* Kartenstil für Karussell-Vorschaukarten, Zeilen und Bewertungskarten */
 .carousel-card,
 .artwork-row,
 .review-card {
@@ -286,12 +378,14 @@ button:hover,
     margin-bottom: 24px;
 }
 
+/* Karussell-Bild: Höhe passt sich an Viewport an, dunkler Hintergrund für Kunstwerke */
 .carousel-img {
     height: clamp(440px, 64vh, 680px);
-    object-fit: contain !important;
+    object-fit: contain !important; /* Bild vollständig sichtbar, kein Zuschnitt */
     background: #211b17;
 }
 
+/* Beschriftung im Karussell: weißer Text mit Schatten für Lesbarkeit */
 .carousel-caption,
 .carousel-caption h5,
 .carousel-caption p {
@@ -299,32 +393,48 @@ button:hover,
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 
+
+/* ==========================================================================
+   10. STARTSEITEN-DATENBOXEN (UC02)
+   Listen ohne Aufzählungszeichen mit Trennlinien zwischen Einträgen.
+   ========================================================================== */
+
 .clean-list {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
+/* Trennlinie zwischen den Listeneinträgen */
 .clean-list li + li {
     border-top: 1px solid #eadfce;
 }
 
+/* Jeder Listeneintrag als klickbarer Block mit internem Gitter */
 .clean-list a {
     display: grid;
     gap: 5px;
     padding: 12px 0;
 }
 
+/* Hinweistexte und Metaangaben in gedämpfter Farbe */
 .box-note,
 small {
     color: #6b6258;
 }
 
+
+/* ==========================================================================
+   11. STERNBEWERTUNG (UC02: Sterne für Top-Werke-Box)
+   Zwei übereinander liegende Ebenen: leere Sterne + gefüllte Sterne.
+   Die Füllbreite wird per CSS-Variable --rating-percent gesteuert.
+   ========================================================================== */
+
 .rating-stars {
     position: relative;
     display: inline-block;
     width: 5.55em;
-    color: #c5b9aa;
+    color: #c5b9aa;          /* Farbe der leeren Sterne */
     font-family: Arial, sans-serif;
     font-size: 1.1rem;
     line-height: 1;
@@ -332,42 +442,22 @@ small {
     white-space: nowrap;
 }
 
+/* Gefüllte Sterne: Breite entspricht dem Bewertungsprozentsatz */
 .rating-stars-fill {
     position: absolute;
     inset: 0 auto 0 0;
-    width: var(--rating-percent);
+    width: var(--rating-percent); /* z. B. 80 % für 4/5 Sterne */
     overflow: hidden;
-    color: #a86413;
+    color: #a86413;              /* Farbe der gefüllten Sterne (Goldbraun) */
 }
 
-.sort-panel form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-}
 
-.artwork-list {
-    display: grid;
-    gap: 16px;
-}
+/* ==========================================================================
+   12. BROWSE ARTWORKS / ARTISTS / GENRES / SUBJECTS (UC05, UC06, UC07, UC08)
+   Einheitliches Kartengitter für alle Browse-Seiten.
+   ========================================================================== */
 
-.artwork-row {
-    display: grid;
-    grid-template-columns: 140px 1fr;
-    gap: 18px;
-    align-items: start;
-}
-
-.artwork-row img {
-    width: 140px;
-    height: 140px;
-    object-fit: cover;
-    border-radius: 12px;
-}
-
-/* D-Bereich: Browse Artworks */
-
+/* Responsive Kartengitter: 240 px Minimalbreite pro Karte */
 .artwork-card-grid,
 .artist-card-grid,
 .genre-card-grid,
@@ -377,6 +467,7 @@ small {
     gap: 20px;
 }
 
+/* Kartenhülle: weißer Hintergrund mit Hover-Animation */
 .artwork-card-link-wrapper,
 .artist-card-link-wrapper,
 .genre-card-link-wrapper,
@@ -388,6 +479,7 @@ small {
     transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+/* Karte hebt sich beim Hover leicht an */
 .artwork-card-link-wrapper:hover,
 .artist-card-link-wrapper:hover,
 .genre-card-link-wrapper:hover,
@@ -396,6 +488,7 @@ small {
     box-shadow: 0 10px 24px rgba(45, 33, 24, 0.12);
 }
 
+/* Kartenlink: gesamte Karte ist klickbar */
 .artwork-card-link,
 .artist-card-link,
 .genre-card-link,
@@ -412,6 +505,7 @@ small {
     text-decoration: none;
 }
 
+/* Kartenbild: gleichmäßig zugeschnitten (object-fit cover) */
 .artwork-card-image,
 .artist-card-image,
 .genre-card-image,
@@ -421,6 +515,7 @@ small {
     object-fit: cover;
 }
 
+/* Karteninhalt: Titel, Metadaten, Schaltfläche */
 .artwork-card-content,
 .artist-card-content,
 .genre-card-content,
@@ -450,7 +545,31 @@ small {
     font-weight: 700;
 }
 
-/* D-Bereich: Search Results */
+/* Zeilenlayout für Listen (alternative Darstellung zu Karten) */
+.artwork-list {
+    display: grid;
+    gap: 16px;
+}
+
+.artwork-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 18px;
+    align-items: start;
+}
+
+.artwork-row img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+
+/* ==========================================================================
+   13. SUCHERGEBNISSE (UC10)
+   Zweispaltiges Raster: links Künstler, rechts Kunstwerke.
+   ========================================================================== */
 
 .result-grid {
     display: grid;
@@ -465,6 +584,7 @@ small {
     padding: 24px;
 }
 
+/* Kompaktkarte für einzelne Suchergebnisse (Bild links, Info rechts) */
 .mini-card {
     display: grid;
     grid-template-columns: 140px 1fr;
@@ -476,6 +596,7 @@ small {
     padding: 16px;
 }
 
+/* Abstand zwischen aufeinanderfolgenden Kompaktkarten */
 .mini-card + .mini-card {
     margin-top: 14px;
 }
@@ -491,6 +612,7 @@ small {
     color: inherit;
 }
 
+/* Aktionsschaltflächen (Ansehen, Zu Favoriten) nebeneinander */
 .result-actions {
     display: flex;
     flex-wrap: wrap;
@@ -498,8 +620,13 @@ small {
     margin-top: 12px;
 }
 
-/* D-Bereich: Single Artwork */
 
+/* ==========================================================================
+   14. EINZELANSICHT KUNSTWERK & KÜNSTLER (UC11, UC12)
+   Zweispaltiges Layout: Bild links, Informationen rechts.
+   ========================================================================== */
+
+/* Zweispaltiges Detaillayout für Kunstwerk, Künstler, Genre und Thema */
 .artwork-detail-layout,
 .artist-detail-layout,
 .genre-detail-layout,
@@ -510,6 +637,7 @@ small {
     margin-bottom: 24px;
 }
 
+/* Bild- und Informationspanels als eigene Karten */
 .artwork-image-panel,
 .artwork-info-panel,
 .artist-image-panel,
@@ -524,6 +652,7 @@ small {
     padding: 24px;
 }
 
+/* Bild füllt die volle Breite des Panels */
 .artwork-image-panel img,
 .artist-image-panel img {
     width: 100%;
@@ -531,6 +660,7 @@ small {
     margin-bottom: 12px;
 }
 
+/* Definitionsliste als zweispaltiges Raster für Metadaten */
 .detail-list {
     display: grid;
     grid-template-columns: 140px 1fr;
@@ -541,14 +671,16 @@ small {
     font-weight: 700;
 }
 
+/* Genre- und Themen-Tags als Pillen-Schaltflächen */
 .tag {
     display: inline-block;
     padding: 6px 10px;
     margin: 0 6px 6px 0;
-    border-radius: 999px;
+    border-radius: 999px; /* Vollständig abgerundete Ecken */
     background: #ead8bd;
 }
 
+/* Favoritenbereich mit leicht hervorgehobenem Hintergrund */
 .favorite-box {
     margin-top: 20px;
     padding: 16px;
@@ -556,6 +688,7 @@ small {
     border-radius: 14px;
 }
 
+/* Einzelne Bewertungskarte in der Bewertungssektion */
 .review-card {
     background: #ffffff;
     border: 1px solid #e3d8c8;
@@ -564,20 +697,26 @@ small {
     margin-bottom: 14px;
 }
 
+/* Hinweismeldungen (Leer-Zustand, Validierung) */
 .message {
     padding: 14px 18px;
-    background: #fff2c2;
+    background: #fff2c2; /* Helles Gelb für Aufmerksamkeit */
     border-radius: 12px;
 }
 
+/* Fußzeile der Seite */
 .site-footer {
     padding: 24px;
     text-align: center;
     color: #6b6258;
 }
 
-/* About Us */
 
+/* ==========================================================================
+   15. ÜBER UNS (UC04)
+   ========================================================================== */
+
+/* Zweispaltiges Layout: Hauptinhalt und Fakten nebeneinander */
 .about-grid {
     display: grid;
     grid-template-columns: 1.35fr 1fr;
@@ -592,6 +731,7 @@ small {
     border-radius: 18px;
 }
 
+/* Fakten-Tabelle: Beschriftung links, Wert rechts */
 .about-facts {
     display: grid;
     grid-template-columns: 110px 1fr;
@@ -603,6 +743,7 @@ small {
     margin: 0;
 }
 
+/* Kacheln für die Teammitglieder */
 .team-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -625,6 +766,7 @@ small {
     margin-bottom: 0;
 }
 
+/* Rollenbezeichnung in Großbuchstaben über dem Namen */
 .team-role {
     color: #8b6148;
     font-size: 0.75rem;
@@ -633,8 +775,12 @@ small {
     text-transform: uppercase;
 }
 
-/* Login */
 
+/* ==========================================================================
+   16. LOGIN & REGISTRIERUNG (UC20, UC22)
+   ========================================================================== */
+
+/* Zweispaltiges Layout: Einführungstext links, Formular rechts */
 .auth-layout {
     display: grid;
     grid-template-columns: minmax(0, 0.8fr) minmax(320px, 1fr);
@@ -654,12 +800,17 @@ small {
     border-radius: 18px;
 }
 
-/* Favorites */
 
+/* ==========================================================================
+   17. FAVORITEN (UC19)
+   ========================================================================== */
+
+/* Abstand zwischen Favoritenlisten-Sektionen */
 .favorites-section + .favorites-section {
     margin-top: 24px;
 }
 
+/* Sektionsüberschrift mit optionaler Schaltfläche rechts */
 .section-heading {
     display: flex;
     align-items: center;
@@ -672,8 +823,12 @@ small {
     margin: 0;
 }
 
-/* Advanced Search placeholder */
 
+/* ==========================================================================
+   18. ERWEITERTE SUCHE (UC24)
+   ========================================================================== */
+
+/* Suchfeld mit Submit-Button nebeneinander */
 .advanced-search-fallback {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -681,12 +836,19 @@ small {
     align-items: end;
 }
 
+/* Vier Browse-Schnelllinks nebeneinander */
 .browse-link-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
 }
 
+
+/* ==========================================================================
+   19. HILFSSTILE
+   ========================================================================== */
+
+/* Visuell versteckter Text für Screenreader (Barrierefreiheit) */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -699,9 +861,15 @@ small {
     border: 0;
 }
 
-/* Responsive */
+
+/* ==========================================================================
+   20. RESPONSIVE BREAKPOINTS
+   Unter 800 px: einspaltiges Layout für alle Raster.
+   Unter 520 px: reduzierter Innenabstand für kleine Bildschirme.
+   ========================================================================== */
 
 @media (max-width: 800px) {
+    /* Alle flexiblen Bereiche werden eingespaltig */
     .site-header,
     .header-top,
     .global-search,
@@ -712,11 +880,13 @@ small {
         flex-direction: column;
     }
 
+    /* Dropdown-Menü im mobilen Modus statisch positioniert */
     .dropdown-menu {
         position: static;
         margin-top: 8px;
     }
 
+    /* Alle Gitterlayouts werden eingespaltig */
     .carousel-strip,
     .three-box-grid,
     .result-grid,
@@ -729,6 +899,7 @@ small {
         grid-template-columns: 1fr;
     }
 
+    /* Login-Formular eingespaltig auf Mobilgeräten */
     .home-login-form {
         grid-template-columns: 1fr;
     }
@@ -743,10 +914,12 @@ small {
         min-height: auto;
     }
 
+    /* Kleinere Karussellhöhe auf schmalen Bildschirmen */
     .carousel-img {
         height: clamp(300px, 55vh, 500px);
     }
 
+    /* Bilder in Zeilen- und Kompaktkarten über die volle Breite */
     .artwork-row img,
     .mini-card img {
         width: 100%;
@@ -755,6 +928,7 @@ small {
 }
 
 @media (max-width: 520px) {
+    /* Noch kleinere Innenabstände für sehr schmale Bildschirme */
     .site-header {
         padding: 16px 20px;
     }
@@ -763,6 +937,7 @@ small {
         padding: 24px 14px;
     }
 
+    /* Suchfeld auf volle Breite */
     .global-search {
         width: 100%;
     }
@@ -772,6 +947,7 @@ small {
         width: 100%;
     }
 
+    /* Fakten-Tabelle eingespaltig auf sehr kleinen Bildschirmen */
     .about-facts {
         grid-template-columns: 1fr;
         gap: 4px;

@@ -1,11 +1,24 @@
 <?php
+/**
+ * Box „Neueste Bewertungen" für die Startseite (UC02).
+ *
+ * Zeigt die zuletzt abgegebenen Bewertungen mit Kunstwerkname,
+ * Kurztext (max. 80 Zeichen), Bewertung und Datum.
+ * Jeder Eintrag verlinkt auf die zugehörige Kunstwerk-Einzelansicht.
+ *
+ * Erwartet ein Array aus assoziativen Arrays mit den Schlüsseln:
+ *   ReviewId, ArtWorkId, Rating, Comment, ReviewDate, ArtworkTitle
+ *
+ * Datenquelle: reviewRepository->getLatestReviewsWithDetails($limit)
+ * (eigene Methode mit JOIN auf artworks, gibt rohe Arrays zurück)
+ */
+
 require_once __DIR__ . '/../helpers.php';
 
 /**
- * Renders the Most Recent Reviews box on the homepage.
- * Expects $reviews as raw associative arrays containing:
- *   ReviewId, ArtWorkId, Rating, Comment, ReviewDate, ArtworkTitle
- * Use reviewRepository->getLatestReviewsWithDetails($limit) to get this data.
+ * Rendert die Neueste-Bewertungen-Box auf der Startseite.
+ *
+ * @param array $reviews Array aus assoziativen Arrays der neuesten Bewertungen
  */
 function renderMostRecentReviewsBox(array $reviews): void
 {
@@ -20,17 +33,23 @@ function renderMostRecentReviewsBox(array $reviews): void
             <ul class="clean-list">
                 <?php foreach ($reviews as $review): ?>
                     <?php
-                    $artworkId    = (int)    ($review['ArtWorkId']    ?? 0);
-                    $artworkTitle = (string) ($review['ArtworkTitle'] ?? 'Unbekanntes Kunstwerk');
-                    $comment      = cleanHtml((string) ($review['Comment'] ?? ''));
-                    $rating       = (string) ($review['Rating']       ?? '');
-                    $date         = (string) ($review['ReviewDate']   ?? '');
+                    $artworkId     = (int)    ($review['ArtWorkId']    ?? 0);
+                    $artworkTitle  = (string) ($review['ArtworkTitle'] ?? 'Unbekanntes Kunstwerk');
+
+                    // HTML-Tags aus DB-Inhalten entfernen (cleanHtml aus helpers.php)
+                    $comment       = cleanHtml((string) ($review['Comment']    ?? ''));
+                    $rating        = (string) ($review['Rating']               ?? '');
+                    $date          = (string) ($review['ReviewDate']           ?? '');
+
+                    // Datum in deutsches Format umwandeln (TT.MM.JJJJ)
                     $dateFormatted = $date ? date('d.m.Y', strtotime($date)) : '';
                     ?>
                     <li>
+                        <!-- Jede Bewertung verlinkt auf die Kunstwerk-Einzelansicht (UC02) -->
                         <a href="<?= e(artworkDetailUrl($artworkId)); ?>">
                             <strong><?= e($artworkTitle); ?></strong>
                             <?php if ($comment !== ''): ?>
+                                <!-- Kommentar auf 80 Zeichen kürzen -->
                                 <span><?= e(mb_strimwidth($comment, 0, 80, '…')); ?></span>
                             <?php endif; ?>
                             <small><?= e($rating); ?>/5 · <?= e($dateFormatted); ?></small>
