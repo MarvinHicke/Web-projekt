@@ -1,4 +1,10 @@
 <?php
+/**
+ * Admin-Bearbeitungsseite für UC21.
+ *
+ * Ermöglicht Administratoren das Bearbeiten von Profildaten, Rolle, Status und
+ * Passwort eines Benutzers. Kritische Selbständerungen werden serverseitig verhindert.
+ */
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../repositories/customerRepository.php';
 
@@ -202,6 +208,7 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
     }
 }
 
+// Handles role and status changes while protecting the current admin from unsafe self-changes.
 if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['formType'] ?? '') === 'statusRole')
 {
     $newType = filter_var((string) ($_POST['type'] ?? ''), FILTER_VALIDATE_INT);
@@ -299,6 +306,7 @@ if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['
     }
 }
 
+// Allows administrators to set a new password for the selected user.
 if ($selectedUser && $_SERVER['REQUEST_METHOD'] === 'POST' && (string) ($_POST['formType'] ?? '') === 'adminPassword')
 {
     $newPassword = (string) ($_POST['newPassword'] ?? '');

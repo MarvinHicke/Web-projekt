@@ -1,4 +1,10 @@
 <?php
+/**
+ * Entfernt ein Kunstwerk oder einen Künstler aus den sessionbasierten Favoriten.
+ *
+ * Erlaubte Weiterleitungsziele werden begrenzt, damit keine offenen Redirects
+ * über beliebige URLs entstehen.
+ */
 require_once __DIR__ . '/../includes/init.php';
 
 if (session_status() === PHP_SESSION_NONE)
@@ -26,6 +32,8 @@ $id = (int) ($_GET["id"] ?? 0);
 $redirectTarget = (string) ($_GET["redirect"] ?? "favorites.php");
 
 $allowedTypes = ["artwork", "artist"];
+
+// Restricts redirects to known project pages after changing session favorites.
 $allowedRedirects = ["favorites.php", "browse-artists.php", "browse-artworks.php", "single-artist.php", "single-artwork.php"];
 
 if (!in_array($redirectTarget, $allowedRedirects, true))

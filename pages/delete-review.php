@@ -1,4 +1,10 @@
 <?php
+/**
+ * Review-Löschaktion für UC17.
+ *
+ * Erlaubt nur Administratoren das Löschen einer Bewertung und prüft zusätzlich,
+ * ob die übergebene Review-ID zum übergebenen Kunstwerk gehört.
+ */
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/reviewRepository.php';
@@ -27,6 +33,7 @@ if ($reviewId === false || $reviewId <= 0 || $artworkId === false || $artworkId 
 $db = new dbaccess();
 $db->connect();
 
+// Loads the review first so the artwork relation can be verified before deletion.
 $reviewRepository = new reviewRepository($db);
 $review = $reviewRepository->getById((int) $reviewId);
 
@@ -36,6 +43,7 @@ if (!$review)
     exit;
 }
 
+// Prevents deleting a review through a mismatched artwork ID.
 if ((int) $review->getArtworkId() !== (int) $artworkId)
 {
     header('Location: ' . base_url('pages/single-artwork.php') . '?id=' . (int) $artworkId . '&review=delete-error#reviews');

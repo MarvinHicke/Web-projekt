@@ -140,7 +140,7 @@ require_once __DIR__ . '/../includes/header.php';
             <p class="artist-bio"><?= e($details); ?></p>
         <?php endif; ?>
 
-        <!-- Favorite button -->
+        <!-- Session-based favorite button for UC18. Works for guests and logged-in users. -->
         <?php if ($isFavorited): ?>
             <a class="btn btn-primary btn-sm mb-3"
                href="<?= e(base_url('pages/remove-favorite.php') . '?type=artist&id=' . $artistId . '&redirect=single-artist.php'); ?>">

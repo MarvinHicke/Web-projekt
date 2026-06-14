@@ -782,7 +782,7 @@ small {
     }
 }
 
-/* E-Bereich: UI consistency fixes */
+/* Person E: layout fixes for auth, account and user management pages */
 
 .auth-panel {
     max-width: 760px;
@@ -1004,15 +1004,6 @@ small {
     table-layout: auto;
     margin-bottom: 0;
     font-size: 0.95rem;
-}
-
-.manage-users-table thead th {
-    padding: 12px 14px;
-    background: #f4eadc;
-    color: #2d2118;
-    border-bottom: 1px solid #d8c4ad;
-    font-weight: 700;
-    white-space: nowrap;
 }
 
 .manage-users-table thead th {

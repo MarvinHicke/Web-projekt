@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * Fügt ein Kunstwerk oder einen Künstler zu den sessionbasierten Favoriten hinzu.
+ *
+ * Die Favoriten werden nur in der PHP-Session gespeichert und nicht in der
+ * Datenbank persistiert.
+ */
 require_once __DIR__ . '/../includes/init.php';
 
 if(session_status() === PHP_SESSION_NONE)
@@ -24,6 +29,7 @@ $id=(int) ($_GET["id"] ?? 0);
 $allowedTypes=["artwork","artist"];
 $redirectTarget = (string) ($_GET["redirect"] ?? "favorites.php");
 
+// Restricts redirects to known project pages after changing session favorites.
 $allowedRedirects = ["favorites.php", "browse-artists.php", "browse-artworks.php", "single-artist.php", "single-artwork.php"];
 
 if (!in_array($redirectTarget, $allowedRedirects, true)) {

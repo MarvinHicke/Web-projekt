@@ -1,4 +1,10 @@
 <?php
+/**
+ * Admin-Übersicht für UC21.
+ *
+ * Zeigt alle Benutzerkonten mit Rolle, Status und Registrierungsdatum an und
+ * verlinkt auf die Detailbearbeitung einzelner Benutzer.
+ */
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../repositories/customerRepository.php';
 
