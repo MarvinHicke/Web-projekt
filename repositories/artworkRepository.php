@@ -103,7 +103,9 @@ class artworkRepository
                     FROM reviews r 
                     WHERE r.ArtWorkId = a.ArtWorkID) as AvgRating
             FROM artworks a
-            JOIN artists art ON a.ArtistID = art.ArtistID
+            // D: Künstlername einbinden 
+            JOIN artists art ON a.ArtistID = art.ArtistID 
+            // D: Kunstwerke ohne Bild ausschließen 
             WHERE a.ImageFileName IS NOT NULL AND a.ImageFileName != ''
             ORDER BY AvgRating DESC
             LIMIT :limit";
