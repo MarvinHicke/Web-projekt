@@ -86,14 +86,6 @@ require_once __DIR__.'/../includes/header.php';
                         <h2><a href="<?= e(artistDetailUrl($artistId)); ?>"><?= e($artistName); ?></a></h2>
                         <div class="result-actions">
                             <a class="btn btn-sm btn-primary" href="<?= e(artistDetailUrl($artistId)); ?>">Ansehen</a>
-                            <?php if (in_array((int) $artistId, $favoriteArtistIds, true)): ?>
-                                <a class="btn btn-sm btn-warning" href="<?= e(base_url('pages/favorites.php')); ?>">In Favoriten</a>
-                            <?php else: ?>
-                                <a class="btn btn-sm btn-outline-primary"
-                                   href="<?= e(base_url('pages/add-favorite.php') . '?type=artist&id=' . $artistId . '&redirect=browse-artists.php'); ?>">
-                                    Zu Favoriten
-                                </a>
-                            <?php endif; ?>
                         </div>
                 </a>
             </article>
