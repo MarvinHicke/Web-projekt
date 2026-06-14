@@ -140,23 +140,17 @@ require_once __DIR__ . '/../includes/header.php';
             <p class="artist-bio"><?= e($details); ?></p>
         <?php endif; ?>
 
-        <!-- Favorite button -->
-        <?php if (isLoggedIn()): ?>
-            <?php if ($isFavorited): ?>
-                <a class="btn btn-warning btn-sm mb-3"
-                   href="<?= e(base_url('pages/remove-favorite.php') . '?type=artist&id=' . $artistId); ?>">
-                    ★ Aus Favoriten entfernen
-                </a>
-            <?php else: ?>
-                <a class="btn btn-outline-warning btn-sm mb-3"
-                   href="<?= e(base_url('pages/add-favorite.php') . '?type=artist&id=' . $artistId); ?>">
-                    ☆ Zu Favoriten hinzufügen
-                </a>
-            <?php endif; ?>
+        <!-- Session-based favorite button for UC18. Works for guests and logged-in users. -->
+        <?php if ($isFavorited): ?>
+            <a class="btn btn-primary btn-sm mb-3"
+               href="<?= e(base_url('pages/remove-favorite.php') . '?type=artist&id=' . $artistId . '&redirect=single-artist.php'); ?>">
+                ★ Aus Favoriten entfernen
+            </a>
         <?php else: ?>
-            <p class="mb-3 small">
-                <a href="<?= e(base_url('pages/login.php')); ?>">Anmelden</a>, um zu favorisieren.
-            </p>
+            <a class="btn btn-outline-primary btn-sm mb-3"
+               href="<?= e(base_url('pages/add-favorite.php') . '?type=artist&id=' . $artistId . '&redirect=single-artist.php'); ?>">
+                ☆ Zu Favoriten hinzufügen
+            </a>
         <?php endif; ?>
 
         <!-- Details table -->

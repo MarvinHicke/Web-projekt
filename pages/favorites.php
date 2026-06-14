@@ -1,4 +1,10 @@
 <?php
+/**
+ * Favoritenübersicht für UC19.
+ *
+ * Liest favorisierte Kunstwerke und Künstler aus der Session und zeigt die
+ * zugehörigen Datenbankeinträge mit Entfernen-Links an.
+ */
 require_once __DIR__ . '/../includes/init.php';
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../repositories/artworkRepository.php';
@@ -11,6 +17,7 @@ if (session_status() === PHP_SESSION_NONE)
     session_start();
 }
 
+// Initializes the session-based favorites structure used by UC18 and UC19.
 if (!isset($_SESSION['favorites']))
 {
     $_SESSION['favorites'] = [];
