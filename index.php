@@ -9,8 +9,6 @@
  *
  * Die Datenboxen sind als ausgelagerte Funktionen in eigenen Dateien
  * eingebunden (UC02-Anforderung).
- *
- * Verantwortlich: D
  */
 
 $pageTitle = 'Startseite · Art Gallery';
@@ -43,8 +41,8 @@ try {
     // 30 Kandidaten abrufen, damit nach der Bildfilterung genug für das Karussell übrig bleiben
     $topArtworkCandidates = $artworkRepo->getTopArtworks(30);
 
-    // Für die Boxen werden die ersten 5 Ergebnisse verwendet
-    $topArtworks = array_slice($topArtworkCandidates, 0, 5);
+    // Für die Boxen werden die ersten 3 Ergebnisse verwendet
+    $topArtworks = array_slice($topArtworkCandidates, 0, 3);
 
     /**
      * Karussell-Filter: Nur Kunstwerke anzeigen, für die tatsächlich
