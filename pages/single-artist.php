@@ -35,7 +35,7 @@ try {
         exit;
     }
 
-    $artists = (new artistRepository($db))->findAll();
+    $artworks = (new artworkRepository($db))->getForArtist($artistId);
 
 } catch (Exception $e) {
     $pageTitle = 'Fehler';
@@ -186,7 +186,7 @@ require_once __DIR__ . '/../includes/header.php';
 
 <!-- ===== ARTWORKS GRID ===== -->
 <section class="mt-5">
-    <h2>Kunst von <?= e($fullName); ?></h2>
+    <h2>Kunsterke von '<?= e($fullName); ?>'</h2>
 
     <?php if (empty($artworks)): ?>
         <p class="text-muted">Keine Kunstwerke für diesen Künstler gefunden.</p>
@@ -202,7 +202,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="col">
                     <div class="card h-100 text-center">
                         <a href="<?= e(artworkDetailUrl($awId)); ?>">
-                            <img src="<?= e(artworkImageUrl($awFileName, 'square-small')); ?>"
+                            <img src="<?= e(artworkImageUrl($awFileName, 'square-medium')); ?>"
                                  alt="<?= e($awTitle); ?>"
                                  class="card-img-top"
                                  style="height:160px; object-fit:cover;">
