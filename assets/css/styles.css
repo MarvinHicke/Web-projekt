@@ -784,59 +784,6 @@ small {
 
 /* E-Bereich: UI consistency fixes */
 
-.btn-primary {
-    background-color: #6f3d20;
-    border-color: #6f3d20;
-    color: #ffffff;
-}
-
-.btn-primary:hover,
-.btn-primary:focus {
-    background-color: #5a311a;
-    border-color: #5a311a;
-    color: #ffffff;
-}
-
-.btn-outline-primary {
-    color: #6f3d20;
-    border-color: #6f3d20;
-}
-
-.btn-outline-primary:hover,
-.btn-outline-primary:focus {
-    background-color: #6f3d20;
-    border-color: #6f3d20;
-    color: #ffffff;
-}
-
-.btn-secondary {
-    background-color: #8b6148;
-    border-color: #8b6148;
-    color: #ffffff;
-}
-
-.btn-secondary:hover,
-.btn-secondary:focus {
-    background-color: #76513c;
-    border-color: #76513c;
-    color: #ffffff;
-}
-
-.alert.alert-info {
-    background-color: #fff4e6;
-    border-color: #e0c5a8;
-    color: #4b2e1f;
-}
-
-.alert.alert-info strong {
-    color: #2d2118;
-}
-
-.alert.alert-info a {
-    color: #6f3d20;
-    font-weight: 700;
-}
-
 .auth-panel {
     max-width: 760px;
     margin: 0 auto 48px auto;
@@ -1224,18 +1171,6 @@ small {
     margin-bottom: 48px;
     display: flex;
     justify-content: flex-start;
-}
-
-.review-own-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 9px;
-    border-radius: 999px;
-    background-color: #f4eadc;
-    color: #4b2e1f;
-    border: 1px solid #d8c4ad;
-    font-size: 0.8rem;
-    font-weight: 700;
 }
 
 @media (max-width: 900px) {
