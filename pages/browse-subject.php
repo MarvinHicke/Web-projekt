@@ -67,9 +67,11 @@ require_once __DIR__.'/../includes/header.php';
                     >
 
                     <div class="subject-card-content">
-                        <h2><?= e($subjectName); ?></h2>
-                        <span class="text-link">Einzelansicht öffnen</span>
-                    </div>
+                        <h2><a href="<?= e(subjectDetailUrl($subjectId)); ?>"><?= e($subjectName); ?></a></h2>
+                        <div class="result-actions">
+                            <a class="btn btn-sm btn-primary" href="<?= e(subjectDetailUrl($subjectId)); ?>">Ansehen</a>
+
+                        </div>
                 </a>
             </article>
         <?php endforeach; ?>
